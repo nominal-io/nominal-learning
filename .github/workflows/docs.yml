@@ -1,0 +1,50 @@
+name: Docs
+
+# Pull requests: builds the docs with warnings as errors and links a preview of them. The docs are
+# deployed by deploy-docs.yml.
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      statuses: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: false
+          python-version: "3.13"
+      - name: Install just
+        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - name: Build docs (warnings fail the build)
+        run: just build
+      - name: "Built docs: upload and preview"
+        if: always()
+        uses: nominal-io/nominal-sphinx-theme/.github/actions/docs-preview@6b72c49c23c1d9139af3f6e74ee57e494ca4f6fe # main, 2026-11-09
+        with:
+          path: docs/_build/dirhtml
+          job-status: ${{ job.status }}
+
+  # The check main's ruleset requires: a theme bump PR needs a passing docs build, and every other
+  # PR passes. See nominal-sphinx-theme's README, "CI".
+  docs-gate:
+    needs: build-docs
+    if: always()
+    uses: nominal-io/nominal-sphinx-theme/.github/workflows/docs-gate.yml@6b72c49c23c1d9139af3f6e74ee57e494ca4f6fe # main, 2026-11-09
+    with:
+      docs-result: ${{ needs.build-docs.result }}

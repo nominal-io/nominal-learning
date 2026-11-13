@@ -1,0 +1,24 @@
+[project]
+name = "nominal-school"
+version = "0"
+description = "Nominal Technical Content docs"
+requires-python = ">=3.12"
+
+[dependency-groups]
+docs = [
+    "sphinx>=9.1.0",
+    "shibuya>=2026.7.12",
+    "myst-parser>=5.1.0",
+    "sphinx-design>=0.7.0",
+    "sphinx-copybutton>=0.5.2",
+    "nominal-sphinx-theme",
+]
+
+[tool.uv]
+package = false
+default-groups = ["docs"]
+
+[tool.uv.sources]
+# github.com/nominal-io/nominal-sphinx-theme; uv.lock pins the commit. To update it:
+# `uv lock --upgrade-package nominal-sphinx-theme`
+nominal-sphinx-theme = { git = "https://github.com/nominal-io/nominal-sphinx-theme" }
