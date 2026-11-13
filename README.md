@@ -1,6 +1,6 @@
 # nominal-school
 
-Nominal Technical Content's docs: MyST Markdown pages in `docs/`, built with Sphinx and
+The docs for Learning, Nominal's workshops and guides on test and measurement: MyST Markdown pages in `docs/`, built with Sphinx and
 [nominal-sphinx-theme](https://github.com/nominal-io/nominal-sphinx-theme).
 
 ## Running locally

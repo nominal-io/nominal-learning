@@ -3,13 +3,13 @@
 # Glossary
 
 {.lead}
-Test and measurement terms used on the test stands, with the other names you may hear for them.
+Test and measurement terms used on the test stands, with the other names you may hear for them. The [guides](../guides/index.md) cover each area in depth.
 
 ## Accuracy
 
 How close a measurement is to the true value.
 
-A sensor's accuracy is stated as a percentage of its full scale or of its reading, such as ±0.25% FS. Accuracy isn't the same as [precision](#precision): a sensor can give the same wrong reading every time.
+A sensor's accuracy is stated as a percentage of its full scale or of its reading, such as ±0.25% FS. Accuracy isn't the same as [precision](#precision): a sensor can give the same wrong reading every time. See [Measurement quality](../guides/measurement-quality.md).
 
 ## Actuator
 
@@ -29,7 +29,7 @@ Lockout/tagout and the workshop's safety briefing are administrative controls. T
 
 A false, slower signal that appears in data when a channel is sampled too slowly for how fast its value changes.
 
-To avoid it, sample at more than twice the fastest frequency in the signal, called the Nyquist rate, or remove faster content before sampling with an anti-aliasing [filter](#filter).
+To avoid it, sample at more than twice the fastest frequency in the signal, or remove faster content before sampling with an anti-aliasing [filter](#filter).
 
 ## Analog-to-digital converter (ADC)
 
@@ -41,13 +41,13 @@ Its number of bits sets its [resolution](#resolution): a 16-bit ADC divides its 
 
 A [communications bus](#communications-bus) that connects the controllers in a vehicle or machine, so they can exchange commands and measurements over one pair of wires.
 
-Short for controller area network. The dyno's three motor controllers share one CAN bus. Other industrial networks, such as Modbus and EtherCAT, do the same kind of job.
+Short for controller area network. The dyno's three motor controllers share one CAN bus. See [Communications](../guides/communications.md#can).
 
 ## Calibration
 
 Comparing a sensor or instrument with a known reference, then correcting or recording the difference.
 
-Calibration is repeated on a schedule, because sensors [drift](#drift). Traceability means each reference was itself calibrated, in a chain back to a national standard.
+Calibration is repeated on a schedule, because sensors [drift](#drift). Traceable calibration means each reference was itself calibrated, in a chain back to a national standard.
 
 ## Channel
 
@@ -67,7 +67,7 @@ The dyno's sequence is a characterization: it runs a range of speeds at three lo
 
 Control that keeps adjusting a command from a measurement of the result, so the result holds at its setpoint.
 
-Also called feedback control. Open-loop control sends a command without checking the result. The dyno's DUT runs closed loop: its motor controller adjusts the current to hold the commanded speed.
+Also called feedback control. Open-loop control sends a command without checking the result. The dyno's DUT runs closed loop: its motor controller adjusts the current to hold the commanded speed. See [Control](../guides/control.md).
 
 ## Command
 
@@ -81,9 +81,7 @@ A command doesn't tell you what happened. The [measurement](#measurement) that s
 
 A data connection that a computer uses to send commands to instruments and read their measurements, as messages rather than as raw electrical signals.
 
-Also called a bus, a fieldbus, or an industrial network. Examples include [CAN bus](#can-bus), Modbus, EtherCAT, Ethernet, RS-232 serial and GPIB, and point-to-point links such as USB. The messages follow a protocol, such as SCPI for lab instruments.
-
-On the dyno, the motor controllers share a CAN bus, and the power supply connects over USB and takes SCPI commands.
+Also called a bus, a fieldbus, or an industrial network. See [Communications](../guides/communications.md).
 
 ## Control cycle
 
@@ -103,23 +101,19 @@ Software that reads a stand's channels, decides what each actuator should do, an
 
 Also called control logic, control code, or on a PLC a PLC program or ladder logic.
 
-Control software works with channels, not with hardware. [Drivers](#driver) connect channels to hardware. On the dyno, the control software also limits each command to a safe range, converts torque commands to current, and trips the stand when a measurement leaves its allowed range.
+Control software works with channels, not with hardware. [Drivers](#driver) connect channels to hardware.
 
 ## Current loop
 
 A way of sending a measurement or command as an electrical current between 4 and 20 mA, where 4 mA is the bottom of the range and 20 mA the top.
 
-Also called a 4–20 mA signal. Because the bottom of the range is 4 mA, a reading of 0 mA means a broken wire rather than a zero value.
-
-On the fluids panel, `p_1` reports 0 to 100 psig as 4 to 20 mA, and `v_2` takes its command the same way.
+Also called a 4–20 mA signal. Because the bottom of the range is 4 mA, a reading of 0 mA means a broken wire rather than a zero value. See [Sensors and instrumentation](../guides/sensors-and-instrumentation.md#420-ma-current-loops).
 
 ## Data acquisition (DAQ)
 
 Hardware that connects sensors and actuators to a computer. It reads the sensors' signals and drives the actuators.
 
 Also called a DAQ system, an I/O system, remote I/O, or a data logger if it records on its own. Its modules plug into a chassis. A [PLC](#plc) reads and drives I/O too, and also runs control software on the same hardware.
-
-The fluids panel has a DAQ. On the dyno, the motor controllers and the power supply do the same job.
 
 ## Deadband
 
@@ -137,9 +131,13 @@ A motor controller can derate as it heats up, so its motor may fall short of its
 
 A channel calculated from other channels rather than measured, such as the dyno's torque, which is calculated from each motor's current.
 
-Also called a calculated channel, a computed channel, or a math channel.
+Also called a calculated channel, a computed channel, or a math channel. In a Nominal workbook, a formula or transform builds one from other channels after the test.
 
-A stand's control software can calculate one while it runs. In a Nominal workbook, a formula or transform builds one from other channels after the test.
+## Design testing
+
+Testing a design, once per version, on a few representative units, to show it meets its requirements with margin.
+
+Also called qualification testing, or in hardware product development a design validation test (DVT). Compare [production testing](#production-testing). See [Test design](../guides/test-design.md).
 
 ## Device under test (DUT)
 
@@ -181,11 +179,7 @@ The motors that apply the load are also called load motors, absorbers or absorpt
 
 An emergency stop button that puts a stand in a safe state through hardware alone, without any software.
 
-Also called an emergency stop, an emergency off (EMO), or a kill switch.
-
-An E-stop is a [human safety](#human-safety) control. Its circuit is wired [fail-safe](#fail-safe): pressing the button opens the circuit, so a broken wire stops the stand too. On the fluids panel, the E-stop opens the vent valve and releases the pressure.
-
-An E-stop is for emergencies. It backs up [guards](#guard) and other controls, and doesn't replace them. Pressing it isn't [lockout/tagout](#lockouttagout-loto), because anyone can release it.
+Also called an emergency stop, an emergency off (EMO), or a kill switch. An E-stop is a [human safety](#human-safety) control, wired [fail-safe](#fail-safe). It backs up [guards](#guard) and other controls, and doesn't replace them. See [Safety](../guides/safety.md#emergency-stop).
 
 ## Encoder
 
@@ -197,7 +191,7 @@ A tachometer measures speed only. On the dyno, each motor controller reports its
 
 A hazard control built into the equipment that keeps people away from a hazard, such as a guard, an interlock, or fail-safe wiring.
 
-Engineering controls work without anyone having to remember them, so the [hierarchy of controls](#hierarchy-of-controls) ranks them above administrative controls and PPE. On these stands, the E-stop, the fail-safe vent valve and the dyno's guard are engineering controls.
+Engineering controls work without anyone having to remember them, so the [hierarchy of controls](#hierarchy-of-controls) ranks them above administrative controls and PPE.
 
 ## Engineering units
 
@@ -215,25 +209,13 @@ In vibration and acoustics testing, excitation also means the [stimulus](#stimul
 
 A design where a failure, such as a power loss or a broken wire, leaves the system in a state that is safe to the human using it.
 
-Also called de-energize-to-trip, or fail-safe wiring when the wiring does it. A fail-safe valve or circuit needs power to stay in its running state, so losing power moves it to the safe one.
-
-On the fluids panel, the vent valve is normally open: it needs power to stay closed, so losing power or pressing the E-stop releases the pressure. Fail-safe wiring is how these stands keep [human safety](#human-safety) without software.
+Also called de-energize-to-trip, or fail-safe wiring when the wiring does it. A fail-safe valve or circuit needs power to stay in its running state, so losing power moves it to the safe one. On the fluids panel, the normally open vent valve releases the pressure when it loses power. See [Safety](../guides/safety.md#fail-safe-design).
 
 ## Failure mode and effects analysis (FMEA)
 
 A review that lists each way each part of a system can fail, what happens as a result, and how the failure is detected or prevented.
 
-A [risk assessment](#risk-assessment) starts from hazards. An FMEA starts from failures.
-
-FMEAs are named for what they analyze:
-
-- Design FMEA (DFMEA): how a product's design can fail.
-- Process FMEA (PFMEA): how a manufacturing or assembly process can fail, and produce a bad part.
-- System FMEA: how subsystems and the interfaces between them can fail.
-- FMEA-MSR, for monitoring and system response: how well a product's diagnostics detect a failure in use, and put it in a safe state. The automotive AIAG-VDA FMEA handbook defines it, with DFMEA and PFMEA.
-- FMECA, for failure mode, effects and criticality analysis: an FMEA that also ranks each failure mode by its severity and likelihood. It comes from the US military standard MIL-STD-1629A.
-
-An FMEA scores each failure for severity, occurrence and detection. Their product, from 1 to 1,000, is the risk priority number (RPN). The AIAG-VDA handbook replaces the RPN with an action priority (AP) of high, medium or low.
+A [risk assessment](#risk-assessment) starts from hazards. An FMEA starts from failures. Its types include design FMEA (DFMEA) and process FMEA (PFMEA). See [Systems engineering](../guides/systems-engineering.md#failure-mode-and-effects-analysis) for the types, scoring and worked examples.
 
 ## Filter
 
@@ -253,21 +235,23 @@ A sensor that measures how much fluid passes per unit of time, such as liters pe
 
 On the fluids panel, `fm_1` is a flow meter. The panel's float gauge is a rotameter: a float rides up a tapered tube as flow increases, and you read it by eye.
 
-A flow meter can be a bare [transducer](#transducer) wired to a DAQ, or an [instrument](#instrument) with its own display and bus connection.
-
 ## Front panel
 
 The physical controls and display on an instrument, such as knobs, buttons and a screen, for operating it by hand.
 
-Also called a local interface. While a computer controls an instrument over a [communications bus](#communications-bus), the instrument can lock its front panel, which is called remote mode. The dyno's power supply has a front panel.
-
-LabVIEW calls the user interface of each of its programs a front panel, after the instruments its programs imitate, which is why those programs are called virtual instruments (VIs). A LabVIEW front panel is software on a screen: an [HMI](#hmi), not part of an instrument.
+Also called a local interface. LabVIEW calls each program's user interface a front panel, after the instruments its programs imitate. A LabVIEW front panel is an [HMI](#hmi) on a screen, not part of an instrument. See [Sensors and instrumentation](../guides/sensors-and-instrumentation.md#instruments).
 
 ## Gauge pressure
 
 Pressure measured relative to the surrounding air, in units such as psig, so an open tank reads 0.
 
-Absolute pressure, in psia, is measured relative to a vacuum, so the air around you reads about 14.7 psia at sea level. Differential pressure, in psid, is the difference between two points. The fluids panel's channels are in psig.
+Absolute pressure, in psia, is measured relative to a vacuum. Differential pressure, in psid, is the difference between two points. The fluids panel's channels are in psig.
+
+## Golden unit
+
+A unit known to be good, kept as a reference to develop and check production tests.
+
+Also called a golden sample or reference unit. A golden unit can degrade over time, so check it against its own history. See [Test design](../guides/test-design.md#the-golden-unit).
 
 ## Ground loop
 
@@ -280,6 +264,12 @@ Electrically isolating the devices breaks the loop.
 A physical barrier that keeps people away from a hazard, such as moving parts.
 
 Also called guarding, a shield or an enclosure. A guard is an [engineering control](#engineering-control). An interlocked guard also stops the machine when it's opened. The dyno has a guard around its moving parts.
+
+## Hardware-in-the-loop (HiL)
+
+Testing the real controller hardware, with its real inputs and outputs, against a model of the system it controls, running in real time on a test system.
+
+HiL testing can repeat faults and edge cases that would be dangerous or expensive on the real system. Compare [MiL](#model-in-the-loop-mil), [SiL](#software-in-the-loop-sil) and [PiL](#processor-in-the-loop-pil). See [Test design](../guides/test-design.md#testing-before-the-hardware-is-ready-mil-sil-pil-and-hil).
 
 ## Hazard
 
@@ -297,13 +287,7 @@ Also called a safety control, or a control. This is a different sense from [cont
 
 The order in which to choose hazard controls, from most to least effective: elimination, substitution, engineering controls, administrative controls, and personal protective equipment (PPE).
 
-1. Elimination removes the hazard, such as by running a check with the stand unpressurized.
-2. Substitution replaces the hazard with a smaller one, such as a lower pressure.
-3. [Engineering controls](#engineering-control) keep people away from the hazard, such as guards, interlocks, and fail-safe wiring.
-4. [Administrative controls](#administrative-control) change how people work, such as procedures, training, and lockout/tagout.
-5. [PPE](#personal-protective-equipment-ppe) is worn to reduce exposure, such as safety glasses.
-
-Where one control isn't enough, combine them. Software trips aren't on the list, because they protect equipment, not people. The hierarchy comes from [NIOSH](https://www.cdc.gov/niosh/hierarchy-of-controls/about/index.html), and [OSHA](https://www.osha.gov/safety-management/hazard-prevention) recommends it.
+Software trips aren't on the list, because they protect equipment, not people. See [Safety](../guides/safety.md#the-hierarchy-of-controls).
 
 ## Historian
 
@@ -315,17 +299,13 @@ Also called a process historian or a data historian.
 
 Short for human-machine interface: the screen an operator uses to watch a stand's channels and send commands.
 
-Also called an operator interface, a control app, or a SCADA screen. In the workshop, the dyno's control app is its HMI.
-
-An instrument's [front panel](#front-panel) is its own physical HMI. LabVIEW calls its software HMIs front panels too.
+Also called an operator interface, a control app, or a SCADA screen. In the workshop, the dyno's control app is its HMI. An instrument's [front panel](#front-panel) is its own physical HMI.
 
 ## Human safety
 
 Protecting people from a stand's hazards, such as stored pressure, moving parts and electrical energy. On these stands, hardware keeps human safety: fail-safe wiring, the E-stop and guards, which all work without software.
 
-Also called personnel safety or operator safety. Compare [machine safety](#machine-safety).
-
-Ordinary control software can't keep people safe, because it can stall or crash. Software can be part of human safety only on a [safety controller](#safety-controller) designed and certified for it. Procedures, training and PPE add to the hardware: see [Hierarchy of controls](#hierarchy-of-controls).
+Also called personnel safety or operator safety. Compare [machine safety](#machine-safety). See [Safety](../guides/safety.md).
 
 ## Hysteresis
 
@@ -337,30 +317,25 @@ A pressure switch that turns a compressor off at a high pressure and back on at 
 
 One input or output on a DAQ, wired to one sensor or actuator.
 
-Also called a point, an I/O channel, a physical channel, or a control point.
-
-There are four kinds:
-
-- Analog input: a sensor that reports a value in a range, such as a pressure.
-- Digital input: a sensor that reports on or off, such as a switch.
-- Analog output: an actuator you set anywhere in a range, such as a proportional valve.
-- Digital output: an actuator you turn on or off, such as a relay that switches a compressor.
-
-These are abbreviated AI, DI, AO and DO.
+Also called a point, an I/O channel, a physical channel, or a control point. The four kinds are analog input, digital input, analog output and digital output, abbreviated AI, DI, AO and DO. See [Sensors and instrumentation](../guides/sensors-and-instrumentation.md#daq-inputs-and-outputs).
 
 ## Instrument
 
 A self-contained device with its own transducers and electronics built in, and any actuators it needs, which a computer controls over a communications bus and a person through its front panel.
 
-Also called an integrated instrument or a smart device. More loosely, any measuring device is called an instrument.
+Also called an integrated instrument or a smart device. More loosely, any measuring device is called an instrument. On the dyno, the motor controllers and the power supply are instruments. See [Sensors and instrumentation](../guides/sensors-and-instrumentation.md#instruments).
 
-An instrument does its own measuring and driving, so the computer exchanges messages with it instead of wiring each signal to a DAQ. On the dyno, the motor controllers and the power supply are instruments. A mass flow controller is another example: it has a flow sensor and a valve built in.
+## Interface control document (ICD)
+
+A document that defines an interface between two parts of a system, so both sides build to the same definition.
+
+An ICD covers the physical, electrical, data and behavioral details of the interface, and who owns each side. See [Systems engineering](../guides/systems-engineering.md#interface-control-documents).
 
 ## Interlock
 
 A condition that must be true before a stand allows an action, or that stops the stand if it changes, such as a switch on a guard or a test cell's door.
 
-A hardware interlock, wired [fail-safe](#fail-safe), is an [engineering control](#engineering-control) for [human safety](#human-safety). A software interlock protects only the machine. For example, the dyno's software won't send motor commands unless the stand is running.
+A hardware interlock, wired [fail-safe](#fail-safe), is an [engineering control](#engineering-control) for [human safety](#human-safety). A software interlock protects only the machine. For example, the dyno's software sends motor commands only in its running and stopping states.
 
 ## Latency
 
@@ -390,9 +365,7 @@ A load cell needs [excitation](#excitation) from the DAQ. A [torque sensor](#tor
 
 A procedure that isolates every energy source on a machine, such as electrical power or air pressure, and locks it off before anyone works on it.
 
-Each person working puts their own lock and tag on the isolation point, and only they remove it. That protects them from the machine starting, or releasing stored energy, while they work.
-
-Lockout/tagout is an [administrative control](#administrative-control) that uses physical locks, and it's part of [human safety](#human-safety). Pressing an E-stop isn't lockout, because anyone can release it.
+Each person working puts their own lock and tag on the isolation point. Lockout/tagout is an [administrative control](#administrative-control) that uses physical locks. Pressing an E-stop isn't lockout, because anyone can release it. See [Safety](../guides/safety.md#lockouttagout).
 
 ## Machine safety
 
@@ -407,6 +380,12 @@ Safety standards, such as ISO 12100, use "safety of machinery" for something els
 A value a sensor reports about what actually happened, such as a pressure or a speed.
 
 Also called a reading, a sample, feedback, a readback, telemetry, or in process control the process value (PV).
+
+## Model-in-the-loop (MiL)
+
+Testing a model of a controller against a model of the system it controls, with nothing physical involved.
+
+The first in-the-loop stage, before [SiL](#software-in-the-loop-sil). See [Test design](../guides/test-design.md#testing-before-the-hardware-is-ready-mil-sil-pil-and-hil).
 
 ## Noise
 
@@ -444,7 +423,7 @@ PPE is the last level of the [hierarchy of controls](#hierarchy-of-controls). Us
 
 A closed-loop control method that sets its output from the error between the setpoint and the measurement: in proportion to the error (P), to its sum over time (I), and to its rate of change (D).
 
-Tuning a PID controller means choosing how much weight each term gets.
+Tuning a PID controller means choosing how much weight each term gets. See [Control](../guides/control.md#pid-control).
 
 ## PLC
 
@@ -463,6 +442,18 @@ Also called repeatability. A precise sensor can still be inaccurate, if it's off
 A valve that holds the pressure downstream of it at a set value, as long as the supply pressure is higher.
 
 An electronic pressure regulator takes its setpoint as a command, such as `pr_2` on the fluids panel.
+
+## Processor-in-the-loop (PiL)
+
+Testing a controller's code on its target processor against a model of the system it controls, to check it gives the same results as on a desktop computer.
+
+PiL can also measure how long the code takes to run on the target. It comes between [SiL](#software-in-the-loop-sil) and [HiL](#hardware-in-the-loop-hil). See [Test design](../guides/test-design.md#testing-before-the-hardware-is-ready-mil-sil-pil-and-hil).
+
+## Production testing
+
+Testing every unit built, to catch the ones built wrong.
+
+Also called acceptance testing, or end-of-line (EOL) testing on a production line. Compare [design testing](#design-testing). See [Test design](../guides/test-design.md).
 
 ## Proof test
 
@@ -500,6 +491,12 @@ Short for regenerative braking: a motor braking by working as a generator, which
 
 On the dyno, the load motors generate power as they brake, and the power supply absorbs it. In the sequence's regen step, the load motors push the axle and the DUT brakes against them.
 
+## Requirement
+
+A statement of what a system has to do or be, written with "shall", that can be checked.
+
+A good requirement says one thing, states what is needed rather than how, and can be verified by test, analysis, demonstration or inspection. See [Systems engineering](../guides/systems-engineering.md#requirements).
+
 ## Resolution
 
 The smallest change a measurement can show.
@@ -528,24 +525,13 @@ See Nominal's [Run](https://dev.nominal.io/platform/reference/glossary/#run) ent
 
 Freedom from unacceptable risk of harm. A test stand has two kinds: machine safety, which protects the equipment and the DUT, and human safety, which protects people.
 
-On these stands, the control software keeps [machine safety](#machine-safety), and fail-safe hardware keeps [human safety](#human-safety). Software can stall or crash, so it never keeps people safe here.
-
-| Failure | What protects against it | Kind of safety |
-| --- | --- | --- |
-| A measurement leaves its allowed range, such as an overspeed or an overtemperature | A [trip](#trip) in the control software | Machine safety |
-| The control software stops sending commands | A [watchdog](#watchdog) in the hardware, such as in the dyno's motor controllers | Machine safety |
-| Power is lost | [Fail-safe](#fail-safe) hardware, such as the fluids panel's normally open vent valve | Human safety |
-| A person is in danger, or a stand does something unexpected | The [E-stop](#e-stop), wired fail-safe | Human safety |
-| A person could reach a moving or pressurized part | [Guards](#guard) and [interlocks](#interlock) | Human safety |
-| Someone works on the stand | [Lockout/tagout](#lockouttagout-loto) | Human safety |
-
-[Hazard controls](#hazard-control) for human safety are chosen in the order of the [hierarchy of controls](#hierarchy-of-controls).
+On these stands, the control software keeps [machine safety](#machine-safety), and fail-safe hardware keeps [human safety](#human-safety). See [Safety](../guides/safety.md#which-control-covers-which-failure) for which control covers which failure.
 
 ## Safety controller
 
 Hardware designed and certified to carry out safety functions, such as stopping a machine when an E-stop is pressed or a guard opens.
 
-Also called a safety relay, or a safety PLC if it's programmable. Unlike ordinary control software, it's built to standards such as ISO 13849 and IEC 61508, with [redundancy](#redundancy) and self-checks, so it can be relied on for [human safety](#human-safety).
+Also called a safety relay, or a safety PLC if it's programmable. It's built to standards such as ISO 13849, so it can be relied on for [human safety](#human-safety). See [Safety](../guides/safety.md#safety-controllers).
 
 ## Sample rate
 
@@ -565,7 +551,7 @@ A device that measures something physical, such as pressure or flow, and turns i
 
 Also called a probe. With actuators, sensors are also called control points.
 
-A sensor wired to a DAQ is a [transducer](#transducer), or a transmitter if it has electronics that output a standard signal such as 4–20 mA. A sensor built into a device with its own electronics and bus connection is part of an [instrument](#instrument). A gauge shows a measurement on the device itself, like the fluids panel's float gauge, and doesn't produce a channel.
+A sensor wired to a DAQ is a [transducer](#transducer). A sensor built into a device with its own electronics and bus connection is part of an [instrument](#instrument). A gauge shows a measurement on the device itself, like the fluids panel's float gauge, and doesn't produce a channel.
 
 ## Sequence
 
@@ -578,6 +564,12 @@ Also called a procedure, a test procedure, a test script, or in process industri
 The value a command asks for, such as a speed of 1,000 RPM.
 
 Also called a target, a demand, a reference, or SP. The dyno's software limits each setpoint to a safe range before sending it.
+
+## Software-in-the-loop (SiL)
+
+Testing a controller's code on a desktop computer against a model of the system it controls, with no real hardware.
+
+SiL checks that the code behaves like the controller's model. It comes between [MiL](#model-in-the-loop-mil) and [PiL](#processor-in-the-loop-pil). See [Test design](../guides/test-design.md#testing-before-the-hardware-is-ready-mil-sil-pil-and-hil).
 
 ## Solenoid valve
 
@@ -595,7 +587,7 @@ The changing period before it is the transient. A [dwell](#dwell) gives a measur
 
 How a measurement responds when its command changes suddenly, in one step.
 
-It's described by the rise time, how long the measurement takes to get most of the way to its new value; the overshoot, how far it goes past; and the settling time, how long until it stays within a band around the new value.
+It's described by the rise time, the overshoot, and the settling time. See [Control](../guides/control.md#reading-a-step-response).
 
 ## Stimulus and response
 
@@ -657,13 +649,17 @@ A sensor that measures the twisting force on a shaft, with strain gauges on the 
 
 Also called a torque transducer or a torque cell. The dyno has none: it calculates torque from each motor's current.
 
+## Traceability
+
+The links between each requirement, the requirements it came from and was split into, and the tests that check it.
+
+Bidirectional traceability means you can follow those links both up and down. See [Systems engineering](../guides/systems-engineering.md#traceability).
+
 ## Transducer
 
 A device that converts one form of energy into another, such as a pressure into an electrical signal, or an electrical signal into motion.
 
-On a test stand, a transducer is a sensor that outputs an electrical signal for a DAQ to read, such as the pressure transducer on the fluids panel's `p_1`. It has no bus connection or front panel of its own, unlike an [instrument](#instrument).
-
-A transmitter is a transducer with built-in electronics that output a standard signal, such as a 4–20 mA [current loop](#current-loop).
+On a test stand, a transducer is a sensor that outputs an electrical signal for a DAQ to read, such as the pressure transducer on the fluids panel's `p_1`. A transmitter is a transducer with built-in electronics that output a standard signal, such as a 4–20 mA [current loop](#current-loop).
 
 ## Trip
 
@@ -677,13 +673,19 @@ A trip is a [machine safety](#machine-safety) control. It can't keep people safe
 
 The range around a measurement within which the true value is expected to lie, given every known source of error.
 
-Also called measurement uncertainty. Combining the sources, such as sensor accuracy, ADC resolution and noise, is called an uncertainty budget or error budget.
+Also called measurement uncertainty. Combining the sources is called an uncertainty budget or error budget. See [Measurement quality](../guides/measurement-quality.md#uncertainty).
 
 ## Unit under test (UUT)
 
 Another name for a device under test (DUT): the device or system a test stand tests.
 
 See [Device under test (DUT)](#device-under-test-dut).
+
+## V-model
+
+A layout of a project as a V: requirements split into designs down the left side, and parts built, integrated and tested up the right, each level against its matching specification.
+
+Also called the Vee. See [Test design](../guides/test-design.md#the-v-model).
 
 ## Watchdog
 

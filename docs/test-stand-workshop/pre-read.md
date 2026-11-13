@@ -56,7 +56,7 @@ A stand has two kinds of safety, and different things keep each one:
 
 The emergency stop (E-stop) button is wired fail-safe. On the fluids panel, pressing the E-stop or losing power opens a vent valve, which releases the air pressure. A valve that opens when it loses power is called normally open.
 
-Software can stall or crash, so on these stands it never keeps people safe. The [glossary's Safety entry](../glossary.md#safety) shows which control protects against which failure.
+Software can stall or crash, so on these stands it never keeps people safe. The [Safety guide](../guides/safety.md#which-control-covers-which-failure) shows which control protects against which failure.
 
 ## Where the data goes
 
