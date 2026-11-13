@@ -6,7 +6,7 @@ MyST Markdown in `docs/`, built with Sphinx and
 
 The site has three tabs:
 
-- **Workshops**: `docs/index.md` and `docs/test-stand-workshop/`.
+- **Workshops**: `docs/index.md`, `docs/test-stand-workshop/` and `docs/integration-workshop/`.
 - **Guides**: `docs/guides/`, deep dives with worked examples and cited sources.
 - **Reference**: `docs/reference/glossary.md`.
 

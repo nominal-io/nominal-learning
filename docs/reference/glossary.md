@@ -199,6 +199,12 @@ The units a quantity is measured in, such as psig, RPM or °C, as opposed to the
 
 Also called EU or scaled units. The raw signal is also called raw counts or the raw value. Converting one to the other is called scaling. [Calibration](#calibration) checks and corrects that conversion.
 
+## Event
+
+In Nominal, a named point or span of time on one or more assets, such as a test step, a fault or a limit violation. You review events in a workbook.
+
+See Nominal's [Event](https://dev.nominal.io/platform/reference/glossary/#event) entry.
+
 ## Excitation
 
 Power that a DAQ supplies to a sensor so it can work, such as a voltage across a strain gauge.
@@ -374,6 +380,12 @@ Protecting a stand and its DUT from damage. On these stands, the control softwar
 Also called machine protection or equipment protection. Compare [human safety](#human-safety).
 
 Safety standards, such as ISO 12100, use "safety of machinery" for something else: protecting people from a machine's hazards, which this glossary calls human safety.
+
+## Manufacturing execution system (MES)
+
+The factory software that tracks each unit through production, including what to test it against and whether it passed.
+
+In a production test, the test executive gets the unit's details from the MES, and sends the result back.
 
 ## Measurement
 
@@ -612,6 +624,12 @@ The dyno's sequence sweeps the DUT's speed at each of three loads.
 In Nominal, a key-value pair on data points, such as `motor_id: 1`, that lets you filter part of a dataset. In SCADA, PLC and historian software, a tag is what Nominal calls a channel.
 
 See [Channel](#channel), and Nominal's [Tag](https://dev.nominal.io/platform/reference/glossary/#tag) entry.
+
+## Test executive
+
+Software that runs a test's steps in order, records each step's result, and decides whether the unit passed.
+
+Also called a test sequencer. NI TestStand is one. Nominal's [TestStand steps](https://dev.nominal.io/ni-teststand/) can create runs and events from a TestStand sequence.
 
 ## Test plan
 
