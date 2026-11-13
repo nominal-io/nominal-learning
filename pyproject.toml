@@ -1,5 +1,5 @@
 [project]
-name = "nominal-school"
+name = "nominal-learning"
 version = "0"
 description = "Nominal Technical Content docs"
 requires-python = ">=3.12"

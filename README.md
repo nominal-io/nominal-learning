@@ -1,4 +1,4 @@
-# nominal-school
+# nominal-learning
 
 The docs for Learning, Nominal's workshops and guides on test and measurement: MyST Markdown pages in `docs/`, built with Sphinx and
 [nominal-sphinx-theme](https://github.com/nominal-io/nominal-sphinx-theme).
@@ -30,7 +30,7 @@ add a `[[project]]` to its `sites.toml`, and the project to its `[groups]`:
 
 ```toml
 [[project]]
-project = "school"                  # the URL, /school/
-repo = "nominal-io/nominal-school"
+project = "learning"                # the URL, /learning/
+repo = "nominal-io/nominal-learning"
 workflow = "deploy-docs.yml"
 ```

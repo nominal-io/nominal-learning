@@ -1,10 +1,8 @@
-# nominal-school
+# nominal-learning
 
 The docs for Learning, Nominal's site of workshops and guides on test and measurement. Pages are
 MyST Markdown in `docs/`, built with Sphinx and
 [nominal-sphinx-theme](https://github.com/nominal-io/nominal-sphinx-theme).
-
-The site is called "Learning". It is not "Nominal School". The repo name, nominal-school, stays.
 
 The site has three tabs:
 

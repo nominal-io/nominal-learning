@@ -390,7 +390,7 @@ wheels = [
 ]
 
 [[package]]
-name = "nominal-school"
+name = "nominal-learning"
 version = "0"
 source = { virtual = "." }
 
