@@ -37,6 +37,18 @@ The part of a DAQ that turns a sensor's voltage or current into a number.
 
 Its number of bits sets its [resolution](#resolution): a 16-bit ADC divides its range into 65,536 steps.
 
+## Backpressure
+
+A receiver making a sender wait when it can't keep up, instead of losing data.
+
+TCP's flow control does this by telling the sender how much buffer space the receiver has left. The dyno's motor controllers don't wait: they send each status frame on schedule, whether or not the computer has read the last one. See [Network performance](../guides/network-performance.md#backpressure).
+
+## Bandwidth
+
+The number of bits a link can carry each second.
+
+What a system achieves in practice, its throughput, is often lower. The dyno's [CAN bus](#can-bus) has a bandwidth of 500 kbit/s. See [Network performance](../guides/network-performance.md#bandwidth-and-throughput).
+
 ## CAN bus
 
 A [communications bus](#communications-bus) that connects the controllers in a vehicle or machine, so they can exchange commands and measurements over one pair of wires.
@@ -343,11 +355,17 @@ A condition that must be true before a stand allows an action, or that stops the
 
 A hardware interlock, wired [fail-safe](#fail-safe), is an [engineering control](#engineering-control) for [human safety](#human-safety). A software interlock protects only the machine. For example, the dyno's software sends motor commands only in its running and stopping states.
 
+## Jitter
+
+The variation in latency from one message to the next.
+
+Where values are timestamped when they arrive, as on the dyno, jitter shows up as uneven gaps between samples. See [Network performance](../guides/network-performance.md#jitter).
+
 ## Latency
 
 The delay between something happening and its effect showing up, such as between a sensor reading and the value appearing on screen.
 
-Also called lag or delay.
+Also called lag or delay. See [Network performance](../guides/network-performance.md#latency).
 
 ## Leak check
 

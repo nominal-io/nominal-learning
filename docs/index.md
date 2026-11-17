@@ -30,6 +30,7 @@ guides/safety
 guides/sensors-and-instrumentation
 guides/measurement-quality
 guides/communications
+guides/network-performance
 guides/control
 guides/systems-engineering
 guides/test-design

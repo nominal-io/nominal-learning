@@ -35,6 +35,13 @@ Accuracy, resolution, noise and sampling, with a full error budget for a pressur
 How a computer talks to instruments and controllers: CAN, serial, Ethernet, Modbus and SCPI.
 :::
 
+:::{grid-item-card} Network performance
+:link: network-performance
+:link-type: doc
+
+Bandwidth, latency and backpressure: how much data a link carries, how long it takes, and what happens when a receiver falls behind.
+:::
+
 :::{grid-item-card} Control
 :link: control
 :link-type: doc
