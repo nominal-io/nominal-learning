@@ -1,0 +1,116 @@
+# Distributed control
+
+{.lead}
+Control can live in one central controller with a lot of I/O, or be spread across many smaller devices that each run part of it. Where it lives decides how much each controller is responsible for, and how much coordination has to happen between them.
+
+## Where control lives
+
+Control can live in two places:
+
+- **Central.** One controller with a lot of {gloss}`I/O points <I/O point>` runs every loop. Its I/O can sit in one rack, or be spread around a machine on a fieldbus such as [EtherCAT](communications.md#industrial-ethernet-ethercat-and-opc-ua).
+- **Distributed.** Many smaller devices, such as {gloss}`PLCs <PLC>`, motor drives and embedded controllers, each run their own loops, and exchange values over a network.
+
+Most systems mix the two. The fastest loops run in hardware next to their I/O, and the network carries supervision, so no loop depends on the network's timing.[^nif-2001][^ess-2023] Loops split by timescale:[^xfel-llrf]
+
+| Timescale | What the loop does | Where it runs |
+| --- | --- | --- |
+| Microseconds | Corrects within one cycle of the process | FPGA |
+| Milliseconds | Adapts from one cycle to the next | CPU |
+| Seconds | Compensates for long-term drift | Slow feedback loops and supervision |
+
+The dyno mixes them too. One program runs the sequence for all three motors, while each motor controller closes its own speed and current loops. The software sets speed setpoints 10 times a second, and the motor controllers hold the speed in between. See [Loop rates](control.md#loop-rates).
+
+## Responsibility and coordination
+
+Each controller is responsible for some of the system's loops and actuators. Anything that crosses from one controller to another has to be coordinated over a link. So for each part of a system, decide how much one controller should own:
+
+- A controller that owns more needs less coordination, but has more to do in each cycle, and more I/O to reach in time.
+- A controller that owns less is simpler, but more of what it does has to be coordinated with others.
+
+Draw each controller's boundary around the actuators that have to act together. The sections below show why.
+
+## Central control
+
+A central controller runs one program that reads every input and writes every output in each {gloss}`control cycle`. That makes coordination simple. Two actuators commanded in the same cycle act on the same view of the stand, and no other controller's command competes with them. Closing several motors' position loops in one controller makes it easier to synchronize them.[^ess-ecmc]
+
+The cost is performance and timing. Every device shares one loop, so a device that answers slowly delays all the others, and a computer that stalls stalls everything. [Network performance](network-performance.md#example-when-the-dynos-computer-fell-behind) shows how that played out on the dyno.
+
+What limits a central loop is the delay between the controller and its I/O, compared with the loop's period. A network delay below 300 µs is negligible for a loop at 25 Hz.[^lhc-orbit] For a loop at 1 kHz, it's almost a third of the period. Delays inside the computers at each end can be an order of magnitude larger than the network's,[^lhc-orbit] so count them too. A deterministic fieldbus such as EtherCAT keeps the delay to the I/O short and predictable, and synchronizes its devices' clocks to within 100 ns.[^ess-ecmc]
+
+## Distributed control
+
+In a distributed system, many devices each run their own loops, and a supervisory layer coordinates them.[^nist-ics] Each device is simpler and can be cheaper, and a fault stays in the part where it happens.[^nist-ics][^nif-2009]
+
+The cost is coordination. When two devices have to act together, the link between them becomes part of the control system, and its {gloss}`latency` and {gloss}`jitter` limit how closely they can work. The communications architecture can matter as much as the control code. The software that routes messages can be the bottleneck as well as the network: putting too many devices behind one server with single-threaded event handling can delay events severely.[^ska-2025]
+
+Separate devices can work together in three ways: keep coupled actuators in one controller, share a clock, or accept loose timing.
+
+### Keep coupled actuators in one controller
+
+Two motors on separate controllers are hard to move together. Sending each motor its own command starts one before the other.[^sardana-motor] Computing a shared path in software and sending each motor its part doesn't keep them on the path while they move.[^maxiv-scans]
+
+Instead, put the axes that have to move together on one controller, which computes their path itself.[^diamond-motion][^maxiv-scans] Multi-axis motion controllers are built for this. They interpolate straight-line paths across up to 8 axes,[^galil] or drive up to 128 axes from one system.[^icepap]
+
+Control software groups axes the same way. One controller in the software handles several axes, and starts them all with one hardware command if the hardware supports it.[^sardana-motor] Synchronizing two separate controllers is harder, and software may leave it out of scope.[^sardana-traj]
+
+Axes on separate controllers can still move together closely, but over a dedicated deterministic link, not the general network.[^soleil][^iter-2011]
+
+### Share a clock
+
+When separate devices have to act at the same instant, send each one its command ahead of time, and let a shared clock say when. A central timing system broadcasts events, and a receiver in each device turns them into hardware triggers.[^mrf] One such system triggers 1,600 channels to 30 ps accuracy.[^nif-2001] A device can also preload the actions it might need, and run the right one when its event arrives.[^acnet]
+
+Over Ethernet, the Precision Time Protocol (PTP, IEEE 1588) synchronizes clocks to under a microsecond, and to under a nanosecond in a properly designed network.[^ptp] With clocks that close, a message can tell a device to act at a given absolute time.[^white-rabbit]
+
+Execution is distributed, but the time base is shared.
+
+### Accept loose timing
+
+Where the process tolerates it, the ordinary network is enough. Two devices started over a network don't start at exactly the same time, but the difference can be well within what the process needs. A dedicated trigger cable is the fallback.[^maxiv-scans]
+
+The dyno works this way. Its DUT and load motors have separate controllers on one CAN bus, and the software updates their setpoints 10 times a second. That's close enough, because the sequence ramps slowly and waits for each test point to settle. See [Ramps, limits and settling](control.md#ramps-limits-and-settling-the-dynos-sequence).
+
+## Choosing where control lives
+
+For each loop or action, compare its timing with the path it has to take:
+
+| If you need | Put the control in | Coordinate with |
+| --- | --- | --- |
+| A loop faster than the network's worst-case delay | The device, or a controller next to its I/O | Setpoints sent from above |
+| Several axes on one path | One multi-axis controller | The controller's coordinate system |
+| Actions at the same instant on separate devices | Each device | A shared timing system |
+| Parts that fail independently | Separate controllers | Supervision, with a {gloss}`watchdog` in each part |
+| Steps in order, seconds apart | A {gloss}`sequence` or {gloss}`test executive` | The network, waiting for each step to finish |
+
+Safety functions follow the same rule at its strictest: they belong in hardware built for them, not in software across a network. See [Safety](safety.md#safety-controllers).
+
+## Further reading
+
+- L. J. Lagin et al., [The Overview of the National Ignition Facility Distributed Computer Control System](https://arxiv.org/abs/cs/0111045), with its supervisory, front-end and timing layers.
+- NIST, [SP 800-82r3, Guide to Operational Technology Security](https://doi.org/10.6028/NIST.SP.800-82r3), section 2.3, on DCS, SCADA and PLC-based systems.
+- R. J. Steinhagen et al., [LHC Orbit Stabilisation Tests at the SPS](https://proceedings.jacow.org/p05/PAPERS/MPPP004.PDF), a central feedback loop over a network.
+- T. Gahl et al., [ECMC, the Open Source Motion Control Package for EtherCAT Hardware at the ESS](https://proceedings.jacow.org/icalepcs2017/papers/mocpl05.pdf), on where to close position loops.
+- H. Enquist et al., [Continuous Scans with Position Based Hardware Triggers](https://proceedings.jacow.org/icalepcs2021/papers/frbr04.pdf), on coordinating motion across controllers.
+- The [EPICS](https://docs.epics-controls.org/) and [Tango Controls](https://tango-controls.readthedocs.io/) documentation, two frameworks for distributed control at physics facilities.
+
+## References
+
+[^nif-2001]: L. J. Lagin et al., LLNL, ["The Overview of the National Ignition Facility Distributed Computer Control System"](https://arxiv.org/abs/cs/0111045), ICALEPCS 2001. Retrieved 2026-11-18.
+[^ess-2023]: T. Korhonen, ESS, ["Status of the European Spallation Source Controls"](https://proceedings.jacow.org/icalepcs2023/papers/fr1bco01.pdf), ICALEPCS 2023, FR1BCO01. Retrieved 2026-11-18.
+[^xfel-llrf]: C. Schmidt et al., DESY, ["High Level Software Structure for the European XFEL LLRF System"](https://proceedings.jacow.org/ICALEPCS2015/papers/wepgf029.pdf), ICALEPCS 2015, WEPGF029. Retrieved 2026-11-18.
+[^ess-ecmc]: T. Gahl et al., ESS, ["ECMC, the Open Source Motion Control Package for EtherCAT Hardware at the ESS"](https://proceedings.jacow.org/icalepcs2017/papers/mocpl05.pdf), ICALEPCS 2017, MOCPL05. Retrieved 2026-11-18.
+[^lhc-orbit]: R. J. Steinhagen et al., CERN, ["LHC Orbit Stabilisation Tests at the SPS"](https://proceedings.jacow.org/p05/PAPERS/MPPP004.PDF), PAC 2005, MPPP004. Retrieved 2026-11-18.
+[^nist-ics]: K. Stouffer et al., NIST, ["Guide to Operational Technology (OT) Security"](https://doi.org/10.6028/NIST.SP.800-82r3), SP 800-82r3, section 2.3, September 2023. Retrieved 2026-11-18.
+[^nif-2009]: P. J. Van Arsdall et al., LLNL, ["National Ignition Facility Project Completion and Control System Status"](https://epaper.kek.jp/icalepcs2009/papers/tup078.pdf), ICALEPCS 2009, TUP078. Retrieved 2026-11-18.
+[^ska-2025]: S. Vrcic, T. Juerges and J. Engelbrecht, SKAO, ["SKA Control System in 2025"](https://proceedings.jacow.org/icalepcs2025/pdf/WEMG002.pdf), ICALEPCS 2025, WEMG002. Retrieved 2026-11-18.
+[^sardana-motor]: Sardana, ["How to write a motor controller"](https://github.com/sardana-org/sardana/blob/develop/doc/source/devel/howto_controllers/howto_motorcontroller.rst), section "Multiple motion synchronization", develop branch. Retrieved 2026-11-18.
+[^maxiv-scans]: H. Enquist et al., MAX IV, ["Continuous Scans with Position Based Hardware Triggers"](https://proceedings.jacow.org/icalepcs2021/papers/frbr04.pdf), ICALEPCS 2021, FRBR04. Retrieved 2026-11-18.
+[^diamond-motion]: B. Nutter et al., Diamond Light Source, ["Recent Developments in Synchronised Motion Control at Diamond Light Source"](https://proceedings.jacow.org/icalepcs2011/papers/wepmn013.pdf), ICALEPCS 2011, WEPMN013. Retrieved 2026-11-18.
+[^galil]: Galil Motion Control, ["Modes of Motion: Vector and Linear Interpolation"](https://www.galil.com/resources/application-notes/modes-of-motion-vector-and-linear-interpolation), Application Note #2519, 2026-05-21. Retrieved 2026-11-18.
+[^icepap]: ESRF, ["IcePAP"](https://esrf.fr/Instrumentation/DetectorsAndElectronics/icepap). Retrieved 2026-11-18.
+[^sardana-traj]: J. Aguilar, ALBA Synchrotron, ["Sardana Trajectories: Preliminary Core Design for Synchronized Motion and Acquisition"](https://indico.tango-controls.org/event/737/contributions/1025/attachments/680/969/Sardana_trajectories.pdf), 40th Tango Community meeting, 2026-06-11. Retrieved 2026-11-18.
+[^soleil]: Y. M. Abiven et al., SOLEIL and Symetrie, ["SOLEIL and Symetrie Company Collaborate to Build Tango Ready In-Vacuum Diffractometer"](https://proceedings.jacow.org/ICALEPCS2017/papers/tupha007.pdf), ICALEPCS 2017, TUPHA007. Retrieved 2026-11-18.
+[^iter-2011]: A. Wallander et al., ITER, ["News from ITER Controls – A Status Report"](https://proceedings.jacow.org/ICALEPCS2011/papers/mobaust01.pdf), ICALEPCS 2011, MOBAUST01. Retrieved 2026-11-18.
+[^mrf]: Micro-Research Finland, ["The MRF Timing System"](https://mrftiming.readthedocs.io/en/stable/hardware/event-system-intro.html). Retrieved 2026-11-18.
+[^acnet]: J. Patrick, Fermilab, ["The Fermilab Accelerator Control System"](https://epaper.kek.jp/icap06/PAPERS/WEA2IS03.PDF), ICAP 2006, WEA2IS03. Retrieved 2026-11-18.
+[^ptp]: IEEE, ["IEEE 1588-2019: Standard for a Precision Clock Synchronization Protocol for Networked Measurement and Control Systems"](https://standards.ieee.org/ieee/1588/6825/), 2020. Retrieved 2026-11-18.
+[^white-rabbit]: M. Kreider et al., GSI and CERN, ["WhiteRabbit – A Novel, High Precision Timing System"](https://proceedings.jacow.org/pcapac2010/papers/frcoma01.pdf), PCaPAC 2010, FRCOMA01. Retrieved 2026-11-18.

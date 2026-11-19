@@ -32,6 +32,7 @@ guides/measurement-quality
 guides/communications
 guides/network-performance
 guides/control
+guides/distributed-control
 guides/systems-engineering
 guides/test-design
 ```

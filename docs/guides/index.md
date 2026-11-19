@@ -49,6 +49,13 @@ Bandwidth, latency and backpressure: how much data a link carries, how long it t
 Setpoints, open and closed loops, PID, and how a measurement responds to a change in its command.
 :::
 
+:::{grid-item-card} Distributed control
+:link: distributed-control
+:link-type: doc
+
+Central and distributed control: where control lives, what each controller is responsible for, and how separate controllers coordinate.
+:::
+
 :::{grid-item-card} Systems engineering
 :link: systems-engineering
 :link-type: doc
