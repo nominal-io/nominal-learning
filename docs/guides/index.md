@@ -56,6 +56,13 @@ Setpoints, open and closed loops, PID, and how a measurement responds to a chang
 Central and distributed control: where control lives, what each controller is responsible for, and how separate controllers coordinate.
 :::
 
+:::{grid-item-card} Alarms
+:link: alarms
+:link-type: doc
+
+What deserves an alarm, how alarm software handles one, and alarm fatigue: why operators stop trusting alarms, and how to keep their trust.
+:::
+
 :::{grid-item-card} Systems engineering
 :link: systems-engineering
 :link-type: doc

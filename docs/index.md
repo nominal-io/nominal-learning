@@ -33,6 +33,7 @@ guides/communications
 guides/network-performance
 guides/control
 guides/distributed-control
+guides/alarms
 guides/systems-engineering
 guides/test-design
 ```

@@ -25,6 +25,24 @@ A hazard control that changes how people work, such as a procedure, training, a 
 
 Lockout/tagout and the workshop's safety briefing are administrative controls. They work only if people follow them, so they back up engineering controls rather than replace them. See [Hierarchy of controls](#hierarchy-of-controls).
 
+## Alarm
+
+A visible or audible signal that tells an operator about an abnormal condition that needs a timely response.
+
+In software operations, the equivalent is an alert or a page. An alarm needs a person to act, where a [trip](#trip) acts on its own. A condition that needs no response is better recorded as an [event](#event). See [Alarms](../guides/alarms.md).
+
+## Alarm fatigue
+
+When people receive so many alarms, most needing no response, that they become desensitized and miss the alarms that matter.
+
+Also called the cry-wolf effect. See [Alarms](../guides/alarms.md#alarm-fatigue).
+
+## Alarm flood
+
+More alarms than an operator can handle. The UK alarm management guide, EEMUA 191, starts a flood at more than 10 new alarms in 10 minutes.
+
+Also called an alarm storm. See [Alarms](../guides/alarms.md#floods).
+
 ## Aliasing
 
 A false, slower signal that appears in data when a channel is sampled too slowly for how fast its value changes.
@@ -131,7 +149,7 @@ Also called a DAQ system, an I/O system, remote I/O, or a data logger if it reco
 
 A band around a setpoint inside which a difference is ignored, so small fluctuations don't cause a reaction.
 
-Also called a dead zone.
+Also called a dead zone. On an [alarm](#alarm), the deadband is how far a value must come back past the alarm's limit before the alarm clears, so a noisy value near the limit doesn't turn the alarm on and off repeatedly.
 
 ## Derating
 
@@ -375,7 +393,7 @@ Also called a leak test or a pressure decay test. The test passes if the pressur
 
 ## Limit
 
-A value a measurement must stay above or below. A test limit decides pass or fail. A protection limit causes a [trip](#trip), which protects the equipment.
+A value a measurement must stay above or below. A test limit decides pass or fail. An alarm limit causes an [alarm](#alarm), which asks an operator to act. A protection limit causes a [trip](#trip), which protects the equipment.
 
 Also called a threshold or a bound, or in rocket engine testing a redline. Upper and lower limits together make an allowed range.
 
@@ -595,6 +613,12 @@ The value a command asks for, such as a speed of 1,000 RPM.
 
 Also called a target, a demand, a reference, or SP. The dyno's software limits each setpoint to a safe range before sending it.
 
+## Shelving
+
+Hiding an alarm from operators for a limited time, such as while someone works on its cause.
+
+Shelving hides an alarm without fixing it, so alarm software such as Ignition limits how long an alarm stays shelved. See [Alarms](../guides/alarms.md#fixing-nuisance-alarms).
+
 ## Software-in-the-loop (SiL)
 
 Testing a controller's code on a desktop computer against a model of the system it controls, with no real hardware.
@@ -701,7 +725,7 @@ On a test stand, a transducer is a sensor that outputs an electrical signal for 
 
 An automatic stop that the control software makes when a measurement leaves its allowed range.
 
-Also called an automatic abort or an interlock trip. An abort that an operator starts, such as the dyno's **Abort** button, isn't a trip.
+Also called an automatic abort or an interlock trip. An abort that an operator starts, such as the dyno's **Abort** button, isn't a trip. Nor is an [alarm](#alarm), which asks an operator to act rather than acting itself.
 
 A trip is a [machine safety](#machine-safety) control. It can't keep people safe, because software can stall or crash. The [E-stop](#e-stop) and [fail-safe](#fail-safe) wiring do that.
 
