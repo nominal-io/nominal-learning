@@ -36,6 +36,7 @@ guides/distributed-control
 guides/alarms
 guides/systems-engineering
 guides/test-design
+guides/manufacturing-types
 ```
 
 ```{toctree}

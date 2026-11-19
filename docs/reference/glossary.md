@@ -67,6 +67,12 @@ The number of bits a link can carry each second.
 
 What a system achieves in practice, its throughput, is often lower. The dyno's [CAN bus](#can-bus) has a bandwidth of 500 kbit/s. See [Network performance](../guides/network-performance.md#bandwidth-and-throughput).
 
+## Batch
+
+A quantity of material made together, in one run of a process with a distinct start and end, and identified by a batch number.
+
+Batch manufacturing is one of three [manufacturing types](../guides/manufacturing-types.md), with [discrete manufacturing](#discrete-manufacturing) and [continuous processes](#continuous-process). Food manufacturing is a typical example. A batch is tested through samples taken from it.
+
 ## CAN bus
 
 A [communications bus](#communications-bus) that connects the controllers in a vehicle or machine, so they can exchange commands and measurements over one pair of wires.
@@ -112,6 +118,12 @@ A command doesn't tell you what happened. The [measurement](#measurement) that s
 A data connection that a computer uses to send commands to instruments and read their measurements, as messages rather than as raw electrical signals.
 
 Also called a bus, a fieldbus, or an industrial network. See [Communications](../guides/communications.md).
+
+## Continuous process
+
+A process that runs without breaks between units of product, such as a refinery, or a rolling mill making aluminum sheet.
+
+Its product has no natural identity, so it's identified by a window of time or quantity, or by the coil or reel it's wound onto. See [Manufacturing types](../guides/manufacturing-types.md#continuous-time-first-then-length).
 
 ## Control cycle
 
@@ -174,6 +186,12 @@ Also called qualification testing, or in hardware product development a design v
 The device or system a test stand tests, such as the dyno's electric axle.
 
 Also called a unit under test (UUT), a test article, equipment under test (EUT), or in materials testing a specimen.
+
+## Discrete manufacturing
+
+Making separate units that each keep their own identity, such as a serial number.
+
+Assembling electronic and mechanical parts, and machining parts, are discrete. The dyno's e-axle is a discrete product. See [Manufacturing types](../guides/manufacturing-types.md#discrete-one-record-per-unit).
 
 ## Drift
 
@@ -283,6 +301,12 @@ Pressure measured relative to the surrounding air, in units such as psig, so an 
 
 Absolute pressure, in psia, is measured relative to a vacuum. Differential pressure, in psid, is the difference between two points. The fluids panel's channels are in psig.
 
+## Genealogy
+
+The record of what went into each product, and what each material and machine went into.
+
+Also called material traceability. A backward trace goes from a product to its materials, and to the equipment that made and tested it. A forward trace goes from a material [lot](#lot) or a machine to every product it touched. See [Manufacturing types](../guides/manufacturing-types.md#genealogy).
+
 ## Golden unit
 
 A unit known to be good, kept as a reference to develop and check production tests.
@@ -373,6 +397,12 @@ A condition that must be true before a stand allows an action, or that stops the
 
 A hardware interlock, wired [fail-safe](#fail-safe), is an [engineering control](#engineering-control) for [human safety](#human-safety). A software interlock protects only the machine. For example, the dyno's software sends motor commands only in its running and stopping states.
 
+## ISA-95
+
+The standard for connecting a factory's control systems to its business systems, published internationally as IEC 62264.
+
+It splits a factory's systems into five levels, from the physical process at level 0 to business planning at level 4, and defines common models for equipment, physical assets, materials and tests. The [MES](#manufacturing-execution-system-mes) is level 3. See [Manufacturing types](../guides/manufacturing-types.md#isa-95-one-model-for-all-three).
+
 ## Jitter
 
 The variation in latency from one message to the next.
@@ -408,6 +438,12 @@ A load cell needs [excitation](#excitation) from the DAQ. A [torque sensor](#tor
 A procedure that isolates every energy source on a machine, such as electrical power or air pressure, and locks it off before anyone works on it.
 
 Each person working puts their own lock and tag on the isolation point. Lockout/tagout is an [administrative control](#administrative-control) that uses physical locks. Pressing an E-stop isn't lockout, because anyone can release it. See [Safety](../guides/safety.md#lockouttagout).
+
+## Lot
+
+An identified quantity of material of uniform character and quality, such as a [batch](#batch), part of a batch, or the amount a [continuous process](#continuous-process) makes in a set time.
+
+A lot number identifies a lot, and links it to its history. See [Genealogy](#genealogy).
 
 ## Machine safety
 
@@ -713,7 +749,7 @@ Also called a torque transducer or a torque cell. The dyno has none: it calculat
 
 The links between each requirement, the requirements it came from and was split into, and the tests that check it.
 
-Bidirectional traceability means you can follow those links both up and down. See [Systems engineering](../guides/systems-engineering.md#traceability).
+Bidirectional traceability means you can follow those links both up and down. See [Systems engineering](../guides/systems-engineering.md#traceability). In manufacturing, traceability also means following a product back to its materials, or a material forward to its products: see [Genealogy](#genealogy).
 
 ## Transducer
 

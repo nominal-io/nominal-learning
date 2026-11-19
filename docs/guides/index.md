@@ -76,4 +76,11 @@ Requirements, interfaces and interface control documents, and failure mode and e
 
 Design testing versus production testing, the V-model, HiL and SiL, and where tests come from.
 :::
+
+:::{grid-item-card} Manufacturing types
+:link: manufacturing-types
+:link-type: doc
+
+Discrete, batch and continuous manufacturing: how each identifies its product, how test data attaches to it, and genealogy.
+:::
 ::::
