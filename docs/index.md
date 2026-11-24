@@ -46,6 +46,9 @@ guides/alarms
 guides/systems-engineering
 guides/test-design
 guides/manufacturing-types
+guides/engineering-data
+guides/statistical-analysis
+guides/frequency-domain
 ```
 
 ```{toctree}

@@ -15,7 +15,7 @@ To check whether a link can carry a stand's data, multiply the number of channel
 8 channels × 1,000 samples/s × 16 bytes = 128,000 bytes/s ≈ 1 Mbit/s
 ```
 
-That's before any protocol overhead. A module sampling at the NI-9203's maximum of 200,000 samples per second[^ni-9203] makes 25.6 Mbit/s, a quarter of a 100 Mbit/s Ethernet link.
+That's before any protocol overhead. A module sampling at the NI-9203's maximum of 200,000 samples per second[^ni-9203] makes 25.6 Mbit/s, a quarter of a 100 Mbit/s Ethernet link. For the storage a run needs, and the file formats to keep it in, see [Engineering data and warehousing](engineering-data.md).
 
 ### Example: a dyno's CAN bus
 

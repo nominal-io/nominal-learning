@@ -64,7 +64,7 @@ A test stand works the same way. The stand's pressure channel, `p_1`, is a role.
 
 ## How test data attaches
 
-ASAM ODS, a standard for storing test data, says test data "can only be understood and applied correctly" if you know where the data is, what was tested, what test equipment was used, which test was performed, and when.[^asam-ods] What changes between the types is the answer to "what was tested".
+ASAM ODS, a standard for storing test data, says test data "can only be understood and applied correctly" if you know where the data is, what was tested, what test equipment was used, which test was performed, and when.[^asam-ods] What changes between the types is the answer to "what was tested". For how to store that context with the data, see [Finding data later](engineering-data.md#finding-data-later).
 
 ### Discrete: one record per unit
 

@@ -47,6 +47,8 @@ A false, slower signal that appears in data when a channel is sampled too slowly
 
 To avoid it, sample at more than twice the fastest frequency in the signal, or remove faster content before sampling with an anti-aliasing [filter](#filter).
 
+In [design of experiments](#design-of-experiments-doe), aliasing means something else: two effects share one estimate. See [Fractional factorials and aliasing](../guides/statistical-analysis.md#fractional-factorials-and-aliasing).
+
 ## Analog-to-digital converter (ADC)
 
 The part of a DAQ that turns a sensor's voltage or current into a number.
@@ -117,11 +119,23 @@ A data connection that a computer uses to send commands to instruments and read 
 
 Also called a bus, a fieldbus, or an industrial network. See [Communications](../guides/communications.md).
 
+## Confidence interval
+
+A range, computed from a sample, that contains the true value, such as a population mean, for a stated share of samples, such as 95%.
+
+Also called confidence limits. See [Confidence intervals](../guides/statistical-analysis.md#confidence-intervals).
+
 ## Continuous process
 
 A process that runs without breaks between units of product, such as a refinery, or a rolling mill making aluminum sheet.
 
 Its product has no natural identity, so it's identified by a window of time or quantity, or by the coil or reel it's wound onto. See [Manufacturing types](../guides/manufacturing-types.md#continuous-time-first-then-length).
+
+## Control chart
+
+A plot of a measured characteristic against time or sample number, with a center line at the in-control mean and limits three standard deviations either side. A point outside the limits, or a pattern inside them, means the process has changed.
+
+See [Control charts](../guides/statistical-analysis.md#control-charts).
 
 ## Control cycle
 
@@ -155,6 +169,18 @@ Hardware that connects sensors and actuators to a computer. It reads the sensors
 
 Also called a DAQ system, an I/O system, remote I/O, or a data logger if it records on its own. Its modules plug into a chassis. A [PLC](#plc) reads and drives I/O too, and also runs control software on the same hardware.
 
+## Data lake
+
+Low-cost storage that holds raw data as files in open formats, such as Parquet, and applies a schema when the data is read. A lakehouse adds database features over it, such as transactions and versioning.
+
+See [Warehouses, lakes and lakehouses](../guides/engineering-data.md#warehouses-lakes-and-lakehouses).
+
+## Data warehouse
+
+A database that collects data from a business's operational systems for reporting and decision support, written to a schema chosen in advance.
+
+See [Warehouses, lakes and lakehouses](../guides/engineering-data.md#warehouses-lakes-and-lakehouses).
+
 ## Deadband
 
 A band around a setpoint inside which a difference is ignored, so small fluctuations don't cause a reaction.
@@ -173,6 +199,12 @@ A channel calculated from other channels rather than measured, such as power cal
 
 Also called a calculated channel, a computed channel, or a math channel. In a Nominal workbook, a formula or transform builds one from other channels after the test.
 
+## Design of experiments (DOE)
+
+A method for choosing test points in advance, so that the results separate the effect of each input, and of their interactions, from random variation.
+
+See [Design of experiments](../guides/statistical-analysis.md#design-of-experiments).
+
 ## Design testing
 
 Testing a design, once per version, on a few representative units, to show it meets its requirements with margin.
@@ -190,6 +222,12 @@ Also called a unit under test (UUT), a test article, equipment under test (EUT),
 Making separate units that each keep their own identity, such as a serial number.
 
 Assembling electronic and mechanical parts, and machining parts, are discrete. See [Manufacturing types](../guides/manufacturing-types.md#discrete-one-record-per-unit).
+
+## Downsampling
+
+Reducing data to fewer values, such as the minimum and maximum of each time bucket, so a chart can show a long recording. Downsample for display, and keep the raw data.
+
+See [Downsampling for display](../guides/engineering-data.md#downsampling-for-display).
 
 ## Drift
 
@@ -269,11 +307,17 @@ A review that lists each way each part of a system can fail, what happens as a r
 
 A [risk assessment](#risk-assessment) starts from hazards. An FMEA starts from failures. Its types include design FMEA (DFMEA) and process FMEA (PFMEA). See [Systems engineering](../guides/systems-engineering.md#failure-mode-and-effects-analysis) for the types, scoring and worked examples.
 
+## Fast Fourier transform (FFT)
+
+An efficient way to compute the discrete Fourier transform, which turns a record of samples into a [spectrum](#spectrum). A record of N samples taken at a sample rate fs gives frequency bins fs/N apart, up to fs/2.
+
+See [From samples to a spectrum](../guides/frequency-domain.md#from-samples-to-a-spectrum).
+
 ## Filter
 
 Processing that removes unwanted parts of a signal, such as a low-pass filter, which removes fast noise and keeps slow changes.
 
-A filter can be hardware, before the ADC, or software, after it. Filtering delays a signal slightly, which matters for [closed-loop](#closed-loop) control.
+A filter can be hardware, before the ADC, or software, after it. Filtering delays a signal slightly, which matters for [closed-loop](#closed-loop) control. See [Filters in the frequency domain](../guides/frequency-domain.md#filters-in-the-frequency-domain).
 
 ## Fixture
 
@@ -298,6 +342,12 @@ Also called a local interface. LabVIEW calls each program's user interface a fro
 Pressure measured relative to the surrounding air, in units such as psig, so an open tank reads 0.
 
 Absolute pressure, in psia, is measured relative to a vacuum. Differential pressure, in psid, is the difference between two points.
+
+## Gauge R&R
+
+A study that measures the same items repeatedly, to split a measurement's variation into repeatability, over a short time, and reproducibility, such as from day to day.
+
+See [Measurement system analysis](../guides/statistical-analysis.md#measurement-system-analysis).
 
 ## Genealogy
 
@@ -329,6 +379,12 @@ Testing the real controller hardware, with its real inputs and outputs, against 
 
 HiL testing can repeat faults and edge cases that would be dangerous or expensive on the real system. Compare [MiL](#model-in-the-loop-mil), [SiL](#software-in-the-loop-sil) and [PiL](#processor-in-the-loop-pil). See [Test design](../guides/test-design.md#testing-before-the-hardware-is-ready-mil-sil-pil-and-hil).
 
+## Harmonic
+
+A frequency at a whole multiple of a fundamental frequency. A repeating signal that isn't a pure sine wave has harmonics, such as mains interference at multiples of 50 Hz or 60 Hz.
+
+See [Time domain and frequency domain](../guides/frequency-domain.md#time-domain-and-frequency-domain).
+
 ## Hazard
 
 A source of possible harm, such as stored air pressure, a spinning shaft, or a live electrical circuit.
@@ -351,7 +407,7 @@ Software trips aren't on the list, because they protect equipment, not people. S
 
 A database that records the time series of a plant's or stand's tags, so operators can look back at them.
 
-Also called a process historian or a data historian.
+Also called a process historian or a data historian. See [Historians](../guides/engineering-data.md#historians).
 
 ## HMI
 
@@ -382,6 +438,12 @@ Also called a point, an I/O channel, a physical channel, or a control point. The
 A self-contained device with its own transducers and electronics built in, and any actuators it needs, which a computer controls over a communications bus and a person through its front panel.
 
 Also called an integrated instrument or a smart device. More loosely, any measuring device is called an instrument. A motor controller and a programmable power supply are both instruments. See [Sensors and instrumentation](../guides/sensors-and-instrumentation.md#instruments).
+
+## Interaction
+
+In [design of experiments](#design-of-experiments-doe), when the effect of one factor on a response depends on the level of another factor.
+
+See [Why one factor at a time misses interactions](../guides/statistical-analysis.md#why-one-factor-at-a-time-misses-interactions).
 
 ## Interface control document (ICD)
 
@@ -489,6 +551,12 @@ The range of conditions, such as speed, load, pressure and temperature, that a D
 
 Also called the operating range, or for power electronics the safe operating area (SOA).
 
+## Order (rotating machinery)
+
+A frequency expressed as the number of times something happens per revolution of a reference shaft. The frequency in Hz is the order times the shaft's speed in RPM, divided by 60, and a gear's mesh order equals its tooth count.
+
+See [Rotating machinery and orders](../guides/frequency-domain.md#rotating-machinery-and-orders).
+
 ## Pass/fail criteria
 
 The conditions a test result must meet for the DUT to pass, such as a maximum leak rate.
@@ -513,6 +581,12 @@ Short for programmable logic controller: a rugged industrial computer that reads
 
 PLCs are programmed in languages such as ladder logic.
 
+## Power spectral density (PSD)
+
+A [spectrum](#spectrum) whose power in each bin is divided by the bin spacing, in units such as g²/Hz, so a broadband random signal reads the same at any resolution. Use it for random signals, and an amplitude spectrum for tones.
+
+See [Amplitude spectrum or power spectral density](../guides/frequency-domain.md#amplitude-spectrum-or-power-spectral-density).
+
 ## Precision
 
 How close repeated measurements of the same value are to each other.
@@ -524,6 +598,12 @@ Also called repeatability. A precise sensor can still be inaccurate, if it's off
 A valve that holds the pressure downstream of it at a set value, as long as the supply pressure is higher.
 
 An electronic pressure regulator takes its setpoint as a command.
+
+## Process capability
+
+How well an in-control process fits inside its specification limits. Cp compares the limits' width with six standard deviations, and Cpk also accounts for a mean that's off center.
+
+See [Process capability](../guides/statistical-analysis.md#process-capability).
 
 ## Processor-in-the-loop (PiL)
 
@@ -663,6 +743,30 @@ An on/off valve that an electromagnet opens or closes when it's powered.
 
 Compare a [proportional valve](#proportional-valve).
 
+## Spectral leakage
+
+Energy from one frequency spreading into other bins of a [spectrum](#spectrum), because the record doesn't hold a whole number of its cycles. A [window](#window-function) reduces it.
+
+See [Leakage and windows](../guides/frequency-domain.md#leakage-and-windows).
+
+## Spectrogram
+
+A plot of how a signal's [spectrum](#spectrum) changes over time, made from the spectra of short, overlapping records. For rotating machinery, the same plot against speed is called a colormap.
+
+See [Signals that change: the spectrogram](../guides/frequency-domain.md#signals-that-change-the-spectrogram).
+
+## Spectrum
+
+A plot of how much of a signal is at each frequency, computed from a time series with an [FFT](#fast-fourier-transform-fft).
+
+See [Frequency domain](../guides/frequency-domain.md).
+
+## Standard deviation
+
+A measure of how far a set of values spreads around its mean. For a sample, it's the square root of the sum of the squared differences from the mean, divided by one less than the number of values.
+
+See [Describing a set of results](../guides/statistical-analysis.md#describing-a-set-of-results).
+
 ## Steady state
 
 When a stand's measurements have stopped changing after a change in its commands.
@@ -727,6 +831,12 @@ A temperature sensor made of two different metals joined at the tip, which produ
 
 It covers a wide range of temperatures. To read it, the DAQ also measures the temperature where the wires connect, which is called cold-junction compensation.
 
+## Time-series database
+
+A database built to store and query values by time. Compression that uses the regular gaps between timestamps, and the small changes between values, can store each value in far fewer bytes than its raw size.
+
+See [Time-series databases](../guides/engineering-data.md#time-series-databases).
+
 ## Tolerance
 
 How far a value may be from its target and still be acceptable, such as 100 mm ± 0.1 mm.
@@ -782,6 +892,12 @@ Also called the Vee. See [Test design](../guides/test-design.md#the-v-model).
 A timer that puts a device in a safe state if the software controlling it stops checking in.
 
 For example, a motor controller can stop driving its motor if no command arrives within a set time, so a crashed program can't leave the motor running.
+
+## Window function
+
+A curve that multiplies a record before an [FFT](#fast-fourier-transform-fft), tapering to zero at both ends to reduce [spectral leakage](#spectral-leakage). A Hann window suits most signals, and a flat top window reads a tone's amplitude accurately.
+
+Also called a window. See [Leakage and windows](../guides/frequency-domain.md#leakage-and-windows).
 
 ## Workbook
 

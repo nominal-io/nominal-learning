@@ -83,4 +83,25 @@ Design testing versus production testing, the V-model, HiL and SiL, and where te
 
 Discrete, batch and continuous manufacturing: how each identifies its product, how test data attaches to it, and genealogy.
 :::
+
+:::{grid-item-card} Engineering data and warehousing
+:link: engineering-data
+:link-type: doc
+
+File formats, historians, time-series databases and data lakes: how test data is stored, how much space it takes, and how you find it again.
+:::
+
+:::{grid-item-card} Statistical analysis and DOE
+:link: statistical-analysis
+:link-type: doc
+
+Means, confidence intervals and t-tests, control charts and process capability, and design of experiments for planning test points.
+:::
+
+:::{grid-item-card} Frequency domain
+:link: frequency-domain
+:link-type: doc
+
+Spectra, windows, PSDs, spectrograms and orders: what a signal's frequencies show, and the sample rate and record length you need to see them.
+:::
 ::::

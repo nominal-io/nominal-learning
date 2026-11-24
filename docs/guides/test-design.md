@@ -116,7 +116,7 @@ A test applies a {gloss}`stimulus <stimulus and response>` to the DUT and measur
 
 When several inputs matter, plan the test points in advance. Design of experiments (DOE) is a method for choosing those test points.[^nist-doe]
 
-The dyno's sequence is a simple planned experiment. It has two inputs, speed and load. It runs every combination of 5 speeds and 3 loads, 15 test points in all, which is called a full factorial. With more inputs, a full factorial grows fast, and DOE gives smaller designs that still separate each input's effect.
+The dyno's sequence is a simple planned experiment. It has two inputs, speed and load. It runs every combination of 5 speeds and 3 loads, 15 test points in all, which is called a full factorial. With more inputs, a full factorial grows fast, and DOE gives smaller designs that still separate each input's effect. [Statistical analysis and DOE](statistical-analysis.md#design-of-experiments) covers those designs, and how to randomize, replicate and block the dyno's test points.
 
 ### Worked example: one requirement, two tests
 
