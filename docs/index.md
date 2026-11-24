@@ -34,21 +34,49 @@ demo-workshop/facilitator-guide
 :hidden:
 :caption: Guides
 
-guides/index
-guides/safety
+Overview <guides/index>
+```
+
+```{toctree}
+:hidden:
+:caption: Test & Measurement
+
 guides/sensors-and-instrumentation
 guides/measurement-quality
-guides/communications
-guides/network-performance
+guides/test-design
+```
+
+```{toctree}
+:hidden:
+:caption: Control & Automation
+
 guides/control
 guides/distributed-control
 guides/alarms
-guides/systems-engineering
-guides/test-design
-guides/manufacturing-types
-guides/engineering-data
-guides/statistical-analysis
+guides/safety
+```
+
+```{toctree}
+:hidden:
+:caption: Communications & Networking
+
+guides/communications
+guides/network-performance
+```
+
+```{toctree}
+:hidden:
+:caption: Signal Processing & Analysis
+
 guides/frequency-domain
+guides/statistical-analysis
+```
+
+```{toctree}
+:hidden:
+:caption: Engineering Data Infrastructure
+
+guides/engineering-data
 ```
 
 ```{toctree}

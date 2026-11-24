@@ -5,7 +5,7 @@ Data from industrial systems is time series from many channels, and it's useful 
 
 ## What test data is made of
 
-A test produces two kinds of information: time series, and metadata that relates them to the physical world. Each {gloss}`channel` is a named set of (time, value) pairs, and separate channels can share timestamps or each have their own. The metadata describes the data in terms of physical things, such as the unit tested and the stand, and spans of time, such as runs and events.[^nominal-data-model] [Manufacturing types](manufacturing-types.md#how-test-data-attaches) lists what ASAM ODS says you need to know, and how test data attaches to each kind of product.
+A test produces two kinds of information: time series, and metadata that relates them to the physical world. Each {gloss}`channel` is a named set of (time, value) pairs, and separate channels can share timestamps or each have their own. The metadata describes the data in terms of physical things, such as the unit tested and the stand, and spans of time, such as runs and events.[^nominal-data-model]
 Some context can't be read from the values at all. Take a {gloss}`dyno <dynamometer>`, where two load motors brake the motor under test, each through its own motor controller:
 
 - A motor temperature of exactly 0.0 °C, or a large negative value, means no sensor is fitted, not a cold motor.
@@ -101,7 +101,7 @@ The FAIR principles, written for scientific data, set out what makes data findab
 
 - **Units.** Store each channel's {gloss}`engineering units` with it. The Mars Climate Orbiter was lost because ground software wrote thruster impulse to a file in pound-force seconds, where the file's interface specification required newton-seconds. The navigation team assumed metric units, underestimated the thrusters' effect by a factor of 4.45, and the spacecraft arrived about 170 km lower than planned.[^mco]
 - **Names.** Name each channel by where it comes from and what it measures. The dyno's software names channels by controller and quantity, such as `dut.velocity` and `left_load.motor_temperature`.
-- **Configuration and calibration.** Record which instrument filled each role, its {gloss}`calibration`, and the system's configuration, for each run. The dyno's manual says to keep each motor controller's exported configuration under version control. See [Equipment and physical assets](manufacturing-types.md#equipment-and-physical-assets).- **The unit and the run.** Link each run's data to the unit it tested, so you can trace from a unit to its data and back. See [Genealogy](manufacturing-types.md#genealogy).
+- **Configuration and calibration.** Record which instrument filled each role, its {gloss}`calibration`, and the system's configuration, for each run. The dyno's manual says to keep each motor controller's exported configuration under version control.- **The unit and the run.** Link each run's data to the unit it tested, so you can trace from a unit to its data and back. See {gloss}`Genealogy`.
 
 ## In Nominal
 

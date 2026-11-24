@@ -1,107 +1,118 @@
-# Guides
+# Engineering Guides
+
+:::{note}
+This page is a work in progress.
+:::
 
 {.lead}
-Deeper dives into test and measurement ideas, with worked examples and sources for further reading. Each guide stands on its own.
+Practical guides to engineering test, measurement, control and data analysis.
 
-::::{grid} 1 1 2 2
+::::{grid} 2
 :gutter: 2
-:margin: 4 4 0 0
+:margin: 4 0 0 0
 
-:::{grid-item-card} Safety
-:link: safety
-:link-type: doc
+:::{grid-item}
+:columns: 2 2 1 1
 
-Human safety and machine safety, the hazard controls that keep each, and which failure each control covers.
+{octicon}`pulse;2.5em`
 :::
 
-:::{grid-item-card} Sensors and instrumentation
-:link: sensors-and-instrumentation
-:link-type: doc
+:::{grid-item}
+:columns: 10 10 11 11
 
-Transducers, instruments, DAQ inputs and outputs, and sensors for pressure, temperature, force and flow.
+{.sd-fs-3 .sd-font-weight-bold .sd-mb-1}
+Test & Measurement
+
+Acquiring, measuring and validating real-world data from physical systems.
+
+[Sensors&nbsp;and&nbsp;instrumentation&nbsp;→](sensors-and-instrumentation.md)&emsp;&emsp;[Measurement&nbsp;quality&nbsp;→](measurement-quality.md)&emsp;&emsp;[Test&nbsp;design&nbsp;→](test-design.md)
+:::
+::::
+
+::::{grid} 2
+:gutter: 2
+:margin: 4 0 0 0
+
+:::{grid-item}
+:columns: 2 2 1 1
+
+{octicon}`workflow;2.5em`
 :::
 
-:::{grid-item-card} Measurement quality
-:link: measurement-quality
-:link-type: doc
+:::{grid-item}
+:columns: 10 10 11 11
 
-Accuracy, resolution, noise and sampling, with a full error budget for a pressure measurement.
+{.sd-fs-3 .sd-font-weight-bold .sd-mb-1}
+Control & Automation
+
+Designing, implementing and operating control systems for test and production.
+
+[Control&nbsp;→](control.md)&emsp;&emsp;[Distributed&nbsp;control&nbsp;→](distributed-control.md)&emsp;&emsp;[Alarms&nbsp;→](alarms.md)&emsp;&emsp;[Safety&nbsp;→](safety.md)
+:::
+::::
+
+::::{grid} 2
+:gutter: 2
+:margin: 4 0 0 0
+
+:::{grid-item}
+:columns: 2 2 1 1
+
+{octicon}`stack;2.5em`
 :::
 
-:::{grid-item-card} Communications
-:link: communications
-:link-type: doc
+:::{grid-item}
+:columns: 10 10 11 11
 
-How a computer talks to instruments and controllers: CAN, serial, Ethernet, Modbus and SCPI.
+{.sd-fs-3 .sd-font-weight-bold .sd-mb-1}
+Communications & Networking
+
+Moving data between instruments, controllers and systems reliably and at scale.
+
+[Communications&nbsp;→](communications.md)&emsp;&emsp;[Network&nbsp;performance&nbsp;→](network-performance.md)
+:::
+::::
+
+::::{grid} 2
+:gutter: 2
+:margin: 4 0 0 0
+
+:::{grid-item}
+:columns: 2 2 1 1
+
+{octicon}`graph;2.5em`
 :::
 
-:::{grid-item-card} Network performance
-:link: network-performance
-:link-type: doc
+:::{grid-item}
+:columns: 10 10 11 11
 
-Bandwidth, latency and backpressure: how much data a link carries, how long it takes, and what happens when a receiver falls behind.
+{.sd-fs-3 .sd-font-weight-bold .sd-mb-1}
+Signal Processing & Analysis
+
+Analyzing signals in the time and frequency domains, and extracting insight from experimental data.
+
+[Frequency&nbsp;domain&nbsp;→](frequency-domain.md)&emsp;&emsp;[Statistical&nbsp;analysis&nbsp;and&nbsp;DOE&nbsp;→](statistical-analysis.md)
+:::
+::::
+
+::::{grid} 2
+:gutter: 2
+:margin: 4 0 0 0
+
+:::{grid-item}
+:columns: 2 2 1 1
+
+{octicon}`database;2.5em`
 :::
 
-:::{grid-item-card} Control
-:link: control
-:link-type: doc
+:::{grid-item}
+:columns: 10 10 11 11
 
-Setpoints, open and closed loops, PID, and how a measurement responds to a change in its command.
-:::
+{.sd-fs-3 .sd-font-weight-bold .sd-mb-1}
+Engineering Data Infrastructure
 
-:::{grid-item-card} Distributed control
-:link: distributed-control
-:link-type: doc
+Storing, organizing and analyzing engineering data at lab, fleet and manufacturing scale.
 
-Central and distributed control: where control lives, what each controller is responsible for, and how separate controllers coordinate.
-:::
-
-:::{grid-item-card} Alarms
-:link: alarms
-:link-type: doc
-
-What deserves an alarm, how alarm software handles one, and alarm fatigue: why operators stop trusting alarms, and how to keep their trust.
-:::
-
-:::{grid-item-card} Systems engineering
-:link: systems-engineering
-:link-type: doc
-
-Requirements, interfaces and interface control documents, and failure mode and effects analysis.
-:::
-
-:::{grid-item-card} Test design
-:link: test-design
-:link-type: doc
-
-Design testing versus production testing, the V-model, HiL and SiL, and where tests come from.
-:::
-
-:::{grid-item-card} Manufacturing types
-:link: manufacturing-types
-:link-type: doc
-
-Discrete, batch and continuous manufacturing: how each identifies its product, how test data attaches to it, and genealogy.
-:::
-
-:::{grid-item-card} Engineering data and warehousing
-:link: engineering-data
-:link-type: doc
-
-File formats, historians, time-series databases and data lakes: how test data is stored, how much space it takes, and how you find it again.
-:::
-
-:::{grid-item-card} Statistical analysis and DOE
-:link: statistical-analysis
-:link-type: doc
-
-Means, confidence intervals and t-tests, control charts and process capability, and design of experiments for planning test points.
-:::
-
-:::{grid-item-card} Frequency domain
-:link: frequency-domain
-:link-type: doc
-
-Spectra, windows, PSDs, spectrograms and orders: what a signal's frequencies show, and the sample rate and record length you need to see them.
+[Engineering&nbsp;data&nbsp;and&nbsp;warehousing&nbsp;→](engineering-data.md)
 :::
 ::::

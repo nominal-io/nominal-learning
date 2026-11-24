@@ -71,7 +71,7 @@ What a system achieves in practice, its throughput, is often lower. See [Network
 
 A quantity of material made together, in one run of a process with a distinct start and end, and identified by a batch number.
 
-Batch manufacturing is one of three [manufacturing types](../guides/manufacturing-types.md), with [discrete manufacturing](#discrete-manufacturing) and [continuous processes](#continuous-process). Food manufacturing is a typical example. A batch is tested through samples taken from it.
+Batch manufacturing is one of three manufacturing types, with [discrete manufacturing](#discrete-manufacturing) and [continuous processes](#continuous-process). Food manufacturing is a typical example. A batch is tested through samples taken from it.
 
 ## CAN bus
 
@@ -129,7 +129,7 @@ Also called confidence limits. See [Confidence intervals](../guides/statistical-
 
 A process that runs without breaks between units of product, such as a refinery, or a rolling mill making aluminum sheet.
 
-Its product has no natural identity, so it's identified by a window of time or quantity, or by the coil or reel it's wound onto. See [Manufacturing types](../guides/manufacturing-types.md#continuous-time-first-then-length).
+Its product has no natural identity, so it's identified by a window of time or quantity, or by the coil or reel it's wound onto.
 ## Control chart
 
 A plot of a measured characteristic against time or sample number, with a center line at the in-control mean and limits three standard deviations either side. A point outside the limits, or a pattern inside them, means the process has changed.
@@ -225,7 +225,7 @@ Also called a unit under test (UUT), a test article, equipment under test (EUT),
 
 Making separate units that each keep their own identity, such as a serial number.
 
-Assembling electronic and mechanical parts, and machining parts, are discrete. See [Manufacturing types](../guides/manufacturing-types.md#discrete-one-record-per-unit).
+Assembling electronic and mechanical parts, and machining parts, are discrete.
 ## Downsampling
 
 Reducing data to fewer values, such as the minimum and maximum of each time bucket, so a chart can show a long recording. Downsample for display, and keep the raw data.
@@ -314,7 +314,7 @@ Also called de-energize-to-trip, or fail-safe wiring when the wiring does it. A 
 
 A review that lists each way each part of a system can fail, what happens as a result, and how the failure is detected or prevented.
 
-A [risk assessment](#risk-assessment) starts from hazards. An FMEA starts from failures. Its types include design FMEA (DFMEA) and process FMEA (PFMEA). See [Systems engineering](../guides/systems-engineering.md#failure-mode-and-effects-analysis) for the types, scoring and worked examples.
+A [risk assessment](#risk-assessment) starts from hazards. An FMEA starts from failures. Its types include design FMEA (DFMEA) and process FMEA (PFMEA).
 ## Fast Fourier transform (FFT)
 
 An efficient way to compute the discrete Fourier transform, which turns a record of samples into a [spectrum](#spectrum). A record of N samples taken at a sample rate fs gives frequency bins fs/N apart, up to fs/2.
@@ -361,7 +361,7 @@ Sources define reproducibility differently. [NIST's statistics handbook](https:/
 
 The record of what went into each product, and what each material and machine went into.
 
-Also called material traceability. A backward trace goes from a product to its materials, and to the equipment that made and tested it. A forward trace goes from a material [lot](#lot) or a machine to every product it touched. See [Manufacturing types](../guides/manufacturing-types.md#genealogy).
+Also called material traceability. A backward trace goes from a product to its materials, and to the equipment that made and tested it. A forward trace goes from a material [lot](#lot) or a machine to every product it touched.
 ## Golden unit
 
 A unit known to be good, kept as a reference to develop and check production tests.
@@ -456,7 +456,7 @@ See [Why one factor at a time misses interactions](../guides/statistical-analysi
 
 A document that defines an interface between two parts of a system, so both sides build to the same definition.
 
-An ICD covers the physical, electrical, data and behavioral details of the interface, and who owns each side. See [Systems engineering](../guides/systems-engineering.md#interface-control-documents).
+An ICD covers the physical, electrical, data and behavioral details of the interface, and who owns each side.
 ## Interlock
 
 A condition that must be true before a machine allows an action, or that stops the machine if it changes, such as a switch on a guard or a test cell's door.
@@ -467,7 +467,7 @@ An interlock that protects people is a [safety function](#safety-function), buil
 
 The standard for connecting a factory's control systems to its business systems, published internationally as IEC 62264.
 
-It splits a factory's systems into five levels, from the physical process at level 0 to business planning at level 4, and defines common models for equipment, physical assets, materials and tests. The [MES](#manufacturing-execution-system-mes) is level 3. See [Manufacturing types](../guides/manufacturing-types.md#isa-95-one-model-for-all-three).
+It splits a factory's systems into five levels, from the physical process at level 0 to business planning at level 4, and defines common models for equipment, physical assets, materials and tests. The [MES](#manufacturing-execution-system-mes) is level 3.
 ## Jitter
 
 The variation in latency from one message to the next.
@@ -658,7 +658,7 @@ Short for regenerative braking: a motor braking by working as a generator, which
 
 A statement of what a system has to do or be, written with "shall", that can be checked.
 
-A good requirement says one thing, states what is needed rather than how, and can be verified by test, analysis, demonstration or inspection. See [Systems engineering](../guides/systems-engineering.md#requirements).
+A good requirement says one thing, states what is needed rather than how, and can be verified by test, analysis, demonstration or inspection.
 ## Resolution
 
 The smallest change a measurement can show.
@@ -867,7 +867,7 @@ Also called a torque transducer or a torque cell.
 
 The links between each requirement, the requirements it came from and was split into, and the tests that check it.
 
-Bidirectional traceability means you can follow those links both up and down. See [Systems engineering](../guides/systems-engineering.md#traceability). In manufacturing, traceability also means following a product back to its materials, or a material forward to its products: see [Genealogy](#genealogy).
+Bidirectional traceability means you can follow those links both up and down. In manufacturing, traceability also means following a product back to its materials, or a material forward to its products: see [Genealogy](#genealogy).
 
 In metrology, traceability, or metrological traceability, means a result can be related to a reference, such as a national standard, through an unbroken chain of calibrations, each adding to the uncertainty. See [Calibration](#calibration).
 

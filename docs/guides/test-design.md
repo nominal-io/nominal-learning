@@ -101,10 +101,10 @@ The dyno's own control software is tested close to SiL. Its tests run the stand'
 
 ### Requirements
 
-Each requirement names how it will be checked: by test, analysis, demonstration or inspection.[^nasa-verification] Each requirement checked by test needs at least one test case, and a review should ask whether every requirement traces to one.[^fhwa-vee] NASA records the results in a requirements compliance or verification matrix, which keeps the link between each requirement and its results.[^nasa-verification] See [Systems engineering](systems-engineering.md) for writing requirements.
+Each requirement names how it will be checked: by test, analysis, demonstration or inspection.[^nasa-verification] Each requirement checked by test needs at least one test case, and a review should ask whether every requirement traces to one.[^fhwa-vee] NASA records the results in a requirements compliance or verification matrix, which keeps the link between each requirement and its results.[^nasa-verification]
 ### Failure modes
 
-An FMEA lists how each part can fail, and how each failure is prevented or detected. Each prevention or detection measure is a claim that needs a test. A design FMEA leads to design tests that cause each failure on purpose, such as unplugging a sensor to show the system trips. A process FMEA leads to production tests that catch each build defect, such as a missing seal. See the [FMEA example](systems-engineering.md#worked-example-fmea-rows-for-two-stands).
+An FMEA lists how each part can fail, and how each failure is prevented or detected. Each prevention or detection measure is a claim that needs a test. A design FMEA leads to design tests that cause each failure on purpose, such as unplugging a sensor to show the system trips. A process FMEA leads to production tests that catch each build defect, such as a missing seal.
 ### Limits on what you can test
 
 Some requirements can't be tested the way they're written, or not at a cost that makes sense:

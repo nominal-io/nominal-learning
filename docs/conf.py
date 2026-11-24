@@ -29,6 +29,9 @@ html_js_files = [("gloss.js", {"defer": "defer"}), ("cite.js", {"defer": "defer"
 
 exclude_patterns = ["_build"]
 
+# each captioned sidebar group folds under its caption, starting open
+nominal_sidebar_open = True
+
 html_theme = "shibuya"
 html_theme_options = theme_options(
     youtube_url="https://www.youtube.com/@nominal-io/shorts",
