@@ -1,17 +1,17 @@
 # Communications
 
 {.lead}
-Instruments talk to the computer in messages, over a link, using a protocol both ends agree on. The link decides how fast values arrive and where they're timestamped.
+Modern systems are communication-heavy, with many devices which must pass data to each other. This communication spans software and hardware layers and has impacts on what the overall system is capable of.
 
 ## Layers
 
-Every link has three layers, and problems can live in any of them:
+The communications links between systems can be defined in terms of the Open Systems Interconnection (OSI) model[^itu-x200], which divides communication into seven layers, from the physical layer (layer 1) up to the application layer (layer 7). This guide merges layers of that model into three:
 
-- **The physical layer** is the wires and the voltages on them: how many wires, how long they can be, and how a bit is signaled.
-- **The protocol layer** is how bits become messages: how a message starts and ends, how a device is addressed, and how errors are detected.
-- **The application layer** is what the messages mean: which message sets a speed, and which one reads a temperature.
+- **The physical layer** is the specification for the actual wires or electromagnetic waves carrying data. This matches OSI layer 1.
+- **The protocol layer** is how bits become messages, including framing, device addressing, and error detection & correction. This covers OSI layers 2-4: data link, network, and transport.
+- **The application layer** is what the messages mean, anything from a command to a data package. This can include additional framing and formatting. This covers OSI layers 5-7: session, presentation, and application.
 
-On an e-axle {gloss}`dyno <dynamometer>`, for example, where a motor drives the e-axle under test and a load motor on each side brakes it, the power supply uses USB as its physical layer and SCPI as its application layer. The three motor controllers use CAN for both the physical and protocol layers, and each controller's own set of messages for the application layer.
+Consider this webpage. Your Ethernet or Wi-Fi connection spans the physical layer and portions of the protocol layer. Your operating system handles the rest of the protocol layer. Cryptography and the HTTP request which fetched this page are carried on the application layer. Finally, the browser takes the content carried by HTTP (the HTML) and renders it.
 
 ## Serial links: RS-232 and RS-485
 
@@ -120,9 +120,9 @@ Before you trust a channel's data, check how its link handles each of these:
 
 ## Links compared
 
-Each link suits different devices on a test stand:
+Each link suits different devices:
 
-| Link | Topology | Speed and reach | On test stands |
+| Link | Topology | Speed and reach | Used for |
 | --- | --- | --- | --- |
 | RS-485 | Multi-drop bus | 10 Mbit/s at 12 m, 100 kbit/s at 1,200 m | Industrial devices, including Modbus devices |
 | CAN | Multi-drop bus | 1 Mbit/s at 40 m | Motor controllers, vehicle electronics |
@@ -140,6 +140,7 @@ Each link suits different devices on a test stand:
 
 ## References
 
+[^itu-x200]: ITU-T, ["X.200: Open Systems Interconnection, Basic Reference Model: The basic model"](https://www.itu.int/rec/T-REC-X.200-199407-I/en), 1994. The same text is published as ISO/IEC 7498-1. Retrieved 2026-11-24.
 [^ti-rs485]: T. Kugelstadt, Texas Instruments, ["The RS-485 Design Guide"](https://www.ti.com/lit/an/slla272d/slla272d.pdf), SLLA272D, revised May 2021. Retrieved 2026-11-12.
 [^ti-can]: S. Corrigan, Texas Instruments, ["Introduction to the Controller Area Network (CAN)"](https://www.ti.com/lit/an/sloa101b/sloa101b.pdf), SLOA101B, revised May 2016. Retrieved 2026-11-12.
 [^cia-can-fd]: CAN in Automation, ["CAN FD: The basic idea"](https://www.can-cia.org/can-knowledge/can-fd-the-basic-idea). Retrieved 2026-11-12.

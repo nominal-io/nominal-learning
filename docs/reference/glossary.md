@@ -9,11 +9,11 @@ Test and measurement terms, with the other names you may hear for them. The [gui
 
 How close a measurement is to the true value.
 
-A sensor's accuracy is stated as a percentage of its full scale or of its reading, such as ±0.25% FS. Accuracy isn't the same as [precision](#precision): a sensor can give the same wrong reading every time. See [Measurement quality](../guides/measurement-quality.md).
+Datasheets state accuracy as a number, such as ±0.25% of full scale (FS) or of the reading. In metrology, that number is the maximum permissible error: the largest error the specification allows. Accuracy isn't the same as [precision](#precision): a sensor can give the same wrong reading every time. See [Measurement quality](../guides/measurement-quality.md).
 
 ## Actuator
 
-A device that changes something physical when the stand commands it, such as a valve, motor, compressor or pressure regulator.
+A device that changes something physical when a control system commands it, such as a valve, motor, compressor or pressure regulator.
 
 Also called an output device, or in process control a final control element. With sensors, actuators are also called control points.
 
@@ -81,17 +81,17 @@ Short for controller area network. See [Communications](../guides/communications
 
 ## Calibration
 
-Comparing a sensor or instrument with a known reference, then correcting or recording the difference.
+Comparing a sensor or instrument with a known reference, and recording the difference so its readings can be corrected.
 
-Calibration is repeated on a schedule, because sensors [drift](#drift). Traceable calibration means each reference was itself calibrated, in a chain back to a national standard.
+Calibration doesn't change the sensor. Changing it so it reads correctly, such as by zeroing it, is a separate step called adjustment. Calibration is repeated on a schedule, because sensors [drift](#drift). Traceable calibration links a result to a reference, such as a national standard, through an unbroken chain of calibrations, each adding to the uncertainty.
 
 ## Channel
 
-A named value that a stand reads or writes, such as `inlet_pressure`, together with the series of values it records over time.
+A named value that a system reads or writes, such as `inlet_pressure`, together with the series of values it records over time.
 
 Also called a tag in SCADA, PLC and historian software, a signal, a point, or in flight test a parameter or measurand. In Nominal, a tag is something else: see [Tag](#tag).
 
-A channel has a data type, and units if it's a quantity. It can hold a measurement, a command, a calculated value such as power from voltage and current, or a state such as whether the stand is running. Nominal's own definition is in the [platform glossary](https://dev.nominal.io/platform/reference/glossary/#channel).
+A channel has a data type, and units if it's a quantity. It can hold a measurement, a command, a calculated value such as power from voltage and current, or a state such as whether a machine is running. Nominal's own definition is in the [platform glossary](https://dev.nominal.io/platform/reference/glossary/#channel).
 
 ## Characterization
 
@@ -107,7 +107,7 @@ Also called feedback control. Open-loop control sends a command without checking
 
 ## Command
 
-A value written to ask a stand for something, such as "open the valve 40%" or "spin at 1,000 RPM".
+A value written to ask a system for something, such as "open the valve 40%" or "spin at 1,000 RPM".
 
 Also called a demand, a request, a write, or an output. The value a command asks for is its [setpoint](#setpoint).
 
@@ -130,7 +130,6 @@ Also called confidence limits. See [Confidence intervals](../guides/statistical-
 A process that runs without breaks between units of product, such as a refinery, or a rolling mill making aluminum sheet.
 
 Its product has no natural identity, so it's identified by a window of time or quantity, or by the coil or reel it's wound onto. See [Manufacturing types](../guides/manufacturing-types.md#continuous-time-first-then-length).
-
 ## Control chart
 
 A plot of a measured characteristic against time or sample number, with a center line at the in-control mean and limits three standard deviations either side. A point outside the limits, or a pattern inside them, means the process has changed.
@@ -145,13 +144,13 @@ Also called a control loop, a tick, or on a PLC a scan cycle. Its rate is the lo
 
 ## Control point
 
-A general name for a sensor or an actuator on a stand, or for the I/O point it connects to.
+A general name for a sensor or an actuator, or for the I/O point it connects to.
 
 See [Sensor](#sensor), [Actuator](#actuator) and [I/O point](#io-point).
 
 ## Control software
 
-Software that reads a stand's channels, decides what each actuator should do, and writes commands, in a loop at a set rate.
+Software that reads a system's channels, decides what each actuator should do, and writes commands, in a loop at a set rate.
 
 Also called control logic, control code, or on a PLC a PLC program or ladder logic.
 
@@ -183,9 +182,14 @@ See [Warehouses, lakes and lakehouses](../guides/engineering-data.md#warehouses-
 
 ## Deadband
 
-A band around a setpoint inside which a difference is ignored, so small fluctuations don't cause a reaction.
+A band within which a change is ignored, so small fluctuations don't cause a reaction.
 
-Also called a dead zone. On an [alarm](#alarm), the deadband is how far a value must come back past the alarm's limit before the alarm clears, so a noisy value near the limit doesn't turn the alarm on and off repeatedly.
+Also called a dead zone. It's used in several places:
+
+- **Control:** around a setpoint, so the controller doesn't act on every small error.
+- **Alarms:** past an [alarm](#alarm)'s limit, so a noisy value must come back by a margin before the alarm clears.
+- **Historians:** a [historian](#historian) stores a new value only when it differs from the last stored value by at least the deadband.
+- **Metrology:** an instrument's insensitivity: the largest change in the measured quantity, in either direction, that doesn't change its reading.
 
 ## Derating
 
@@ -222,7 +226,6 @@ Also called a unit under test (UUT), a test article, equipment under test (EUT),
 Making separate units that each keep their own identity, such as a serial number.
 
 Assembling electronic and mechanical parts, and machining parts, are discrete. See [Manufacturing types](../guides/manufacturing-types.md#discrete-one-record-per-unit).
-
 ## Downsampling
 
 Reducing data to fewer values, such as the minimum and maximum of each time bucket, so a chart can show a long recording. Downsample for display, and keep the raw data.
@@ -231,9 +234,9 @@ See [Downsampling for display](../guides/engineering-data.md#downsampling-for-di
 
 ## Drift
 
-A slow change in a sensor's reading, over time or with temperature, when the quantity it measures hasn't changed.
+A slow change in a sensor's reading over time, when the quantity it measures hasn't changed.
 
-Zero drift shifts the whole reading. Span drift changes how far the reading moves for a given change in the quantity. [Calibration](#calibration) corrects both.
+Zero drift shifts the whole reading. Span drift changes how far the reading moves for a given change in the quantity. [Calibration](#calibration) measures both, so they can be corrected. A change caused by temperature is a separate error, the temperature error.
 
 ## Driver
 
@@ -257,13 +260,13 @@ Also called a hold. A long dwell, such as one to see how hot a DUT gets, is call
 
 A test stand that loads a motor or engine and records its speed and torque.
 
-The motors that apply the load are also called load motors, absorbers or absorption units. An e-axle dyno can have a load motor on each side of the axle.
+The motors that apply the load are also called load motors, absorbers or absorption units.
 
 ## E-stop
 
-An emergency stop button that puts a stand in a safe state through hardware alone, without any software.
+An emergency stop button that removes power from a machine's actuators, and keeps the machine stopped until someone resets it.
 
-Also called an emergency stop, an emergency off (EMO), or a kill switch. An E-stop is a [human safety](#human-safety) control, wired [fail-safe](#fail-safe). It backs up [guards](#guard) and other controls, and doesn't replace them. See [Safety](../guides/safety.md#emergency-stop).
+Also called an emergency stop, an emergency off (EMO), or a kill switch. An E-stop backs up [guards](#guard) and other controls, and doesn't replace them. It has to stop the machine in [stop category](#stop-category) 0 or 1. See [Safety](../guides/safety.md#emergency-stop).
 
 ## Encoder
 
@@ -281,7 +284,13 @@ Engineering controls work without anyone having to remember them, so the [hierar
 
 The units a quantity is measured in, such as psig, RPM or °C, as opposed to the raw electrical signal a sensor sends.
 
-Also called EU or scaled units. The raw signal is also called raw counts or the raw value. Converting one to the other is called scaling. [Calibration](#calibration) checks and corrects that conversion.
+Also called EU or scaled units. The raw signal is also called raw counts or the raw value. Converting one to the other is called scaling. [Calibration](#calibration) checks that conversion, so it can be corrected.
+
+## Equipment protection
+
+Protecting a machine, a plant or its product from damage, as opposed to [safety](#safety), which protects people.
+
+Also called asset protection or machine protection. Accelerators call the system that does it a machine protection system (MPS). See [Safety and equipment protection](../guides/safety.md#safety-and-equipment-protection) and [Protecting equipment](../guides/safety.md#protecting-equipment).
 
 ## Event
 
@@ -297,7 +306,7 @@ In vibration and acoustics testing, excitation also means the [stimulus](#stimul
 
 ## Fail-safe
 
-A design where a failure, such as a power loss or a broken wire, leaves the system in a state that is safe to the human using it.
+A design where a failure, such as a power loss or a broken wire, leaves the system in a safe state.
 
 Also called de-energize-to-trip, or fail-safe wiring when the wiring does it. A fail-safe valve or circuit needs power to stay in its running state, so losing power moves it to the safe one. For example, a normally open vent valve releases a vessel's pressure when it loses power. See [Safety](../guides/safety.md#fail-safe-design).
 
@@ -306,7 +315,6 @@ Also called de-energize-to-trip, or fail-safe wiring when the wiring does it. A 
 A review that lists each way each part of a system can fail, what happens as a result, and how the failure is detected or prevented.
 
 A [risk assessment](#risk-assessment) starts from hazards. An FMEA starts from failures. Its types include design FMEA (DFMEA) and process FMEA (PFMEA). See [Systems engineering](../guides/systems-engineering.md#failure-mode-and-effects-analysis) for the types, scoring and worked examples.
-
 ## Fast Fourier transform (FFT)
 
 An efficient way to compute the discrete Fourier transform, which turns a record of samples into a [spectrum](#spectrum). A record of N samples taken at a sample rate fs gives frequency bins fs/N apart, up to fs/2.
@@ -345,16 +353,15 @@ Absolute pressure, in psia, is measured relative to a vacuum. Differential press
 
 ## Gauge R&R
 
-A study that measures the same items repeatedly, to split a measurement's variation into repeatability, over a short time, and reproducibility, such as from day to day.
+A study that measures the same items repeatedly, to split a measurement's variation into repeatability, over a short time, and reproducibility, such as between operators or from day to day.
 
-See [Measurement system analysis](../guides/statistical-analysis.md#measurement-system-analysis).
+Sources define reproducibility differently. [NIST's statistics handbook](https://www.itl.nist.gov/div898/handbook/mpc/section4/mpc44.htm) includes day-to-day changes at one site. The [International Vocabulary of Metrology](https://www.bipm.org/en/doi/10.59161/jcgm200-2012) calls those intermediate precision, and keeps reproducibility for a change of site, operator or instrument. See [Measurement system analysis](../guides/statistical-analysis.md#measurement-system-analysis).
 
 ## Genealogy
 
 The record of what went into each product, and what each material and machine went into.
 
 Also called material traceability. A backward trace goes from a product to its materials, and to the equipment that made and tested it. A forward trace goes from a material [lot](#lot) or a machine to every product it touched. See [Manufacturing types](../guides/manufacturing-types.md#genealogy).
-
 ## Golden unit
 
 A unit known to be good, kept as a reference to develop and check production tests.
@@ -401,25 +408,25 @@ Also called a safety control, or a control. This is a different sense from [cont
 
 The order in which to choose hazard controls, from most to least effective: elimination, substitution, engineering controls, administrative controls, and personal protective equipment (PPE).
 
-Software trips aren't on the list, because they protect equipment, not people. See [Safety](../guides/safety.md#the-hierarchy-of-controls).
+An ordinary control system's [trips](#trip) get little or no credit as protection for people. See [Safety](../guides/safety.md#the-hierarchy-of-controls).
 
 ## Historian
 
-A database that records the time series of a plant's or stand's tags, so operators can look back at them.
+A database that records the time series of a plant's or machine's tags, so operators can look back at them.
 
 Also called a process historian or a data historian. See [Historians](../guides/engineering-data.md#historians).
 
 ## HMI
 
-Short for human-machine interface: the screen an operator uses to watch a stand's channels and send commands.
+Short for human-machine interface: the screen an operator uses to watch a machine or process and send it commands.
 
 Also called an operator interface, a control app, or a SCADA screen. An instrument's [front panel](#front-panel) is its own physical HMI.
 
 ## Human safety
 
-Protecting people from a stand's hazards, such as stored pressure, moving parts and electrical energy. Controls for human safety, such as fail-safe wiring, an E-stop and guards, work without the stand's control software.
+Protecting people from harm. Safety standards call this [safety](#safety).
 
-Also called personnel safety or operator safety. Compare [machine safety](#machine-safety). See [Safety](../guides/safety.md).
+Also called personnel safety, personnel protection or operator safety. Compare [equipment protection](#equipment-protection).
 
 ## Hysteresis
 
@@ -437,7 +444,7 @@ Also called a point, an I/O channel, a physical channel, or a control point. The
 
 A self-contained device with its own transducers and electronics built in, and any actuators it needs, which a computer controls over a communications bus and a person through its front panel.
 
-Also called an integrated instrument or a smart device. More loosely, any measuring device is called an instrument. A motor controller and a programmable power supply are both instruments. See [Sensors and instrumentation](../guides/sensors-and-instrumentation.md#instruments).
+Also called an integrated instrument or a smart device. In metrology, any device used for making measurements is a measuring instrument. A motor controller and a programmable power supply are both instruments in the first sense. See [Sensors and instrumentation](../guides/sensors-and-instrumentation.md#instruments).
 
 ## Interaction
 
@@ -450,19 +457,17 @@ See [Why one factor at a time misses interactions](../guides/statistical-analysi
 A document that defines an interface between two parts of a system, so both sides build to the same definition.
 
 An ICD covers the physical, electrical, data and behavioral details of the interface, and who owns each side. See [Systems engineering](../guides/systems-engineering.md#interface-control-documents).
-
 ## Interlock
 
-A condition that must be true before a stand allows an action, or that stops the stand if it changes, such as a switch on a guard or a test cell's door.
+A condition that must be true before a machine allows an action, or that stops the machine if it changes, such as a switch on a guard or a test cell's door.
 
-A hardware interlock, wired [fail-safe](#fail-safe), is an [engineering control](#engineering-control) for [human safety](#human-safety). A software interlock protects only the machine. For example, control software can refuse to send motor commands unless the stand is running.
+An interlock that protects people is a [safety function](#safety-function), built and rated as one, such as a switch wired [fail-safe](#fail-safe) or logic in a [safety controller](#safety-controller). An interlock can also protect equipment, such as control software that sends motor commands only while a machine is running. See [Guards and interlocks](../guides/safety.md#guards-and-interlocks).
 
 ## ISA-95
 
 The standard for connecting a factory's control systems to its business systems, published internationally as IEC 62264.
 
 It splits a factory's systems into five levels, from the physical process at level 0 to business planning at level 4, and defines common models for equipment, physical assets, materials and tests. The [MES](#manufacturing-execution-system-mes) is level 3. See [Manufacturing types](../guides/manufacturing-types.md#isa-95-one-model-for-all-three).
-
 ## Jitter
 
 The variation in latency from one message to the next.
@@ -507,11 +512,9 @@ A lot number identifies a lot, and links it to its history. See [Genealogy](#gen
 
 ## Machine safety
 
-Protecting a stand and its DUT from damage. Control software can keep machine safety, by limiting commands to a safe range and tripping when a measurement leaves its allowed range.
+A term with two opposite meanings. In the machinery standards, "safety of machinery" means protecting people from a machine's hazards. Some facilities use "machine safety" for protecting the machine itself, which this glossary calls [equipment protection](#equipment-protection).
 
-Also called machine protection or equipment protection. Compare [human safety](#human-safety).
-
-Safety standards, such as ISO 12100, use "safety of machinery" for something else: protecting people from a machine's hazards, which this glossary calls human safety.
+NIF's Machine Safety System (MSS), for example, protects only the machine. See [Safety and equipment protection](../guides/safety.md#safety-and-equipment-protection).
 
 ## Manufacturing execution system (MES)
 
@@ -523,7 +526,7 @@ In a production test, the test executive gets the unit's details from the MES, a
 
 A value a sensor reports about what actually happened, such as a pressure or a speed.
 
-Also called a reading, a sample, feedback, a readback, telemetry, or in process control the process value (PV).
+Also called a reading, a sample, feedback, a readback, telemetry, or in process control the process value (PV). In metrology, a measurement is the process of obtaining a value, and the value it gives is the measured value.
 
 ## Model-in-the-loop (MiL)
 
@@ -547,7 +550,7 @@ For an electrical contact, normally open means the circuit is open, so no curren
 
 ## Operating envelope
 
-The range of conditions, such as speed, load, pressure and temperature, that a DUT or a stand is designed to run in.
+The range of conditions, such as speed, load, pressure and temperature, that a device or system is designed to run in.
 
 Also called the operating range, or for power electronics the safe operating area (SOA).
 
@@ -591,7 +594,7 @@ See [Amplitude spectrum or power spectral density](../guides/frequency-domain.md
 
 How close repeated measurements of the same value are to each other.
 
-Also called repeatability. A precise sensor can still be inaccurate, if it's off by the same amount every time. Compare [accuracy](#accuracy).
+Repeatability is precision under unchanged conditions: the same operator, instrument and place, over a short time. A precise sensor can still be inaccurate, if it's off by the same amount every time. Compare [accuracy](#accuracy).
 
 ## Pressure regulator
 
@@ -637,9 +640,9 @@ The rate is the ramp rate, such as RPM per second.
 
 ## Range
 
-The span of values a sensor or channel can measure, such as 0 to 100 psig.
+The interval of values a sensor or channel can measure, such as 0 to 100 psig.
 
-Also called the measurement range or span. The top of the range is full scale (FS), and a sensor's specifications can be given as a percentage of it, such as ±0.5% FS.
+Also called the measurement range. Its width, such as 100 psig, is the span. The top of the range is full scale (FS), and a sensor's specifications can be given as a percentage of it, such as ±0.5% FS.
 
 ## Redundancy
 
@@ -656,16 +659,15 @@ Short for regenerative braking: a motor braking by working as a generator, which
 A statement of what a system has to do or be, written with "shall", that can be checked.
 
 A good requirement says one thing, states what is needed rather than how, and can be verified by test, analysis, demonstration or inspection. See [Systems engineering](../guides/systems-engineering.md#requirements).
-
 ## Resolution
 
 The smallest change a measurement can show.
 
-For a DAQ, the [ADC](#analog-to-digital-converter-adc)'s number of bits sets it. Resolution isn't [accuracy](#accuracy): a reading can show many digits and still be wrong.
+For a DAQ, the [ADC](#analog-to-digital-converter-adc)'s number of bits sets the smallest step it can show, but noise can hide changes smaller than that. Resolution isn't [accuracy](#accuracy): a reading can show many digits and still be wrong.
 
 ## Risk assessment
 
-A structured review that finds a stand's hazards, estimates the risk of each, and decides which controls bring the risk down to an acceptable level.
+A structured review that finds a machine's or process's hazards, estimates the risk of each, and decides which controls bring the risk down to an acceptable level.
 
 ISO 12100 describes how to do one for machines. An [FMEA](#failure-mode-and-effects-analysis-fmea) is a related review that starts from how each part can fail.
 
@@ -683,15 +685,27 @@ See Nominal's [Run](https://dev.nominal.io/platform/reference/glossary/#run) ent
 
 ## Safety
 
-Freedom from unacceptable risk of harm. A test stand has two kinds: machine safety, which protects the equipment and the DUT, and human safety, which protects people.
+Freedom from unacceptable risk of harm to people. Some standards also count harm that reaches people through damage to property or the environment.
 
-See [Machine safety](#machine-safety), [Human safety](#human-safety), and [Safety](../guides/safety.md#which-control-covers-which-failure) for which control covers which failure.
+Protecting equipment for its own sake is [equipment protection](#equipment-protection). See [Safety and equipment protection](../guides/safety.md#safety-and-equipment-protection), and [Which control covers which failure](../guides/safety.md#which-control-covers-which-failure).
 
 ## Safety controller
 
 Hardware designed and certified to carry out safety functions, such as stopping a machine when an E-stop is pressed or a guard opens.
 
-Also called a safety relay, or a safety PLC if it's programmable. It's built to standards such as ISO 13849, so it can be relied on for [human safety](#human-safety). See [Safety](../guides/safety.md#safety-controllers).
+Also called a safety relay, or a safety PLC if it's programmable. It's built and rated to standards such as ISO 13849-1 or IEC 62061, so it can carry [safety functions](#safety-function). See [Safety](../guides/safety.md#safety-controllers).
+
+## Safety function
+
+A function whose failure can immediately increase the risk to people, such as stopping a machine when a guard opens.
+
+ISO 13849-1 rates how reliably it works as a performance level (PL), and IEC 62061 and IEC 61511 as a safety integrity level (SIL). In process plants, a [safety instrumented system](#safety-instrumented-system-sis) carries out safety instrumented functions (SIFs). See [Safety functions and the control system](../guides/safety.md#safety-functions-and-the-control-system).
+
+## Safety instrumented system (SIS)
+
+In process plants, the system that carries out safety instrumented functions, from sensors to final elements such as valves. It's kept separate from the basic process control system (BPCS) that runs the process.
+
+IEC 61511 sets its requirements. Some labs use SIS for a safety interlock system instead, such as NIF's, which protects people. See [Safety functions and the control system](../guides/safety.md#safety-functions-and-the-control-system).
 
 ## Sample rate
 
@@ -711,7 +725,7 @@ A device that measures something physical, such as pressure or flow, and turns i
 
 Also called a probe. With actuators, sensors are also called control points.
 
-A sensor wired to a DAQ is a [transducer](#transducer). A sensor built into a device with its own electronics and bus connection is part of an [instrument](#instrument). A gauge, such as a dial pressure gauge, shows a measurement on the device itself and doesn't produce a channel.
+A sensor is a kind of [transducer](#transducer). It can be wired to a DAQ on its own, or built into an [instrument](#instrument) with its own electronics and bus connection. A gauge, such as a dial pressure gauge, shows a measurement on the device itself and doesn't produce a channel. In metrology, the sensor is only the part the quantity acts on directly, such as the Bourdon tube inside a dial pressure gauge, whatever its output.
 
 ## Sequence
 
@@ -769,7 +783,7 @@ See [Describing a set of results](../guides/statistical-analysis.md#describing-a
 
 ## Steady state
 
-When a stand's measurements have stopped changing after a change in its commands.
+When a system's measurements have stopped changing after a change in its commands.
 
 The changing period before it is the transient. A [dwell](#dwell) gives a measurement time to reach steady state before it's recorded.
 
@@ -855,11 +869,13 @@ The links between each requirement, the requirements it came from and was split 
 
 Bidirectional traceability means you can follow those links both up and down. See [Systems engineering](../guides/systems-engineering.md#traceability). In manufacturing, traceability also means following a product back to its materials, or a material forward to its products: see [Genealogy](#genealogy).
 
+In metrology, traceability, or metrological traceability, means a result can be related to a reference, such as a national standard, through an unbroken chain of calibrations, each adding to the uncertainty. See [Calibration](#calibration).
+
 ## Transducer
 
-A device that converts one form of energy into another, such as a pressure into an electrical signal, or an electrical signal into motion.
+A device that converts energy from one form to another, such as a pressure into an electrical signal, or an electrical signal into motion.
 
-On a test stand, a transducer is a sensor that outputs an electrical signal for a DAQ to read, such as a pressure transducer. A transmitter is a transducer with built-in electronics that output a standard signal, such as a 4–20 mA [current loop](#current-loop).
+A [sensor](#sensor), such as a pressure transducer, is a transducer that measures. An [actuator](#actuator) is one that acts. A transmitter is a transducer with built-in electronics that output a standard signal, such as a 4–20 mA [current loop](#current-loop). In metrology, a measuring transducer is any device whose output has a specified relation to its input, such as a thermocouple.
 
 ## Trip
 
@@ -867,13 +883,13 @@ An automatic stop that the control software makes when a measurement leaves its 
 
 Also called an automatic abort or an interlock trip. An abort that an operator starts isn't a trip. Nor is an [alarm](#alarm), which asks an operator to act rather than acting itself.
 
-A trip is a [machine safety](#machine-safety) control. It can't keep people safe, because software can stall or crash. The [E-stop](#e-stop) and [fail-safe](#fail-safe) wiring do that.
+A trip in an ordinary control system is [equipment protection](#equipment-protection), and gets little or no credit as protection for people. A trip that protects people is a [safety function](#safety-function), carried out by a rated system such as a [safety controller](#safety-controller).
 
 ## Uncertainty
 
-The range around a measurement within which the true value is expected to lie, given every known source of error.
+How far the true value may be from a measurement, given as a range and a probability, such as ±0.7 psig at about 95%.
 
-Also called measurement uncertainty. Combining the sources is called an uncertainty budget or error budget. See [Measurement quality](../guides/measurement-quality.md#uncertainty).
+Also called measurement uncertainty. An uncertainty budget lists each source of uncertainty, and how they're calculated and combined. An error budget does the same with each source's error limits. See [Measurement quality](../guides/measurement-quality.md#uncertainty).
 
 ## Unit under test (UUT)
 
@@ -909,4 +925,4 @@ Nominal's own definition is in the [platform glossary](https://dev.nominal.io/pl
 
 A sensor's reading when the quantity it measures is zero.
 
-Also called zero error or bias. Zeroing subtracts it, and on a scale it's called taring. In Nominal, an [offset](https://dev.nominal.io/platform/reference/glossary/#offset) is a time shift, not this.
+Also called zero error. It's a kind of bias: a systematic error, in this case the one at zero. Zeroing subtracts the zero offset, and on a scale it's called taring. In Nominal, an [offset](https://dev.nominal.io/platform/reference/glossary/#offset) is a time shift, not this.

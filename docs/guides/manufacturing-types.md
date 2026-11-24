@@ -48,7 +48,19 @@ ISA-95 splits a factory's systems into five levels:[^opc-10030-levels]
 | 3 | Manufacturing operations management, including quality assurance and laboratory functions, on timescales from days down to seconds |
 | 4 | Business planning and logistics, on timescales from months to days |
 
-A test stand spans levels 1 to 3. Its sensors and actuators are level 1, its controller and {gloss}`DAQ <Data acquisition (DAQ)>` are level 2, and the test results it reports for each unit feed level 3. ISA-95 names "quality tests and test labs" as one of four parts of an organization that level 3 coordinates, with production, inventory and maintenance.[^opc-10030-ops] The {gloss}`MES <Manufacturing execution system (MES)>` is level 3 software.
+A test stand, for example, spans levels 1 to 3. Its sensors and actuators are level 1, its controller and {gloss}`DAQ <Data acquisition (DAQ)>` are level 2, and the test results it reports for each unit feed level 3. ISA-95 names "quality tests and test labs" as one of four parts of an organization that level 3 coordinates, with production, inventory and maintenance.[^opc-10030-ops] The {gloss}`MES <Manufacturing execution system (MES)>` is level 3 software.
+
+```mermaid
+%%{init: {"block": {"padding": 12}}}%%
+block-beta
+    columns 2
+    space stand["A test stand"]
+    l4["Level 4: Business planning and logistics"] space
+    l3["Level 3: Manufacturing operations management"] s3["Its test results feed level 3"]
+    l2["Level 2: Automation and control systems"] s2["Its controller and DAQ"]
+    l1["Level 1: Sensors and actuators"] s1["Its sensors and actuators"]
+    l0["Level 0: The physical process"] space
+```
 
 ### Material lots
 
@@ -107,7 +119,7 @@ Each type maps onto those:
 
 ## Worked example: tracing an e-axle
 
-Suppose an e-axle {gloss}`dyno <dynamometer>` tests e-axles in production. An e-axle is discrete, with a serial number. It's also made from materials of the other types, so its genealogy mixes all three:
+Suppose a {gloss}`dyno <dynamometer>` tests e-axles in production. An e-axle combines an electric motor, its power electronics and a transmission in one drive unit.[^bosch-eaxle] It's discrete, with a serial number. It's also made from materials of the other types, so its genealogy mixes all three:
 
 | Input | Type | Identified by |
 | --- | --- | --- |
@@ -115,6 +127,13 @@ Suppose an e-axle {gloss}`dyno <dynamometer>` tests e-axles in production. An e-
 | The gear oil in its gearbox | Batch | The oil's lot number |
 | The steel its motor's laminations were stamped from | Continuous | The coil, and where along it the laminations came from |
 | The dyno that tested it, and each instrument on the dyno | Physical assets | Their serial numbers, during the run |
+
+```mermaid
+flowchart LR
+    coil["Steel coil<br>Continuous"] -->|stamped into| lam["The motor's<br>laminations"] --> axle["E-axle<br>Discrete"]
+    oil["Gear oil lot<br>Batch"] --> axle
+    dyno["Dyno and its instruments<br>Physical assets"] -.->|tested| axle
+```
 
 Three questions show what the records have to hold:
 
@@ -134,6 +153,7 @@ In Nominal, give each e-axle an asset, with its serial number, oil lot and coil 
 
 ## References
 
+[^bosch-eaxle]: Bosch Mobility, ["eAxle systems"](https://www.bosch-mobility.com/en/solutions/powertrain/battery-electric/eaxle/). Retrieved 2026-11-24.
 [^nist-82r2]: K. Stouffer et al., NIST, ["Guide to Industrial Control Systems (ICS) Security"](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-82r2.pdf), SP 800-82 Rev. 2, section 2.2.1, May 2015. Superseded by Rev. 3. Retrieved 2026-11-19.
 [^nist-discrete]: NIST, ["Discrete process"](https://csrc.nist.gov/glossary/term/discrete_process), CSRC glossary, from SP 800-82r3. Retrieved 2026-11-19.
 [^cfr-210-3]: US Code of Federal Regulations, [21 CFR 210.3, Definitions](https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-210/section-210.3), paragraphs (b)(2), (b)(10) and (b)(11). Retrieved 2026-11-19.

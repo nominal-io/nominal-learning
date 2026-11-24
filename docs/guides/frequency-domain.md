@@ -142,7 +142,7 @@ In software, a notch filter removes a narrow band. MathWorks removes 60 Hz hum w
 
 ## Worked example: what an e-axle dyno's data can show
 
-Take an e-axle {gloss}`dyno <dynamometer>`: a motor drives the e-axle under test, and a load motor on each side brakes it. This dyno is built to map speed, torque, current, power and temperature, and its manual says it isn't a noise and vibration stand. Its software reads each motor controller about 16 times a second, enough to show changes slower than 8 Hz, as [Sample rate and aliasing](measurement-quality.md#sample-rate-and-aliasing) describes. This example works out which of the driveline's frequencies fall below that, and what an added accelerometer would need.
+Take a {gloss}`dyno <dynamometer>` that tests e-axles. An e-axle combines an electric motor, its power electronics and a transmission in one drive unit.[^bosch-eaxle] On the dyno, the e-axle's motor drives the axle through its gearbox, and a load motor on each side brakes it. This dyno is built to map speed, torque, current, power and temperature, and its manual says it isn't a noise and vibration stand. Its software reads each motor controller about 16 times a second, enough to show changes slower than 8 Hz, as [Sample rate and aliasing](measurement-quality.md#sample-rate-and-aliasing) describes. This example works out which of the driveline's frequencies fall below that, and what an added accelerometer would need.
 
 ### 1. Find the frequencies
 
@@ -168,7 +168,7 @@ Suppose you add an accelerometer to the e-axle's housing, to see the mesh and it
 
 Sidebands sit around the mesh at multiples of each shaft's frequency, so the axle, the slowest shaft, sets the closest spacing: 2.75 Hz at 1,500 RPM.[^lim-singh] A 2 s record gives 0.5 Hz bins. With a Hann window, each tone's leakage typically stays within 1.5 bins, or 0.75 Hz, on each side, so sidebands 2.75 Hz apart stay separate.[^siemens-windows] Each sweep test point holds for 10 s by default, enough for five 2 s records, or nine overlapped by half. Averaging N independent records cuts random noise by a factor of √N, so five records cut it by about 2.2.[^smith-spectral]
 
-The mesh is order 12 of the motor shaft, so each 1 RPM change in motor speed moves it 0.2 Hz. To keep it within one 0.5 Hz bin, the speed has to hold within 2.5 RPM during a record, and the sequence only checks that it's within 50 RPM of its setpoint. Check the speed's spread during the hold, as in the [noise check](measurement-quality.md#checks-you-can-do-on-a-stand), or use order tracking, with the DUT speed channel as the reference.
+The mesh is order 12 of the motor shaft, so each 1 RPM change in motor speed moves it 0.2 Hz. To keep it within one 0.5 Hz bin, the speed has to hold within 2.5 RPM during a record, and the sequence only checks that it's within 50 RPM of its setpoint. Check the speed's spread during the hold, as in the [noise check](measurement-quality.md#checks-you-can-do-in-place), or use order tracking, with the DUT speed channel as the reference.
 
 ### 4. Check the manual's working assumption
 
@@ -182,6 +182,7 @@ The manual measures the product of the DUT motor's pole pairs and its gear ratio
 
 ## References
 
+[^bosch-eaxle]: Bosch Mobility, ["eAxle systems"](https://www.bosch-mobility.com/en/solutions/powertrain/battery-electric/eaxle/). Retrieved 2026-11-24.
 [^smith-dft]: S. W. Smith, ["The Discrete Fourier Transform"](https://www.dspguide.com/ch8.htm), chapter 8 of *The Scientist and Engineer's Guide to Digital Signal Processing*, California Technical Publishing, sections 8.1 to 8.3. Retrieved 2026-11-24.
 [^smith-spectral]: S. W. Smith, ["Spectral Analysis of Signals"](https://www.dspguide.com/ch9/1.htm), section 9.1 of *The Scientist and Engineer's Guide to Digital Signal Processing*, California Technical Publishing. Retrieved 2026-11-24.
 [^smith-filters]: S. W. Smith, ["Introduction to Digital Filters"](https://www.dspguide.com/ch14.htm), chapter 14 of *The Scientist and Engineer's Guide to Digital Signal Processing*, California Technical Publishing, sections 14.2, 14.4 and 14.5. Retrieved 2026-11-24.

@@ -1,7 +1,7 @@
 # Alarms
 
 {.lead}
-An alarm tells an operator that something on a test stand needs a response, in time to make it. It works only while operators trust it, and they stop trusting alarms that go off too often or need nothing from them.
+An alarm tells an operator that equipment or a process needs a response, in time to make it. It works only while operators trust it, and they stop trusting alarms that go off too often or need nothing from them.
 
 ## What an alarm is
 
@@ -27,15 +27,15 @@ An alarm, a {gloss}`trip` and an event can all start from the same measurement. 
 
 An alarm protects nothing by itself. It works only if someone notices it, understands it, and acts in time. After the explosion at the Texaco refinery in Milford Haven, HSE recommended that "ultimate plant safety should not rely on operator response to a control system alarm."[^hse-milford] In layer of protection analysis, the norm is to credit an operator's response to an alarm with at most a tenfold reduction in risk, and usually only if the operator has at least 20 minutes to respond.[^pii-lopa]
 
-So where the consequence of a late response is damage, use a trip. Where it's harm to people, use the hardware described in [Safety](safety.md).
+So where the consequence of a late response is damage, use a trip. Where it's harm to people, use a rated safety function, as described in [Safety functions and the control system](safety.md#safety-functions-and-the-control-system).
 
 ## Alarm limits and trip limits
 
-An alarm limit sits between normal operation and the trip limit. Alarm limits "should be set such that the operators have sufficient time to carry out their defined response before the plant condition escalates."[^hse-alarm-mgmt] An alarm limit too close to normal operation goes off in every test. One too close to the trip limit leaves the operator no time before the stand trips.
+An alarm limit sits between normal operation and the trip limit. Alarm limits "should be set such that the operators have sufficient time to carry out their defined response before the plant condition escalates."[^hse-alarm-mgmt] An alarm limit too close to normal operation goes off all the time. One too close to the trip limit leaves the operator no time before the system trips.
 
 To place an alarm limit, work back from the trip limit. The time the operator gets is the margin between the two limits, divided by how fast the measurement can move toward the trip limit. The [worked example](#worked-example-an-alarm-on-the-load-motors-temperature) does this for the dyno.
 
-The same ordering applies between software and hardware. On an e-axle {gloss}`dyno <dynamometer>`, where a motor drives the e-axle under test and a load motor on each side brakes it, the power supply has its own overvoltage protection, set above the software's bus voltage trip so that the software trips first.
+The same ordering applies between software and hardware. On a {gloss}`dyno <dynamometer>`, where two load motors brake the motor under test, the power supply has its own overvoltage protection, set above the software's bus voltage trip so that the software trips first.
 
 A limit alarm in [OPC UA](communications.md#industrial-ethernet-ethercat-and-opc-ua) can have four limits, which must be in the order HighHigh > High > Low > LowLow.[^opcua-part9]
 
@@ -151,7 +151,7 @@ A condition that fails still has somewhere to go:
 - If it repeats another alarm, remove it.
 - If it needs a faster response than a person can give, make it a trip.
 
-The same rules hold for alerts in software operations. Google's SRE book says that "every page should be actionable", and that "it's better to spend much more effort on catching symptoms than causes".[^sre] On a stand, alarm on the condition the operator acts on, such as a hot motor, rather than on each thing that could cause it.
+The same rules hold for alerts in software operations. Google's SRE book says that "every page should be actionable", and that "it's better to spend much more effort on catching symptoms than causes".[^sre] On industrial equipment, alarm on the condition the operator acts on, such as a hot motor, rather than on each thing that could cause it.
 
 On a test stand, an alarm can protect the data as well as the hardware. Above 85 °C, the dyno's motor controllers reduce their current without reporting it, so the stand looks like it's at the commanded load when it isn't. An alarm whose consequence is data that's quietly wrong has a defined consequence and a defined response, so it passes.
 
@@ -166,10 +166,10 @@ Alarm software has settings for each kind of nuisance alarm:
 | Chattering: a noisy value near its limit turns the alarm on and off repeatedly | A {gloss}`deadband`, so the value must come back past the limit by a margin before the alarm clears | **Deadband**[^ign-tag-alarm] | Deadband properties on limit alarms[^opcua-part9] |
 | Chattering, when a deadband isn't enough | An off-delay, which holds the alarm on for a time after the condition clears | **Clear Delay**[^ign-tag-alarm] | `OffDelay`[^opcua-part9] |
 | Fleeting: a brief spike past the limit | An on-delay, which waits until the value has stayed past the limit for a time | **Active Delay**[^ign-tag-alarm] | `OnDelay`[^opcua-part9] |
-| Standing: the alarm doesn't apply in the stand's current state | Suppress the alarm in that state | **Enabled**, bound to a tag[^ign-configuring] | `SuppressedState`[^opcua-part9] |
+| Standing: the alarm doesn't apply in the system's current state | Suppress the alarm in that state | **Enabled**, bound to a tag[^ign-configuring] | `SuppressedState`[^opcua-part9] |
 | A known problem someone is already working on | Shelve the alarm for a limited time | Shelving[^ign-alarming] | Timed or one-shot shelving[^opcua-part9] |
 
-In Ignition, an alarm with setpoints of 45 and 65 and a deadband of 3 goes active outside 45 to 65, and clears only when the value falls below 42 or rises above 68.[^ign-configuring] Ignition can bind **Enabled** to a tag, for example to "disable alarms when production is stopped."[^ign-configuring]
+In Ignition, an alarm with setpoints of 45 and 65 and a deadband of 3 goes active between 45 and 65, and clears only when the value falls below 42 or rises above 68.[^ign-configuring] Ignition can bind **Enabled** to a tag, for example to "disable alarms when production is stopped."[^ign-configuring]
 
 ISA-18.2's first edition gives starting points for deadbands and delays:[^siemens-wp]
 
@@ -208,7 +208,7 @@ ISA-18.2 sets targets for each operator's alarm load, based on at least 30 days 
 
 Averages hide peaks, so count floods as well as the average.[^vancamp]
 
-ISA-18.2 is written for the process industries.[^siemens-wp] On a stand, the same counts work per run: how many alarms the operator saw, how many needed a response, and which alarms went off most often. HSE suggests watching for operators who acknowledge many alarms in quick succession, or turn audible alarms off.[^hse-chis6]
+ISA-18.2 is written for the process industries.[^siemens-wp] On a test stand, the same counts work per run: how many alarms the operator saw, how many needed a response, and which alarms went off most often. HSE suggests watching for operators who acknowledge many alarms in quick succession, or turn audible alarms off.[^hse-chis6]
 
 ## Alarms in Nominal
 
@@ -267,7 +267,7 @@ The rest of the design follows from those numbers:
 - **State.** Enable the alarm only while the stand is RUNNING. In ARMED, nothing loads the motors, so there's no load to drop.
 - **Acknowledge and confirm.** The operator acknowledges the alarm, drops the load, and confirms it once the temperature is falling.
 
-To check the heating rate on your own stand, plot each load motor's winding temperature and current from a past run in a workbook, and read the slope at each current.
+To check the heating rate of your own motors, plot each motor's winding temperature and current from a past run in a workbook, and read the slope at each current.
 
 ## Further reading
 

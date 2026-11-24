@@ -39,7 +39,7 @@ The mean of N runs varies less than one run does. Its standard deviation, called
 
 An outlier is an observation that appears to deviate markedly from the others. If you can show it's wrong, for example because the test wasn't run correctly, delete or correct it. If you can't, don't delete it: it may be random variation, or a sign of something real. Use a method that outliers affect less instead.[^nist-outliers] The median is one: extreme values don't distort it, because it's based on ranks.[^nist-location]
 
-On an e-axle {gloss}`dyno <dynamometer>`, where a motor drives the e-axle under test and a load motor on each side brakes it, a test point recorded while a load motor was above 85 °C has a known cause. Its controller was reducing its current, so the data isn't at the commanded load. Exclude it, and record why.
+On a {gloss}`dyno <dynamometer>`, where two load motors brake the motor under test, a test point recorded while a load motor was above 85 °C has a known cause. Its controller was reducing its current, so the data isn't at the commanded load. Exclude it, and record why.
 
 To find candidates, plot the data first. For one outlier in roughly normal data, NIST recommends Grubbs' test. A z-score, the distance from the mean in standard deviations, can mislead in small samples, because it can't exceed (N − 1)/√N.[^nist-outliers] With 10 values, that's 2.85, so a rule that flags values beyond 3 standard deviations never fires.
 
@@ -127,7 +127,7 @@ Cp compares widths only. Cpk also accounts for a mean that's off center, and is 
 
 ### Measurement system analysis
 
-Every unit's result includes the measurement's own variation. Check the gauges before you rely on them.[^nist-doe-steps] A {gloss}`gauge R&R` study measures the same items repeatedly: over a short time for repeatability, the gauge's short-term {gloss}`precision`, and over days for reproducibility.[^nist-grr] On a production stand, testing a {gloss}`golden unit` several times a day, over several days, gives you that data. For accuracy and uncertainty, see [Measurement quality](measurement-quality.md).
+Every unit's result includes the measurement's own variation. Check the gauges before you rely on them.[^nist-doe-steps] A {gloss}`gauge R&R` study measures the same items repeatedly: over a short time for repeatability, the gauge's short-term {gloss}`precision`, and over days for reproducibility.[^nist-grr] On a production line, testing a {gloss}`golden unit` several times a day, over several days, gives you that data. For accuracy and uncertainty, see [Measurement quality](measurement-quality.md).
 
 ## Design of experiments
 

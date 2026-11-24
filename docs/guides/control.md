@@ -11,15 +11,23 @@ Control theory names three quantities:[^ni-pid]
 - The **{gloss}`setpoint`** is the value you want the process variable to have.
 - The **error** is the difference between the two.
 
-On an e-axle {gloss}`dyno <dynamometer>`, a motor drives the e-axle under test, and a load motor on each side brakes it. When the dyno's sequence asks for 1,000 RPM, that's the setpoint. The DUT's measured speed is the process variable, and the gap between them is the error.
+On a {gloss}`dyno <dynamometer>`, two load motors brake the motor under test. When the dyno's sequence asks for 1,000 RPM, that's the setpoint. The DUT's measured speed is the process variable, and the gap between them is the error.
 
 ## Open loop and closed loop
 
 An open-loop system sends a command and doesn't check the result. Take a fluids panel, which runs compressed air through valves and measures it with pressure transducers and a flow meter. If you command its proportional valve, `v_2`, and read the flow on `fm_1`, nothing adjusts `v_2` to hold a flow. If the supply pressure changes, the flow changes with it.
 
-A {gloss}`closed loop <closed loop>` measures the process variable, compares it with the setpoint, and adjusts its output, over and over at a fixed rate.[^ni-pid] The dyno's DUT runs closed loop: its motor controller measures the speed and adjusts the motor current to hold the setpoint as the load changes.
+A {gloss}`closed loop <closed loop>` measures the process variable, compares it with the setpoint, and adjusts its output, over and over at a fixed rate.[^ni-pid] The dyno's DUT runs closed loop: its motor controller measures the speed and adjusts the motor current to hold the setpoint as the load changes:
 
-Loops can also run inside instruments, where they can be fast. The fluids panel's electronic pressure regulator, `pr_2`, holds its own outlet pressure at whatever setpoint it's commanded. The dyno's motor controllers hold speed themselves. The stand's control software then works one level up, setting the setpoints those inner loops follow.
+```mermaid
+flowchart LR
+    SP([Setpoint]) --> MC[Motor controller]
+    MC -- motor current --> DUT
+    L([Load]) --> DUT
+    DUT -- "measured speed<br>(process variable)" --> MC
+```
+
+Loops can also run inside instruments, where they can be fast. The fluids panel's electronic pressure regulator, `pr_2`, holds its own outlet pressure at whatever setpoint it's commanded. The dyno's motor controllers hold speed themselves. Each system's control software then works one level up, setting the setpoints those inner loops follow.
 
 ## PID control
 
@@ -62,14 +70,6 @@ The dyno's sequence doesn't jump its setpoints. It ramps them, and checks that t
 2. **Settle.** Once a ramp ends, the sequence waits until the DUT's measured speed is within 50 RPM of its setpoint. If it isn't within 15 s, the sequence aborts.
 3. **Hold.** Only then does the test point's hold time start, 10 s by default for each sweep test point, so the recorded data is at {gloss}`steady state`.
 
-Throughout, every setpoint is clamped to its channel's range before it's sent.
-
-A ramp asks less of the inner loop than a jump does. The motor controller doesn't have to accelerate as hard, so its current stays further from its limit, and the speed tracks the setpoint more closely.
-
-At the end of the warm-up, the sequence measures the ratio between the DUT's speed and the load motors' speed, and projects the load motors' speed at the fastest test point of the plan. If that projection is above the load motors' overspeed limit, the sequence aborts before the sweep starts, instead of finding out at full speed.
-
-## Loop rates
-
 ```mermaid
 flowchart LR
     R[Ramp] --> S[Settle]
@@ -77,6 +77,14 @@ flowchart LR
     S -- not within 15 s --> A[Abort]
     H -- next test point --> R
 ```
+
+Throughout, every setpoint is clamped to its channel's range before it's sent.
+
+A ramp asks less of the inner loop than a jump does. The motor controller doesn't have to accelerate as hard, so its current stays further from its limit, and the speed tracks the setpoint more closely.
+
+At the end of the warm-up, the sequence measures the ratio between the DUT's speed and the load motors' speed, and projects the load motors' speed at the fastest test point of the plan. If that projection is above the load motors' overspeed limit, the sequence aborts before the sweep starts, instead of finding out at full speed.
+
+## Loop rates
 
 A loop can't correct faster than it measures. If a loop runs too slowly for the process it controls, it reacts late, and a late correction overshoots or oscillates.
 
@@ -92,7 +100,7 @@ The motor controllers' own speed and current loops run inside them, much faster 
 
 ## Sequences and states
 
-Above the control loops, a {gloss}`sequence` decides which setpoints apply when. The software that runs it is a state machine: at any moment the stand is in one state, and only certain commands are allowed in each.
+Above the control loops, a {gloss}`sequence` decides which setpoints apply when. The software that runs it is a state machine: at any moment the system is in one state, and only certain commands are allowed in each.
 
 The dyno's software has these states:
 

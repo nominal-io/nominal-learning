@@ -1,13 +1,12 @@
 # Engineering data and warehousing
 
 {.lead}
-Test data is time series from many channels, and it's useful later only with its context: units, calibration, the stand's configuration, and the unit and run it came from. How you store the values and their context sets how much space they take, and whether you can find and trust them later.
+Data from industrial systems is time series from many channels, and it's useful later only with its context: units, calibration, the system's configuration, and the unit and run it came from. How you store the values and their context sets how much space they take, and whether you can find and trust them later.
 
 ## What test data is made of
 
 A test produces two kinds of information: time series, and metadata that relates them to the physical world. Each {gloss}`channel` is a named set of (time, value) pairs, and separate channels can share timestamps or each have their own. The metadata describes the data in terms of physical things, such as the unit tested and the stand, and spans of time, such as runs and events.[^nominal-data-model] [Manufacturing types](manufacturing-types.md#how-test-data-attaches) lists what ASAM ODS says you need to know, and how test data attaches to each kind of product.
-
-Some context can't be read from the values at all. Take an e-axle {gloss}`dyno <dynamometer>`, where a motor drives the e-axle under test and a load motor on each side brakes it, each through its own motor controller:
+Some context can't be read from the values at all. Take a {gloss}`dyno <dynamometer>`, where two load motors brake the motor under test, each through its own motor controller:
 
 - A motor temperature of exactly 0.0 °C, or a large negative value, means no sensor is fitted, not a cold motor.
 - Each motor controller calculates its input current from phase current and duty cycle, rather than measuring it, so the value is noisy, worst at low duty. The power supply's reading is the reference for power.
@@ -16,7 +15,7 @@ Some context can't be read from the values at all. Take an e-axle {gloss}`dyno <
 
 Record context like this with the data, in channel descriptions and run properties, so it's there for someone who opens the data without the manual. Store a gap as a gap, too. The dyno's manual says that "missing data must never look like a measurement of zero", after a zero standing in for missing data caused a false abort during commissioning.
 
-To estimate how much data a stand produces, multiply its channels by each channel's {gloss}`sample rate` and the bytes per value, as in [Network performance](network-performance.md#bandwidth-and-throughput), then by the run's length. That guide's example, 8 channels at 1,000 samples per second and 16 bytes per value, makes 128,000 bytes a second, about 461 MB an hour.
+To estimate how much data a system produces, multiply its channels by each channel's {gloss}`sample rate` and the bytes per value, as in [Network performance](network-performance.md#bandwidth-and-throughput), then by the run's length. That guide's example, 8 channels at 1,000 samples per second and 16 bytes per value, makes 128,000 bytes a second, about 461 MB an hour.
 
 ## File formats
 
@@ -47,6 +46,7 @@ A self-describing file carries its metadata with its data, so everything travels
 ### Rows and columns
 
 A CSV file stores one record per line,[^rfc4180] so to read one channel, a program reads every line. Parquet splits a table into row groups, and stores each column's values for a row group together, as a column chunk. A reader reads the file's metadata first, to find the column chunks it needs.[^parquet-format]
+
 ```mermaid
 block-beta
     columns 5
@@ -62,7 +62,6 @@ block-beta
     class l1t,l1a,l1b,l1c,l2t,l2a,l2b,l2c,l3t,l3a,l3b,l3c,r1t,r1b,r2t,r2b,meta read
 ```
 
-
 A column store reads only the columns a query uses. Data stored by column also compresses better, because the values in one column resemble each other more than the values across a row.[^abadi] Parquet's encodings include dictionary encoding, run-length encoding for repeated values, and delta encoding for 32- and 64-bit integers.[^parquet-encodings] Parquet has no field for physical units, but the file and each column chunk can carry optional key-value metadata.[^parquet-thrift]
 
 ## Where the data lives
@@ -73,16 +72,16 @@ A {gloss}`historian` records a plant's tags over time. Ignition's Tag Historian,
 
 ### Time-series databases
 
-Facebook built Gorilla, an in-memory {gloss}`time-series database`, for its monitoring measurements. Gorilla held each value as a 64-bit timestamp and a 64-bit floating-point number, 16 bytes, and compressed them to an average of 1.37 bytes. It encoded each timestamp as the change in the gap since the previous one, which took a single bit for about 96% of timestamps. It XORed each value with the one before, which took a single bit for the 51% of values that repeated. Gorilla's users cared more about aggregates than individual values, so it accepted "possibly dropping small amounts of data on the write path."[^gorilla] Check how a database behaves under load before you make it the only copy of a test's data.
+Facebook built Gorilla, an in-memory {gloss}`time-series database`, for its monitoring measurements. Gorilla held each value as a 64-bit timestamp and a 64-bit floating-point number, 16 bytes, and compressed them to an average of 1.37 bytes. It encoded each timestamp as the change in the gap since the previous one, which took a single bit for about 96% of timestamps. It XORed each value with the one before, which took a single bit for the 51% of values that repeated. Gorilla's users cared more about aggregates than individual values, so it accepted "possibly dropping small amounts of data on the write path."[^gorilla] Check how a database behaves under load before you make it the only copy of your data.
 
 ### Warehouses, lakes and lakehouses
 
 {gloss}`Data warehouses <data warehouse>` began as a way to collect data from a business's operational databases for decision support and business intelligence, written to a schema chosen in advance. {gloss}`Data lakes <data lake>` came next: low-cost storage with a file interface, holding raw data in open formats such as Parquet, with the schema applied when the data is read. Analysis tools, such as machine learning libraries, can read those files directly. A lakehouse keeps data in open formats on low-cost storage, and adds database features over it, such as transactions, versioning, indexing and caching.[^lakehouse]
+
 ```mermaid
 flowchart LR
     wh["Data warehouse<br>Schema chosen<br>in advance"] --> lake["Data lake<br>Open formats on<br>low-cost storage<br>Schema applied<br>when read"] -->|adds database<br>features| lh["Lakehouse<br>Transactions,<br>versioning, indexing<br>and caching"]
 ```
-
 
 ### Downsampling for display
 
@@ -94,7 +93,7 @@ Downsample for display, and keep the raw data. The dyno's loaded-test script log
 
 Time-series databases can delete data automatically once it reaches a set age. InfluxDB's guide suggests keeping "the high precision raw data for only a limited time", storing downsampled summaries for longer, and setting how long each is kept with a retention policy.[^influx-downsample] Ignition's historian can partition and delete old data too.[^ign-historian]
 
-Before a policy deletes raw test data, check what your industry requires. US drug manufacturers, for example, must keep each batch's production and control records for at least 1 year after the batch's expiration date.[^cfr-211-180] The dyno's loaded-test script logs every run, including aborted ones, which its manual says "are usually the informative ones."
+Before a policy deletes raw data, check what your industry requires. US drug manufacturers, for example, must keep each batch's production and control records for at least 1 year after the batch's expiration date.[^cfr-211-180] The dyno's loaded-test script logs every run, including aborted ones, which its manual says "are usually the informative ones."
 
 ## Finding data later
 
@@ -102,8 +101,7 @@ The FAIR principles, written for scientific data, set out what makes data findab
 
 - **Units.** Store each channel's {gloss}`engineering units` with it. The Mars Climate Orbiter was lost because ground software wrote thruster impulse to a file in pound-force seconds, where the file's interface specification required newton-seconds. The navigation team assumed metric units, underestimated the thrusters' effect by a factor of 4.45, and the spacecraft arrived about 170 km lower than planned.[^mco]
 - **Names.** Name each channel by where it comes from and what it measures. The dyno's software names channels by controller and quantity, such as `dut.velocity` and `left_load.motor_temperature`.
-- **Configuration and calibration.** Record which instrument filled each role, its {gloss}`calibration`, and the stand's configuration, for each run. The dyno's manual says to keep each motor controller's exported configuration under version control. See [Equipment and physical assets](manufacturing-types.md#equipment-and-physical-assets).
-- **The unit and the run.** Link each run's data to the unit it tested, so you can trace from a unit to its data and back. See [Genealogy](manufacturing-types.md#genealogy).
+- **Configuration and calibration.** Record which instrument filled each role, its {gloss}`calibration`, and the system's configuration, for each run. The dyno's manual says to keep each motor controller's exported configuration under version control. See [Equipment and physical assets](manufacturing-types.md#equipment-and-physical-assets).- **The unit and the run.** Link each run's data to the unit it tested, so you can trace from a unit to its data and back. See [Genealogy](manufacturing-types.md#genealogy).
 
 ## In Nominal
 

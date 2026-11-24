@@ -10,7 +10,7 @@ A test can answer one of two questions:
 - **Does this design work?** You test a design once per version, on a few representative units, to show it meets its requirements with margin. This guide calls that **design testing**.
 - **Was this unit built right?** You test every unit you build, to catch the ones that came out wrong. This guide calls that **production testing**.
 
-The same stand can run both, but the tests are different:
+The same test equipment can run both, but the tests are different:
 
 | | Design testing | Production testing |
 | --- | --- | --- |
@@ -91,7 +91,7 @@ A controller can be tested long before the system it controls exists, by simulat
 | Processor-in-the-loop (PiL) | Code, running on the target processor | A model | Differences from the target's compiler and arithmetic, and execution time, which PiL measures[^mathworks-pil] |
 | Hardware-in-the-loop (HiL) | The real controller hardware, with its real inputs and outputs | A model, running in real time on a test system | Timing, wiring and signal problems, and the controller's response to faults[^mathworks-hil] |
 
-In HiL, the plant model runs in real time, so the controller sees realistic timing.[^mathworks-hil] After HiL comes testing on the real system, on a test stand such as an e-axle {gloss}`dyno <dynamometer>`.
+In HiL, the plant model runs in real time, so the controller sees realistic timing.[^mathworks-hil] After HiL comes testing on the real system, for example on a test stand such as a {gloss}`dyno <dynamometer>`.
 
 In HiL, only the controller is real, so faults that would damage the plant are safe to apply: a short that would destroy a real motor is an input to the plant model. HiL can start before the whole system exists, and it repeats edge cases and faults exactly.[^ni-hil]
 
@@ -102,11 +102,9 @@ The dyno's own control software is tested close to SiL. Its tests run the stand'
 ### Requirements
 
 Each requirement names how it will be checked: by test, analysis, demonstration or inspection.[^nasa-verification] Each requirement checked by test needs at least one test case, and a review should ask whether every requirement traces to one.[^fhwa-vee] NASA records the results in a requirements compliance or verification matrix, which keeps the link between each requirement and its results.[^nasa-verification] See [Systems engineering](systems-engineering.md) for writing requirements.
-
 ### Failure modes
 
-An FMEA lists how each part can fail, and how each failure is prevented or detected. Each prevention or detection measure is a claim that needs a test. A design FMEA leads to design tests that cause each failure on purpose, such as unplugging a sensor to show the stand trips. A process FMEA leads to production tests that catch each build defect, such as a missing seal. See the [FMEA example](systems-engineering.md#worked-example-fmea-rows-for-two-stands).
-
+An FMEA lists how each part can fail, and how each failure is prevented or detected. Each prevention or detection measure is a claim that needs a test. A design FMEA leads to design tests that cause each failure on purpose, such as unplugging a sensor to show the system trips. A process FMEA leads to production tests that catch each build defect, such as a missing seal. See the [FMEA example](systems-engineering.md#worked-example-fmea-rows-for-two-stands).
 ### Limits on what you can test
 
 Some requirements can't be tested the way they're written, or not at a cost that makes sense:

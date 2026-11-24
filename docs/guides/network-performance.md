@@ -9,7 +9,7 @@ A link's {gloss}`bandwidth` is the number of bits it can carry each second. Thro
 
 Every stage between a sensor and the data store has its own limit: the link, the adapter, the computer's drivers, and the program that reads each message. The slowest stage sets the throughput, so a fast link doesn't help if the program reading it falls behind.
 
-To check whether a link can carry a stand's data, multiply the number of channels by each channel's sample rate and the size of each value. Stored as a 64-bit timestamp and a 64-bit number, a value takes 16 bytes. Eight channels at 1,000 samples per second each come to:
+To check whether a link can carry a system's data, multiply the number of channels by each channel's sample rate and the size of each value. Stored as a 64-bit timestamp and a 64-bit number, a value takes 16 bytes. Eight channels at 1,000 samples per second each come to:
 
 ```text
 8 channels × 1,000 samples/s × 16 bytes = 128,000 bytes/s ≈ 1 Mbit/s
@@ -19,7 +19,7 @@ That's before any protocol overhead. A module sampling at the NI-9203's maximum 
 
 ### Example: a dyno's CAN bus
 
-On an e-axle {gloss}`dyno <dynamometer>`, a motor drives the e-axle under test, and a load motor on each side brakes it. Their three motor controllers share a {gloss}`CAN bus` that runs at 500 kbit/s. Each controller broadcasts its status without being asked: two frames at 50 Hz and one at 5 Hz, for about 105 frames a second from each controller, 315 in all.
+On a {gloss}`dyno <dynamometer>`, two load motors brake the motor under test. Their three motor controllers share a {gloss}`CAN bus` that runs at 500 kbit/s. Each controller broadcasts its status without being asked: two frames at 50 Hz and one at 5 Hz, for about 105 frames a second from each controller, 315 in all.
 
 Each status frame has a 29-bit identifier and up to 8 bytes of data. Counting stuff bits, the extra bits CAN inserts after five bits of the same value, and the gap between frames, such a frame takes at most 160 bits on the bus.[^wiki-can] At worst, the status frames use:
 
@@ -33,7 +33,7 @@ During commissioning, each controller sent two more status frames, for 205 a sec
 
 {gloss}`Latency` is the time a message takes to get from one end of a link to the other. It has three parts:[^sa-performance]
 
-- **Propagation** is the time the signal takes to travel the distance. It grows with distance, and on a stand's short cables it's tiny next to the other two parts.
+- **Propagation** is the time the signal takes to travel the distance. It grows with distance, and on short cables it's tiny next to the other two parts.
 - **Transmit** time is the size of the message divided by the bandwidth. A 160-bit CAN frame at 500 kbit/s takes 320 µs.
 - **Queuing** is the time a message waits for its turn, in a buffer or for a shared link to be free. On a CAN bus, a frame waits until the bus is free and it wins [arbitration](communications.md#can).
 
@@ -64,7 +64,7 @@ sequenceDiagram
 
 ### Batching
 
-The Nominal Python client doesn't send each value as you write it. It collects values into batches, and sends a batch when it reaches `batch_size` points or when it's `max_wait` old. The defaults are 250,000 points and 0.25 s.[^nominal-client] Unless a stand writes 250,000 points in less than 0.25 s, each batch waits the full 0.25 s, so a value can wait up to that long before it's sent.
+The Nominal Python client doesn't send each value as you write it. It collects values into batches, and sends a batch when it reaches `batch_size` points or when it's `max_wait` old. The defaults are 250,000 points and 0.25 s.[^nominal-client] Unless a program writes 250,000 points in less than 0.25 s, each batch waits the full 0.25 s, so a value can wait up to that long before it's sent.
 
 A smaller `max_wait` sends data sooner, in more and smaller requests:
 
@@ -122,7 +122,7 @@ When you write a value, it's queued, not uploaded. If uploads fall behind and 4 
 
 To keep data through a network outage, pass `file_fallback`, the path to an `.avro` file. The client writes batches that fail to upload to that file.[^nominal-client]
 
-## Checks you can do on a stand
+## Checks you can do
 
 Each check finds one of the problems above:
 

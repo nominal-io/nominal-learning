@@ -42,7 +42,7 @@ The two can be mixed. At large physics facilities, control that needs a determin
 | Milliseconds | Adapts from one cycle to the next | CPU |
 | Seconds | Compensates for long-term drift | External modules and slow feedback loops |
 
-An e-axle {gloss}`dyno <dynamometer>` mixes them too. A motor drives the e-axle under test, and a load motor on each side brakes it. One program runs the sequence for all three motors, while each motor controller closes its own speed and current loops. The software sets speed setpoints 10 times a second, and the motor controllers hold the speed in between. See [Loop rates](control.md#loop-rates).
+A {gloss}`dyno <dynamometer>`, where two load motors brake the motor under test, mixes them too. One program runs the sequence for all three motors, while each motor controller closes its own speed and current loops. The software sets speed setpoints 10 times a second, and the motor controllers hold the speed in between. See [Loop rates](control.md#loop-rates).
 
 ## Responsibility and coordination
 
@@ -55,7 +55,7 @@ Draw each controller's boundary around the actuators that have to act together.
 
 ## Central control
 
-A central controller runs one program that reads every input and writes every output in each {gloss}`control cycle`. That makes coordination simple. Two actuators commanded in the same cycle act on the same view of the stand, and no other controller's command competes with them. Closing several motors' position loops in one controller makes it easier to synchronize them.[^ess-ecmc]
+A central controller runs one program that reads every input and writes every output in each {gloss}`control cycle`. That makes coordination simple. Two actuators commanded in the same cycle act on the same view of the system, and no other controller's command competes with them. Closing several motors' position loops in one controller makes it easier to synchronize them.[^ess-ecmc]
 
 The cost is performance and timing. When one loop handles every device, a device that answers slowly delays all the others, and a computer that stalls stalls everything. [Network performance](network-performance.md#example-when-the-dynos-computer-fell-behind) shows how that played out on the dyno.
 

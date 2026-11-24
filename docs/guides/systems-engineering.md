@@ -23,7 +23,7 @@ NASA's checklist for a good requirement includes these:[^nasa-requirements]
 
 ### Worked example: a requirement for a dyno
 
-Take an e-axle {gloss}`dyno <dynamometer>`, where a motor drives the e-axle under test and a load motor on each side brakes it. A first draft of a requirement for it:
+Take a {gloss}`dyno <dynamometer>`, where two load motors brake the motor under test. A first draft of a requirement for it:
 
 > The stand shall hold speed well under load.
 
@@ -54,6 +54,16 @@ More requirements don't make a better specification: "One hundred well-defined r
 ### Traceability
 
 {gloss}`Traceability` links each requirement to the requirement it came from, to the requirements it was split into, and to the tests that check it. NASA calls the first two bidirectional traceability: being able to trace any requirement both to its parent and to its children.[^nasa-glossary]
+
+```mermaid
+flowchart TB
+    subgraph bidir [Bidirectional traceability]
+        P[Parent requirement] <--> R[Requirement]
+        R <--> C1[Child requirement]
+        R <--> C2[Child requirement]
+    end
+    T[Test] -- checks --> R
+```
 
 Linking each requirement to its test, with the test's pass or fail history, turns a failed test into a flag on the requirement it checks, and a signal to that requirement's owner.[^flow-3] Nominal's checklists can serve as the test end of that link: link each check to the requirement it tests, and it runs on every run's data.
 
@@ -91,7 +101,7 @@ An ICD for the connection between the dyno's software and its DUT motor controll
 
 Every row is something one side assumes about the other. A units mismatch is easy to miss: if one side used electrical RPM and the other mechanical RPM, every speed would be off by a factor of 4.
 
-A stand's channel list is an ICD for its data. It gives each channel's name, units, range and rate, so the stand and everything that reads its data agree on what each channel means.
+A system's channel list is an ICD for its data. It gives each channel's name, units, range and rate, so the system and everything that reads its data agree on what each channel means.
 
 ## Failure mode and effects analysis
 
