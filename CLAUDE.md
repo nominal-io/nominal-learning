@@ -31,8 +31,9 @@ Build before calling the work done.
 ## Sources
 
 Sources are required. Every claim on a page cites a source that says what the claim says. If
-you can't find a source for a claim, take the claim out. The exception is facts about the
-workshop's own stands, which come from the stands and their manuals.
+you can't find a source for a claim, take the claim out. The exception is details of the example
+systems the guides use, such as an e-axle dyno or a fluids panel, which come from those systems'
+manuals.
 
 - Cite sources as MyST footnotes, `[^name]`, defined under the page's last heading,
   `## References`. `docs/_static/cite.js` shows each source in a popup on hover.

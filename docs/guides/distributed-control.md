@@ -18,7 +18,7 @@ The two can be mixed. At large physics facilities, control that needs a determin
 | Milliseconds | Adapts from one cycle to the next | CPU |
 | Seconds | Compensates for long-term drift | External modules and slow feedback loops |
 
-The dyno mixes them too. One program runs the sequence for all three motors, while each motor controller closes its own speed and current loops. The software sets speed setpoints 10 times a second, and the motor controllers hold the speed in between. See [Loop rates](control.md#loop-rates).
+An e-axle {gloss}`dyno <dynamometer>` mixes them too. A motor drives the e-axle under test, and a load motor on each side brakes it. One program runs the sequence for all three motors, while each motor controller closes its own speed and current loops. The software sets speed setpoints 10 times a second, and the motor controllers hold the speed in between. See [Loop rates](control.md#loop-rates).
 
 ## Responsibility and coordination
 

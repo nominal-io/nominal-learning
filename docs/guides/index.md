@@ -1,7 +1,7 @@
 # Guides
 
 {.lead}
-Deeper dives into the test and measurement ideas behind the workshop, with worked examples from the two test stands and sources for further reading. Each guide stands on its own.
+Deeper dives into test and measurement ideas, with worked examples and sources for further reading. Each guide stands on its own.
 
 ::::{grid} 1 1 2 2
 :gutter: 2

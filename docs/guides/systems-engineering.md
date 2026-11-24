@@ -21,9 +21,9 @@ NASA's checklist for a good requirement includes these:[^nasa-requirements]
 - **Traceable.** It links to the higher-level requirement it comes from.
 - **Reasoned.** It records its rationale, including any assumptions.
 
-### Worked example: a requirement for the dyno
+### Worked example: a requirement for a dyno
 
-A first draft:
+Take an e-axle {gloss}`dyno <dynamometer>`, where a motor drives the e-axle under test and a load motor on each side brakes it. A first draft of a requirement for it:
 
 > The stand shall hold speed well under load.
 
@@ -106,11 +106,13 @@ There are several kinds of FMEA:
 - **FMEA for monitoring and system response (FMEA-MSR)** analyzes how well a product's diagnostics detect a failure in use, and put it in a safe state. The AIAG & VDA handbook added it.[^aiag-fmea]
 - **FMECA**, failure mode, effects and criticality analysis, also ranks each failure mode's criticality. It comes from the US military standard MIL-STD-1629A.
 
-### Worked example: FMEA rows for the stands
+### Worked example: FMEA rows for two stands
+
+These rows cover the dyno and a fluids panel, which runs compressed air through valves and pressure transducers:
 
 | Part | Failure mode | Effect | Prevention or detection |
 | --- | --- | --- | --- |
-| Fluids panel vent valve, `v_1` | Stuck closed | Pressing the E-stop doesn't release the pressure | The facilitator presses the E-stop and checks that `p_1` falls before every session |
+| Fluids panel vent valve, `v_1` | Stuck closed | Pressing the E-stop doesn't release the pressure | Press the E-stop and check that `p_1` falls before every session |
 | Fluids panel pressure transducer, `p_1` | Broken wire | The loop current falls to 0 mA | A reading below 4 mA shows a fault rather than a believable pressure |
 | Dyno CAN cable | Unplugged mid-run | Commands and telemetry stop | Each motor controller stops its motor after half a second without a command |
 | Dyno motor temperature sensor | Disconnected | The reading falls to 0 °C or below | The software treats it as a fault, and trips |

@@ -18,6 +18,8 @@ Safety standards use "safety of machinery" for protecting people from a machine'
 
 A {gloss}`hazard` is a source of possible harm. Risk combines how severe the harm would be with how likely it is, and reducing risk means reducing either one or both.[^idec-12100]
 
+The hazards depend on the stand. Compare a fluids panel, which runs compressed air through valves and a proof and leak vessel, with an e-axle {gloss}`dyno <dynamometer>`, where a motor drives the e-axle under test and a load motor on each side brakes it:
+
 | Hazard | Fluids panel | E-axle dyno |
 | --- | --- | --- |
 | Stored pressure | Compressed air in the supply line, up to about 85 psig, and in the proof and leak vessel | None |
@@ -29,10 +31,10 @@ A {gloss}`hazard` is a source of possible harm. Risk combines how severe the har
 
 A {gloss}`hazard control` is anything that reduces a hazard's risk. NIOSH ranks five kinds of hazard control from most to least effective, and OSHA recommends choosing them in that order:[^niosh-hoc][^osha-hpc]
 
-1. **Elimination** removes the hazard. On the stands, that means running a check with the panel vented, or testing control software against a simulated stand instead of the hardware.
+1. **Elimination** removes the hazard. On these two stands, that means running a check with the fluids panel vented, or testing control software against a simulated stand instead of the hardware.
 2. **Substitution** replaces the hazard with a smaller one. Test at the lowest pressure or speed that answers your question. The proof and leak branch fills its vessel to about 72 psig, below the 85 psig supply.
 3. **Engineering controls** keep people away from the hazard: the E-stop, fail-safe valves, guards and interlocks.
-4. **Administrative controls** change how people work: procedures, training, the workshop's safety briefing, and lockout/tagout.
+4. **Administrative controls** change how people work: procedures, training, a safety briefing, and lockout/tagout.
 5. **Personal protective equipment (PPE)** is worn to reduce exposure, such as safety glasses. Use it with the other controls, not instead of them.
 
 Where no single control protects people enough, combine them. A control mustn't add a hazard of its own, such as hearing protection that stops someone hearing an alarm.[^osha-hpc]
@@ -75,15 +77,15 @@ A safety controller is hardware built and certified to carry out safety function
 
 ISO 13849-1 rates how reliably the safety-related parts of a control system perform a safety function, as a performance level (PL) from PL a, the lowest, to PL e, the highest. Each level is a band of probability of a dangerous failure per hour. A risk assessment sets the required level, PLr, that a machine's safety function has to reach. IEC 62061 rates the same thing as a safety integrity level (SIL).[^sick-pl]
 
-Ordinary control software, like the stands' Python programs, has no such rating.
+Ordinary control software, such as a Python program that runs a stand, has no such rating.
 
 ## Administrative controls
 
-Administrative controls depend on people following them, so they back up engineering controls. The workshop uses several:
+Administrative controls depend on people following them, so they back up engineering controls. On a test stand, they can include:
 
-- The safety briefing, where everyone is shown each E-stop.
-- The rule that anyone may press an E-stop without asking.
-- The facilitator's E-stop test before each session.
+- A safety briefing, where everyone is shown each E-stop.
+- A rule that anyone may press an E-stop without asking.
+- An E-stop test before each session.
 
 ### Lockout/tagout
 

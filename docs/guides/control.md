@@ -11,11 +11,11 @@ Control theory names three quantities:[^ni-pid]
 - The **{gloss}`setpoint`** is the value you want the process variable to have.
 - The **error** is the difference between the two.
 
-On the dyno, when the sequence asks for 1,000 RPM, that's the setpoint. The DUT's measured speed is the process variable, and the gap between them is the error.
+On an e-axle {gloss}`dyno <dynamometer>`, a motor drives the e-axle under test, and a load motor on each side brakes it. When the dyno's sequence asks for 1,000 RPM, that's the setpoint. The DUT's measured speed is the process variable, and the gap between them is the error.
 
 ## Open loop and closed loop
 
-An open-loop system sends a command and doesn't check the result. In the workshop, you command the fluids panel's proportional valve, `v_2`, and read the flow on `fm_1`, but nothing adjusts `v_2` to hold a flow. If the supply pressure changes, the flow changes with it.
+An open-loop system sends a command and doesn't check the result. Take a fluids panel, which runs compressed air through valves and measures it with pressure transducers and a flow meter. If you command its proportional valve, `v_2`, and read the flow on `fm_1`, nothing adjusts `v_2` to hold a flow. If the supply pressure changes, the flow changes with it.
 
 A {gloss}`closed loop <closed loop>` measures the process variable, compares it with the setpoint, and adjusts its output, over and over at a fixed rate.[^ni-pid] The dyno's DUT runs closed loop: its motor controller measures the speed and adjusts the motor current to hold the setpoint as the load changes.
 

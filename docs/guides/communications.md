@@ -11,7 +11,7 @@ Every link has three layers, and problems can live in any of them:
 - **The protocol layer** is how bits become messages: how a message starts and ends, how a device is addressed, and how errors are detected.
 - **The application layer** is what the messages mean: which message sets a speed, and which one reads a temperature.
 
-The dyno's power supply, for example, uses USB as its physical layer and SCPI as its application layer. Its motor controllers use CAN for both the physical and protocol layers, and each controller's own set of messages for the application layer.
+On an e-axle {gloss}`dyno <dynamometer>`, for example, where a motor drives the e-axle under test and a load motor on each side brakes it, the power supply uses USB as its physical layer and SCPI as its application layer. The three motor controllers use CAN for both the physical and protocol layers, and each controller's own set of messages for the application layer.
 
 ## Serial links: RS-232 and RS-485
 

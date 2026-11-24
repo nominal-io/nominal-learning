@@ -3,7 +3,7 @@
 # Glossary
 
 {.lead}
-Test and measurement terms used on the test stands, with the other names you may hear for them. The [guides](../guides/index.md) cover each area in depth.
+Test and measurement terms, with the other names you may hear for them. The [guides](../guides/index.md) cover each area in depth.
 
 ## Accuracy
 
@@ -17,13 +17,11 @@ A device that changes something physical when the stand commands it, such as a v
 
 Also called an output device, or in process control a final control element. With sensors, actuators are also called control points.
 
-On the fluids panel, `v_2` and `pump_1` are actuators. On the dyno, the DUT and the two load motors are.
-
 ## Administrative control
 
 A hazard control that changes how people work, such as a procedure, training, a sign, or a limit on who can enter an area.
 
-Lockout/tagout and the workshop's safety briefing are administrative controls. They work only if people follow them, so they back up engineering controls rather than replace them. See [Hierarchy of controls](#hierarchy-of-controls).
+Lockout/tagout and a safety briefing are administrative controls. They work only if people follow them, so they back up engineering controls rather than replace them. See [Hierarchy of controls](#hierarchy-of-controls).
 
 ## Alarm
 
@@ -59,13 +57,13 @@ Its number of bits sets its [resolution](#resolution): a 16-bit ADC divides its 
 
 A receiver making a sender wait when it can't keep up, instead of losing data.
 
-TCP's flow control does this by telling the sender how much buffer space the receiver has left. The dyno's motor controllers don't wait: they send each status frame on schedule, whether or not the computer has read the last one. See [Network performance](../guides/network-performance.md#backpressure).
+TCP's flow control does this by telling the sender how much buffer space the receiver has left. See [Network performance](../guides/network-performance.md#backpressure).
 
 ## Bandwidth
 
 The number of bits a link can carry each second.
 
-What a system achieves in practice, its throughput, is often lower. The dyno's [CAN bus](#can-bus) has a bandwidth of 500 kbit/s. See [Network performance](../guides/network-performance.md#bandwidth-and-throughput).
+What a system achieves in practice, its throughput, is often lower. See [Network performance](../guides/network-performance.md#bandwidth-and-throughput).
 
 ## Batch
 
@@ -77,7 +75,7 @@ Batch manufacturing is one of three [manufacturing types](../guides/manufacturin
 
 A [communications bus](#communications-bus) that connects the controllers in a vehicle or machine, so they can exchange commands and measurements over one pair of wires.
 
-Short for controller area network. The dyno's three motor controllers share one CAN bus. See [Communications](../guides/communications.md#can).
+Short for controller area network. See [Communications](../guides/communications.md#can).
 
 ## Calibration
 
@@ -87,23 +85,23 @@ Calibration is repeated on a schedule, because sensors [drift](#drift). Traceabl
 
 ## Channel
 
-A named value that a stand reads or writes, such as `p_1`, together with the series of values it records over time.
+A named value that a stand reads or writes, such as `inlet_pressure`, together with the series of values it records over time.
 
 Also called a tag in SCADA, PLC and historian software, a signal, a point, or in flight test a parameter or measurand. In Nominal, a tag is something else: see [Tag](#tag).
 
-A channel has a data type, and units if it's a quantity. It can hold a measurement, a command, a calculated value such as the dyno's torque, or a state such as whether the stand is running. Nominal's own definition is in the [platform glossary](https://dev.nominal.io/platform/reference/glossary/#channel).
+A channel has a data type, and units if it's a quantity. It can hold a measurement, a command, a calculated value such as power from voltage and current, or a state such as whether the stand is running. Nominal's own definition is in the [platform glossary](https://dev.nominal.io/platform/reference/glossary/#channel).
 
 ## Characterization
 
 Testing that maps how a DUT behaves across its operating range, rather than checking that it passes.
 
-The dyno's sequence is a characterization: it runs a range of speeds at three loads. An acceptance test, by contrast, checks a DUT against [pass/fail criteria](#passfail-criteria).
+Running a motor across a range of speeds and loads is a characterization. An acceptance test, by contrast, checks a DUT against [pass/fail criteria](#passfail-criteria).
 
 ## Closed loop
 
 Control that keeps adjusting a command from a measurement of the result, so the result holds at its setpoint.
 
-Also called feedback control. Open-loop control sends a command without checking the result. The dyno's DUT runs closed loop: its motor controller adjusts the current to hold the commanded speed. See [Control](../guides/control.md).
+Also called feedback control. Open-loop control sends a command without checking the result. A motor controller that adjusts its motor's current to hold a commanded speed runs closed loop. See [Control](../guides/control.md).
 
 ## Command
 
@@ -171,7 +169,7 @@ A motor controller can derate as it heats up, so its motor may fall short of its
 
 ## Derived channel
 
-A channel calculated from other channels rather than measured, such as the dyno's torque, which is calculated from each motor's current.
+A channel calculated from other channels rather than measured, such as power calculated from voltage and current.
 
 Also called a calculated channel, a computed channel, or a math channel. In a Nominal workbook, a formula or transform builds one from other channels after the test.
 
@@ -183,7 +181,7 @@ Also called qualification testing, or in hardware product development a design v
 
 ## Device under test (DUT)
 
-The device or system a test stand tests, such as the dyno's electric axle.
+The device or system a test stand tests, such as a motor, a valve or a circuit board.
 
 Also called a unit under test (UUT), a test article, equipment under test (EUT), or in materials testing a specimen.
 
@@ -191,7 +189,7 @@ Also called a unit under test (UUT), a test article, equipment under test (EUT),
 
 Making separate units that each keep their own identity, such as a serial number.
 
-Assembling electronic and mechanical parts, and machining parts, are discrete. The dyno's e-axle is a discrete product. See [Manufacturing types](../guides/manufacturing-types.md#discrete-one-record-per-unit).
+Assembling electronic and mechanical parts, and machining parts, are discrete. See [Manufacturing types](../guides/manufacturing-types.md#discrete-one-record-per-unit).
 
 ## Drift
 
@@ -215,13 +213,13 @@ For a device, duty cycle also means the pattern of running and resting it needs 
 
 Holding a command steady for a set time, so the measurements can settle and be recorded.
 
-Also called a hold. A long dwell, such as one to see how hot a DUT gets, is called a soak. The dyno's sequence dwells at each sweep step, for the time in **Dwell per Step**.
+Also called a hold. A long dwell, such as one to see how hot a DUT gets, is called a soak.
 
 ## Dynamometer (dyno)
 
 A test stand that loads a motor or engine and records its speed and torque.
 
-The motors that apply the load are also called load motors, absorbers or absorption units. The workshop's e-axle dyno has a load motor on each side of the axle.
+The motors that apply the load are also called load motors, absorbers or absorption units. An e-axle dyno can have a load motor on each side of the axle.
 
 ## E-stop
 
@@ -233,7 +231,7 @@ Also called an emergency stop, an emergency off (EMO), or a kill switch. An E-st
 
 A sensor on a shaft that reports its position or speed as a stream of pulses.
 
-A tachometer measures speed only. On the dyno, each motor controller reports its own motor's speed.
+A tachometer measures speed only.
 
 ## Engineering control
 
@@ -263,7 +261,7 @@ In vibration and acoustics testing, excitation also means the [stimulus](#stimul
 
 A design where a failure, such as a power loss or a broken wire, leaves the system in a state that is safe to the human using it.
 
-Also called de-energize-to-trip, or fail-safe wiring when the wiring does it. A fail-safe valve or circuit needs power to stay in its running state, so losing power moves it to the safe one. On the fluids panel, the normally open vent valve releases the pressure when it loses power. See [Safety](../guides/safety.md#fail-safe-design).
+Also called de-energize-to-trip, or fail-safe wiring when the wiring does it. A fail-safe valve or circuit needs power to stay in its running state, so losing power moves it to the safe one. For example, a normally open vent valve releases a vessel's pressure when it loses power. See [Safety](../guides/safety.md#fail-safe-design).
 
 ## Failure mode and effects analysis (FMEA)
 
@@ -287,7 +285,7 @@ Also called a jig, or for electronics a test socket.
 
 A sensor that measures how much fluid passes per unit of time, such as liters per minute.
 
-On the fluids panel, `fm_1` is a flow meter. The panel's float gauge is a rotameter: a float rides up a tapered tube as flow increases, and you read it by eye.
+A rotameter is a flow gauge with no electrical output: a float rides up a tapered tube as flow increases, and you read it by eye.
 
 ## Front panel
 
@@ -299,7 +297,7 @@ Also called a local interface. LabVIEW calls each program's user interface a fro
 
 Pressure measured relative to the surrounding air, in units such as psig, so an open tank reads 0.
 
-Absolute pressure, in psia, is measured relative to a vacuum. Differential pressure, in psid, is the difference between two points. The fluids panel's channels are in psig.
+Absolute pressure, in psia, is measured relative to a vacuum. Differential pressure, in psid, is the difference between two points.
 
 ## Genealogy
 
@@ -323,7 +321,7 @@ Electrically isolating the devices breaks the loop.
 
 A physical barrier that keeps people away from a hazard, such as moving parts.
 
-Also called guarding, a shield or an enclosure. A guard is an [engineering control](#engineering-control). An interlocked guard also stops the machine when it's opened. The dyno has a guard around its moving parts.
+Also called guarding, a shield or an enclosure. A guard is an [engineering control](#engineering-control). An interlocked guard also stops the machine when it's opened.
 
 ## Hardware-in-the-loop (HiL)
 
@@ -359,11 +357,11 @@ Also called a process historian or a data historian.
 
 Short for human-machine interface: the screen an operator uses to watch a stand's channels and send commands.
 
-Also called an operator interface, a control app, or a SCADA screen. In the workshop, the dyno's control app is its HMI. An instrument's [front panel](#front-panel) is its own physical HMI.
+Also called an operator interface, a control app, or a SCADA screen. An instrument's [front panel](#front-panel) is its own physical HMI.
 
 ## Human safety
 
-Protecting people from a stand's hazards, such as stored pressure, moving parts and electrical energy. On these stands, hardware keeps human safety: fail-safe wiring, the E-stop and guards, which all work without software.
+Protecting people from a stand's hazards, such as stored pressure, moving parts and electrical energy. Controls for human safety, such as fail-safe wiring, an E-stop and guards, work without the stand's control software.
 
 Also called personnel safety or operator safety. Compare [machine safety](#machine-safety). See [Safety](../guides/safety.md).
 
@@ -383,7 +381,7 @@ Also called a point, an I/O channel, a physical channel, or a control point. The
 
 A self-contained device with its own transducers and electronics built in, and any actuators it needs, which a computer controls over a communications bus and a person through its front panel.
 
-Also called an integrated instrument or a smart device. More loosely, any measuring device is called an instrument. On the dyno, the motor controllers and the power supply are instruments. See [Sensors and instrumentation](../guides/sensors-and-instrumentation.md#instruments).
+Also called an integrated instrument or a smart device. More loosely, any measuring device is called an instrument. A motor controller and a programmable power supply are both instruments. See [Sensors and instrumentation](../guides/sensors-and-instrumentation.md#instruments).
 
 ## Interface control document (ICD)
 
@@ -395,7 +393,7 @@ An ICD covers the physical, electrical, data and behavioral details of the inter
 
 A condition that must be true before a stand allows an action, or that stops the stand if it changes, such as a switch on a guard or a test cell's door.
 
-A hardware interlock, wired [fail-safe](#fail-safe), is an [engineering control](#engineering-control) for [human safety](#human-safety). A software interlock protects only the machine. For example, the dyno's software sends motor commands only in its running and stopping states.
+A hardware interlock, wired [fail-safe](#fail-safe), is an [engineering control](#engineering-control) for [human safety](#human-safety). A software interlock protects only the machine. For example, control software can refuse to send motor commands unless the stand is running.
 
 ## ISA-95
 
@@ -407,7 +405,7 @@ It splits a factory's systems into five levels, from the physical process at lev
 
 The variation in latency from one message to the next.
 
-Where values are timestamped when they arrive, as on the dyno, jitter shows up as uneven gaps between samples. See [Network performance](../guides/network-performance.md#jitter).
+Where values are timestamped when they arrive, jitter shows up as uneven gaps between samples. See [Network performance](../guides/network-performance.md#jitter).
 
 ## Latency
 
@@ -447,7 +445,7 @@ A lot number identifies a lot, and links it to its history. See [Genealogy](#gen
 
 ## Machine safety
 
-Protecting a stand and its DUT from damage. On these stands, the control software keeps machine safety, by limiting commands to a safe range and tripping when a measurement leaves its allowed range.
+Protecting a stand and its DUT from damage. Control software can keep machine safety, by limiting commands to a safe range and tripping when a measurement leaves its allowed range.
 
 Also called machine protection or equipment protection. Compare [human safety](#human-safety).
 
@@ -525,7 +523,7 @@ Also called repeatability. A precise sensor can still be inaccurate, if it's off
 
 A valve that holds the pressure downstream of it at a set value, as long as the supply pressure is higher.
 
-An electronic pressure regulator takes its setpoint as a command, such as `pr_2` on the fluids panel.
+An electronic pressure regulator takes its setpoint as a command.
 
 ## Processor-in-the-loop (PiL)
 
@@ -549,13 +547,13 @@ Also called a proof pressure test.
 
 A valve that opens partway, in proportion to its command, rather than only open or shut.
 
-On the fluids panel, `v_2` is a proportional valve. Compare a [solenoid valve](#solenoid-valve).
+Compare a [solenoid valve](#solenoid-valve).
 
 ## Ramp
 
 Changing a command gradually at a set rate, instead of in one step.
 
-The rate is the ramp rate, such as RPM per second. The dyno's sequence ramps the DUT's speed at the rate in **DUT Speed Ramp Rate**.
+The rate is the ramp rate, such as RPM per second.
 
 ## Range
 
@@ -572,8 +570,6 @@ Safety circuits use redundancy, such as an E-stop with two separate contacts, ea
 ## Regen
 
 Short for regenerative braking: a motor braking by working as a generator, which turns the energy it absorbs into electrical power.
-
-On the dyno, the load motors generate power as they brake, and the power supply absorbs it. In the sequence's regen step, the load motors push the axle and the DUT brakes against them.
 
 ## Requirement
 
@@ -609,7 +605,7 @@ See Nominal's [Run](https://dev.nominal.io/platform/reference/glossary/#run) ent
 
 Freedom from unacceptable risk of harm. A test stand has two kinds: machine safety, which protects the equipment and the DUT, and human safety, which protects people.
 
-On these stands, the control software keeps [machine safety](#machine-safety), and fail-safe hardware keeps [human safety](#human-safety). See [Safety](../guides/safety.md#which-control-covers-which-failure) for which control covers which failure.
+See [Machine safety](#machine-safety), [Human safety](#human-safety), and [Safety](../guides/safety.md#which-control-covers-which-failure) for which control covers which failure.
 
 ## Safety controller
 
@@ -635,19 +631,19 @@ A device that measures something physical, such as pressure or flow, and turns i
 
 Also called a probe. With actuators, sensors are also called control points.
 
-A sensor wired to a DAQ is a [transducer](#transducer). A sensor built into a device with its own electronics and bus connection is part of an [instrument](#instrument). A gauge shows a measurement on the device itself, like the fluids panel's float gauge, and doesn't produce a channel.
+A sensor wired to a DAQ is a [transducer](#transducer). A sensor built into a device with its own electronics and bus connection is part of an [instrument](#instrument). A gauge, such as a dial pressure gauge, shows a measurement on the device itself and doesn't produce a channel.
 
 ## Sequence
 
 A test's steps in order, from start up to shut down, each with what to do and what you should see.
 
-Also called a procedure, a test procedure, a test script, or in process industries a recipe. The dyno runs its sequence from a script named **Procedure**.
+Also called a procedure, a test procedure, a test script, or in process industries a recipe.
 
 ## Setpoint
 
 The value a command asks for, such as a speed of 1,000 RPM.
 
-Also called a target, a demand, a reference, or SP. The dyno's software limits each setpoint to a safe range before sending it.
+Also called a target, a demand, a reference, or SP.
 
 ## Shelving
 
@@ -683,7 +679,7 @@ It's described by the rise time, the overshoot, and the settling time. See [Cont
 
 A stimulus is what a test applies to the DUT, such as a speed, a load or a pressure. The response is how the DUT reacts, as its sensors measure it.
 
-Also called input and output, or in vibration and acoustics testing excitation and response. On the dyno, the load torque is a stimulus, and the DUT's current is its response.
+Also called input and output, or in vibration and acoustics testing excitation and response.
 
 ## Stop category
 
@@ -694,8 +690,6 @@ An E-stop has to be category 0 or 1.
 ## Sweep
 
 Running a test across a range of one input, such as speed, in steps or continuously, and recording the response at each point.
-
-The dyno's sequence sweeps the DUT's speed at each of three loads.
 
 ## Tag
 
@@ -743,7 +737,7 @@ A tolerance sets the [limits](#limit) of a pass/fail check.
 
 A sensor that measures the twisting force on a shaft, with strain gauges on the shaft or in a flange.
 
-Also called a torque transducer or a torque cell. The dyno has none: it calculates torque from each motor's current.
+Also called a torque transducer or a torque cell.
 
 ## Traceability
 
@@ -755,13 +749,13 @@ Bidirectional traceability means you can follow those links both up and down. Se
 
 A device that converts one form of energy into another, such as a pressure into an electrical signal, or an electrical signal into motion.
 
-On a test stand, a transducer is a sensor that outputs an electrical signal for a DAQ to read, such as the pressure transducer on the fluids panel's `p_1`. A transmitter is a transducer with built-in electronics that output a standard signal, such as a 4–20 mA [current loop](#current-loop).
+On a test stand, a transducer is a sensor that outputs an electrical signal for a DAQ to read, such as a pressure transducer. A transmitter is a transducer with built-in electronics that output a standard signal, such as a 4–20 mA [current loop](#current-loop).
 
 ## Trip
 
 An automatic stop that the control software makes when a measurement leaves its allowed range.
 
-Also called an automatic abort or an interlock trip. An abort that an operator starts, such as the dyno's **Abort** button, isn't a trip. Nor is an [alarm](#alarm), which asks an operator to act rather than acting itself.
+Also called an automatic abort or an interlock trip. An abort that an operator starts isn't a trip. Nor is an [alarm](#alarm), which asks an operator to act rather than acting itself.
 
 A trip is a [machine safety](#machine-safety) control. It can't keep people safe, because software can stall or crash. The [E-stop](#e-stop) and [fail-safe](#fail-safe) wiring do that.
 
@@ -787,7 +781,7 @@ Also called the Vee. See [Test design](../guides/test-design.md#the-v-model).
 
 A timer that puts a device in a safe state if the software controlling it stops checking in.
 
-On the dyno, each motor controller stops driving its motor if no command arrives for half a second, so a crashed program can't leave a motor running.
+For example, a motor controller can stop driving its motor if no command arrives within a set time, so a crashed program can't leave the motor running.
 
 ## Workbook
 

@@ -17,9 +17,9 @@ To check whether a link can carry a stand's data, multiply the number of channel
 
 That's before any protocol overhead. A module sampling at the NI-9203's maximum of 200,000 samples per second[^ni-9203] makes 25.6 Mbit/s, a quarter of a 100 Mbit/s Ethernet link.
 
-### Example: the dyno's CAN bus
+### Example: a dyno's CAN bus
 
-The dyno's three motor controllers share a {gloss}`CAN bus` that runs at 500 kbit/s. Each controller broadcasts its status without being asked: two frames at 50 Hz and one at 5 Hz, for about 105 frames a second from each controller, 315 in all.
+On an e-axle {gloss}`dyno <dynamometer>`, a motor drives the e-axle under test, and a load motor on each side brakes it. Their three motor controllers share a {gloss}`CAN bus` that runs at 500 kbit/s. Each controller broadcasts its status without being asked: two frames at 50 Hz and one at 5 Hz, for about 105 frames a second from each controller, 315 in all.
 
 Each status frame has a 29-bit identifier and up to 8 bytes of data. Counting stuff bits, the extra bits CAN inserts after five bits of the same value, and the gap between frames, such a frame takes at most 160 bits on the bus.[^wiki-can] At worst, the status frames use:
 
@@ -103,7 +103,7 @@ Each check finds one of the problems above:
 - **Rate check.** Count the messages each device sends in a second, and compare with what it's set up to send. Each of the dyno's controllers should send about 105 frames a second. Fewer means the computer is missing frames.
 - **Age check.** Compare each value's timestamp with the current time. A value that stops changing may be stale rather than steady.
 - **Gap check.** Plot the time between one sample and the next. Spikes are delays, and a wide spread is jitter.
-- **Load check.** Before you add a device or raise a rate, work out the bus load, as in the [dyno's CAN bus example](#example-the-dynos-can-bus).
+- **Load check.** Before you add a device or raise a rate, work out the bus load, as in the [dyno's CAN bus example](#example-a-dynos-can-bus).
 
 ## Further reading
 

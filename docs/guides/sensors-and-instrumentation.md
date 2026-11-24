@@ -5,16 +5,16 @@ A test stand measures with sensors and acts with actuators. Each one is either w
 
 ## Two ways in: wired to a DAQ, or through an instrument
 
-A {gloss}`transducer` turns one physical quantity into an electrical signal, and nothing more. It's wired to an input on a {gloss}`data acquisition (DAQ) <data acquisition>` system, which measures the signal. The fluids panel works this way: its pressure transducers, its switches and its valves are each wired to the panel's DAQ.
+A {gloss}`transducer` turns one physical quantity into an electrical signal, and nothing more. It's wired to an input on a {gloss}`data acquisition (DAQ) <data acquisition>` system, which measures the signal. A fluids panel, which runs compressed air through valves, works this way: its pressure transducers, its switches and its valves are each wired to the panel's DAQ.
 
-An {gloss}`instrument` has its own transducers, electronics and actuators built in. The computer exchanges messages with it over a {gloss}`communications bus` instead of measuring its signals. The dyno works this way: its motor controllers and its power supply are instruments.
+An {gloss}`instrument` has its own transducers, electronics and actuators built in. The computer exchanges messages with it over a {gloss}`communications bus` instead of measuring its signals. An e-axle {gloss}`dyno <dynamometer>`, where a motor drives the e-axle under test and a load motor on each side brakes it, works this way: its motor controllers and its power supply are instruments.
 
 | | Wired to a DAQ | Instrument |
 | --- | --- | --- |
 | What crosses the wire | An electrical signal, such as a current or a voltage | Messages, such as "set speed to 1,000 RPM" or "speed is 998 RPM" |
 | Where the measuring happens | In the DAQ | Inside the instrument |
 | What you configure | The DAQ channel's range, scaling and sample rate | The instrument's settings, through its messages or its front panel |
-| On the workshop's stands | The fluids panel | The dyno |
+| Example | A fluids panel | An e-axle dyno |
 
 A flow meter, for example, can come either way: as a bare transducer for a DAQ, or as an instrument with its own display and bus connection.
 

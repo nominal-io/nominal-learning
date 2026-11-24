@@ -1,7 +1,7 @@
 # Alarms
 
 {.lead}
-An alarm tells an operator that something on the stand needs a response, in time to make it. It works only while operators trust it, and they stop trusting alarms that go off too often or need nothing from them.
+An alarm tells an operator that something on a test stand needs a response, in time to make it. It works only while operators trust it, and they stop trusting alarms that go off too often or need nothing from them.
 
 ## What an alarm is
 
@@ -22,7 +22,7 @@ An alarm, a {gloss}`trip` and an event can all start from the same measurement. 
 | | Who responds | Example |
 | --- | --- | --- |
 | Alarm | An operator, soon | A load motor's winding passes 85 °C, and the operator drops the load |
-| Trip | The control software, at once | A motor passes 100 °C, and the dyno's software stops every motor |
+| Trip | The control software, at once | A motor on a dyno passes 100 °C, and the control software stops every motor |
 | Event | Someone reviewing the data later | A test point starts |
 
 An alarm protects nothing by itself. It works only if someone notices it, understands it, and acts in time. After the explosion at the Texaco refinery in Milford Haven, HSE recommended that "ultimate plant safety should not rely on operator response to a control system alarm."[^hse-milford] In layer of protection analysis, the norm is to credit an operator's response to an alarm with at most a tenfold reduction in risk, and usually only if the operator has at least 20 minutes to respond.[^pii-lopa]
@@ -35,7 +35,7 @@ An alarm limit sits between normal operation and the trip limit. Alarm limits "s
 
 To place an alarm limit, work back from the trip limit. The time the operator gets is the margin between the two limits, divided by how fast the measurement can move toward the trip limit. The [worked example](#worked-example-an-alarm-on-the-load-motors-temperature) does this for the dyno.
 
-The same ordering applies between software and hardware. The dyno's power supply has its own overvoltage protection, set above the software's bus voltage trip so that the software trips first.
+The same ordering applies between software and hardware. On an e-axle {gloss}`dyno <dynamometer>`, where a motor drives the e-axle under test and a load motor on each side brakes it, the power supply has its own overvoltage protection, set above the software's bus voltage trip so that the software trips first.
 
 A limit alarm in [OPC UA](communications.md#industrial-ethernet-ethercat-and-opc-ua) can have four limits, which must be in the order HighHigh > High > Low > LowLow.[^opcua-part9]
 

@@ -107,7 +107,7 @@ Each type maps onto those:
 
 ## Worked example: tracing an e-axle
 
-Suppose the dyno tests e-axles in production. An e-axle is discrete, with a serial number. It's also made from materials of the other types, so its genealogy mixes all three:
+Suppose an e-axle {gloss}`dyno <dynamometer>` tests e-axles in production. An e-axle is discrete, with a serial number. It's also made from materials of the other types, so its genealogy mixes all three:
 
 | Input | Type | Identified by |
 | --- | --- | --- |

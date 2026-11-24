@@ -77,7 +77,7 @@ A controller can be tested long before the system it controls exists, by simulat
 | Processor-in-the-loop (PiL) | Code, running on the target processor | A model | Differences from the target's compiler and arithmetic, and execution time, which PiL measures[^mathworks-pil] |
 | Hardware-in-the-loop (HiL) | The real controller hardware, with its real inputs and outputs | A model, running in real time on a test system | Timing, wiring and signal problems, and the controller's response to faults[^mathworks-hil] |
 
-In HiL, the plant model runs in real time, so the controller sees realistic timing.[^mathworks-hil] After HiL comes testing on the real system, on a test stand like the workshop's dyno.
+In HiL, the plant model runs in real time, so the controller sees realistic timing.[^mathworks-hil] After HiL comes testing on the real system, on a test stand such as an e-axle {gloss}`dyno <dynamometer>`.
 
 In HiL, only the controller is real, so faults that would damage the plant are safe to apply: a short that would destroy a real motor is an input to the plant model. HiL can start before the whole system exists, and it repeats edge cases and faults exactly.[^ni-hil]
 
@@ -91,7 +91,7 @@ Each requirement names how it will be checked: by test, analysis, demonstration 
 
 ### Failure modes
 
-An FMEA lists how each part can fail, and how each failure is prevented or detected. Each prevention or detection measure is a claim that needs a test. A design FMEA leads to design tests that cause each failure on purpose, such as unplugging a sensor to show the stand trips. A process FMEA leads to production tests that catch each build defect, such as a missing seal. See the [FMEA example](systems-engineering.md#worked-example-fmea-rows-for-the-stands).
+An FMEA lists how each part can fail, and how each failure is prevented or detected. Each prevention or detection measure is a claim that needs a test. A design FMEA leads to design tests that cause each failure on purpose, such as unplugging a sensor to show the stand trips. A process FMEA leads to production tests that catch each build defect, such as a missing seal. See the [FMEA example](systems-engineering.md#worked-example-fmea-rows-for-two-stands).
 
 ### Limits on what you can test
 
