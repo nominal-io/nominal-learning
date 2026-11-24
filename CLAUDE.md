@@ -11,6 +11,17 @@ The site has three tabs:
 - **Guides**: `docs/guides/`, deep dives with worked examples and cited sources.
 - **Reference**: `docs/reference/glossary.md`.
 
+The guides are grouped into categories, each a captioned toctree in `docs/index.md` and a block on
+`docs/guides/index.md`. Keep the two in step. `shelved/` holds guides taken off the site for now,
+outside `docs/` so they aren't built. Nothing on the site links to them.
+
+The guides and the glossary are general-purpose learning on industrial topics. Test and
+measurement serves every industry, such as oil and gas, aerospace and manufacturing, so "test"
+isn't a word to avoid. What to avoid is framing a topic around a generic test stand, which makes it
+read as if it doesn't apply anywhere else. A dyno or a fluids panel can be a worked example,
+introduced as one, but the topic, the leads and the definitions stay general. Name the example's
+specifics, such as an e-axle as the dyno's DUT, only where they matter to the point.
+
 - Before writing or editing any page, load the `nominal-docs:nominal-docs` skill, and follow it.
   Its rules are required, not suggestions: accuracy, confidentiality, audience, style, terms and
   examples.
@@ -32,8 +43,12 @@ Build before calling the work done.
 
 Sources are required. Every claim on a page cites a source that says what the claim says. If
 you can't find a source for a claim, take the claim out. The exception is details of the example
-systems the guides use, such as an e-axle dyno or a fluids panel, which come from those systems'
+systems the guides use, such as a dyno or a fluids panel, which come from those systems'
 manuals.
+
+What your human tells you about their own experience, such as how one lab they worked at named
+its systems, is a lead to research, not a source. Don't build a page around it. Find what
+standards and published practice say, cite that, and note where practice differs.
 
 - Cite sources as MyST footnotes, `[^name]`, defined under the page's last heading,
   `## References`. `docs/_static/cite.js` shows each source in a popup on hover.
