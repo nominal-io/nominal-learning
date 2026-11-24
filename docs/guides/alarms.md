@@ -58,6 +58,47 @@ In Ignition, a cleared alarm never becomes active again. If the condition return
 
 Acknowledging an alarm says that someone saw it, not that the problem is fixed. OPC UA can keep the two apart. In its example, an operator acknowledges a motor's high temperature alarm, lowers the load on the motor, and then confirms the alarm to report that a corrective action has been taken.[^opcua-part9] A latched alarm goes further: it stays active until someone resets it, even after the value returns to normal.[^opcua-part9]
 
+### The ISA-18.2 state diagram
+
+ISA-18.2's first edition draws every state an alarm can be in, and what moves it from one to the next:[^iconics-isa][^nasby]
+
+```mermaid
+stateDiagram-v2
+    state "States A to F" as alarm {
+        A: A. Normal
+        B: B. Active and unacknowledged
+        C: C. Active and acknowledged
+        D: D. Cleared and unacknowledged
+        E: E. Latched and unacknowledged
+        F: F. Latched and acknowledged
+        A --> B: Condition becomes true
+        B --> C: Acknowledge
+        B --> D: Condition clears
+        C --> A: Condition clears
+        D --> A: Acknowledge
+        D --> B: Condition becomes true
+        C --> B: Re-alarm
+        B --> E: Clears, if latching
+        C --> F: Clears, if latching
+        E --> F: Acknowledge
+        E --> D: Reset
+        F --> A: Reset
+    }
+    G: G. Shelved
+    H: H. Suppressed by design
+    I: I. Out of service
+    alarm --> G: Shelve
+    G --> alarm: Unshelve
+    alarm --> H: Suppress
+    H --> alarm: Unsuppress
+    alarm --> I: Remove from service
+    I --> alarm: Return to service
+```
+
+Ignition's four states are A to D. Where the diagram moves an alarm from D back to B, Ignition starts a new alarm event instead.[^ign-alarming] A re-alarming alarm goes from C back to B if it's still active after a set time, which brings it back to the operator's attention.[^opcua-part9]
+
+OPC UA keeps each part of an alarm's state separately, as `ActiveState`, `AckedState`, `LatchedState`, `ShelvingState`, `SuppressedState` and `OutOfServiceState`, rather than as one list of combined states. Shelving, suppression and out of service don't depend on whether the alarm is active or acknowledged. OPC UA says its model supports all the alarm states in IEC 62682.[^opcua-part9]
+
 ### Priority
 
 Priority tells the operator which alarm to answer first. Set it from how severe the consequence is, and how much time the operator has to respond.[^siemens-wp] HSE recommends about three priorities, based on the consequences if the operator fails to respond, in proportions such as 5% high, 15% medium and 80% low.[^hse-chis6]
@@ -234,12 +275,14 @@ To check the heating rate on your own stand, plot each load motor's winding temp
 [^hse-milford]: HSE, ["The explosion and fires at the Texaco Refinery, Milford Haven, 24 July 1994"](https://jesip.org.uk/uploads/media/incident_reports_and_inquiries/Texaco%20Refinery%20Explosion.pdf), HSE Books, 1997, paragraphs 102–105 and recommendation 6. Retrieved 2026-11-19.
 [^pii-lopa]: W. Bridges and T. Clark, Process Improvement Institute, ["LOPA and Human Reliability – Human Errors and Human IPLs (Updated)"](https://www.process-improvement-institute.com/wp-content/uploads/2026/05/LOPA-Validating-Human-IPLs-and-IEs-Updated-2011.pdf), AIChE 7th Global Congress on Process Safety, March 2011. Retrieved 2026-11-19.
 [^hse-alarm-mgmt]: HSE, ["Alarm management"](https://www.hse.gov.uk/humanfactors/topics/alarm-management.htm), human factors topic page, 2024-10-29. Retrieved 2026-11-19.
-[^opcua-part9]: OPC Foundation, ["OPC 10000-9: UA Part 9: Alarms and Conditions"](https://reference.opcfoundation.org/Core/Part9/v105/docs/), version 1.05.06, sections 4.3, 4.6, 4.8, 5.8.2, 5.8.17 and 5.8.18. Retrieved 2026-11-19.
+[^opcua-part9]: OPC Foundation, ["OPC 10000-9: UA Part 9: Alarms and Conditions"](https://reference.opcfoundation.org/Core/Part9/v105/docs/), version 1.05.06, sections 4.3, 4.6, 4.8, 5.8.2, 5.8.17 and 5.8.18, and Annex E. Retrieved 2026-11-19.
 [^ign-alarming]: Inductive Automation, ["Alarming"](https://docs.inductiveautomation.com/docs/8.1/platform/alarming), Ignition 8.1 documentation, updated 2026-04-17. Retrieved 2026-11-19.
 [^ign-tag-alarm]: Inductive Automation, ["Tag Alarm Properties"](https://docs.inductiveautomation.com/docs/8.1/platform/tags/tag-properties/tag-alarm-properties), Ignition 8.1 documentation, updated 2026-10-06. Retrieved 2026-11-19.
 [^ign-configuring]: Inductive Automation, ["Configuring Alarms"](https://docs.inductiveautomation.com/docs/8.1/platform/alarming/configuring-alarms), Ignition 8.1 documentation, updated 2026-06-04. Retrieved 2026-11-19.
 [^ign-shelve]: Inductive Automation, ["system.alarm.shelve"](https://docs.inductiveautomation.com/docs/8.1/appendix/scripting-functions/system-alarm/system-alarm-shelve), Ignition 8.1 documentation, updated 2024-05-23. Retrieved 2026-11-19.
 [^ia-smarter]: Inductive Automation, ["Smarter SCADA Alarming"](https://inductiveautomation.com/resources/article/smarter-scada-alarming), updated 2018-11-19. Retrieved 2026-11-19.
+[^iconics-isa]: ICONICS, ["ISA 18.2 Alarm State Transition Diagram"](https://documentation.iconics.com/v10.98/Content/Alarming/Alarm%20Server/Alarm%20References/alarm-state-transition-diagram.htm), GENESIS64 10.98 documentation. Reproduces the ISA-18.2-2009 state diagram, which this guide redraws. Retrieved 2026-11-19.
+[^nasby]: G. Nasby, ["Introduction to the ISA 18.2 Alarm Management Standard"](https://www.grahamnasby.com/files_publications/NasbyG_2013_IntroToAlarmMgmt_YorkRegion_oct2013_slides.pdf), York Region alarm management training, 2013, slide 38. Retrieved 2026-11-19.
 [^siemens-wp]: Siemens Industry, ["Setting a New Standard in Alarm Management"](https://assets.new.siemens.com/siemens/assets/api/uuid:234f1026-298f-49dc-8961-0c5223c38588/white-paper-alarm-management-2021-final.pdf), white paper, 2021. Its starting points for deadbands and delays cite ANSI/ISA-18.2-2009. Retrieved 2026-11-19.
 [^hse-chis6]: HSE, ["Better alarm handling"](https://www.hse.gov.uk/pubns/chis6.pdf), Chemicals Information Sheet No 6, 2000. Retrieved 2026-11-19.
 [^kepware-ae]: PTC, ["OPC AE"](https://support.ptc.com/help/kepware/kepware_server/en/kepware/server/interface-opc-ae.html), Kepware Server help. Retrieved 2026-11-19.
