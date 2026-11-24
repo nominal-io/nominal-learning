@@ -32,6 +32,24 @@ Content above fs/2 aliases, as [Sample rate and aliasing](measurement-quality.md
 
 The FFT treats a record as one period of a signal that repeats forever. If the record doesn't hold a whole number of cycles, the join between its end and its start is a jump, which spreads the tone's energy into other bins. This is {gloss}`spectral leakage`.[^ni-fft] A running motor's frequencies aren't tied to your record length, so they don't normally fit it.[^siemens-leakage]
 
+```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      plotColorPalette: "seagreen"
+  xyChart:
+    height: 300
+    yAxis:
+      showLabel: false
+      showTick: false
+---
+xychart-beta
+    x-axis "Time (record lengths)" 0 --> 2
+    y-axis -1 --> 1
+    line [1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92, -1.00, -0.92, -0.71, -0.38, 0.00, 0.38, 0.71, 0.92, 1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92, -1.00, -0.92, -0.71, -0.38, 0.00, 0.38, 0.71, 0.92, 1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92, 1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92, -1.00, -0.92, -0.71, -0.38, 0.00, 0.38, 0.71, 0.92, 1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92, -1.00, -0.92, -0.71, -0.38, 0.00, 0.38, 0.71, 0.92, 1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92]
+```
+
 A {gloss}`window <window function>` multiplies the record by a curve that tapers to zero at both ends, so the ends meet without a jump.[^ni-fft] Every window trades resolution, the width of a peak, against leakage, the height of its tails.[^smith-spectral] With a Hann window, a tone's leakage typically stays within 1.5 bins on each side, and its amplitude is off by up to 15%. A flat top window reads amplitude to within 0.01%, but spreads each tone over 3.43 bins on each side, so two tones 4 Hz apart, with 1 Hz bins, show as one peak. With no window, which is called a rectangular or uniform window, a tone that doesn't fit the record reads up to 36% low, and leaks across the whole spectrum.[^siemens-windows] Choose the window from the signal:[^ni-fft][^siemens-windows]
 
 | Signal | Window |
@@ -76,6 +94,21 @@ print(f"Noise floor: {np.mean(psd[f > 1000]):.1e} g²/Hz")
 ```
 
 It prints 0.50 Hz bins up to 2,500 Hz, a tone of 1.42 g RMS at 300.0 Hz, and a noise floor of 1.0 × 10⁻⁴ g²/Hz. A 2 g peak is 1.41 g RMS.[^siemens-windows] The noise's variance, 0.25 g², spread evenly from 0 to 2,500 Hz, is 1.0 × 10⁻⁴ g²/Hz.[^scipy-welch]
+
+```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      plotColorPalette: "seagreen"
+  xyChart:
+    height: 300
+---
+xychart-beta
+    x-axis "Frequency (Hz)" 295 --> 305
+    y-axis "Amplitude (g RMS)" 0 --> 1.5
+    line [0.01, 0.02, 0.02, 0.02, 0.02, 0.01, 0.03, 0.28, 0.91, 1.37, 1.42, 1.37, 0.91, 0.28, 0.03, 0.01, 0.01, 0.02, 0.02, 0.01, 0.01]
+```
 
 ## Signals that change: the spectrogram
 

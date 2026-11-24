@@ -50,6 +50,20 @@ Hardware companies name the phases of a product's development after the tests in
 
 Design testing happens in EVT and DVT. The production test stands are built and proven in PVT, and production testing runs on every unit from then on.
 
+```mermaid
+---
+config:
+  flowchart:
+    diagramPadding: 32
+---
+flowchart LR
+    subgraph design [Design testing]
+        EVT --> DVT
+    end
+    DVT --> PVT["PVT: production test<br>stands built and proven"]
+    PVT --> MP["MP: production testing<br>on every unit"]
+```
+
 ## The V-model
 
 The V-model, or Vee, lays out a project as a V. Down the left side, requirements are split into a system design, then subsystems, then components. Up the right side, the parts are built, integrated and tested, and each level on the right is tested against the specification from the same level on the left:[^fhwa-vee]

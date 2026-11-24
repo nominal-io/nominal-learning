@@ -16,6 +16,23 @@ These describe the sample, the results you have. They estimate the mean, μ, and
 
 The {gloss}`confidence intervals <confidence interval>` and t-tests below assume that the results come from one normal distribution, the symmetric bell curve, and are uncorrelated over time. They tolerate small departures from normality. Check with a histogram or a normal probability plot.[^nist-assumptions] The outlier tests and capability indices assume normal data too.[^nist-outliers][^nist-capability] In a normal distribution, 68.27% of values lie within 1σ of the mean, 95.45% within 2σ, and 99.73% within 3σ.[^nist-normal] In data with extreme values in the tails, the median, the middle value, estimates the center better than the mean does.[^nist-location]
 
+```mermaid
+---
+config:
+  xyChart:
+    xAxis:
+      titlePadding: 20
+  themeVariables:
+    xyChart:
+      plotColorPalette: "#2a78d6"
+---
+xychart-beta
+    title "Percentage of values in each band of a normal distribution"
+    x-axis "Distance from the mean" ["−3σ to −2σ", "−2σ to −1σ", "−1σ to mean", "mean to +1σ", "+1σ to +2σ", "+2σ to +3σ"]
+    y-axis "Values (%)" 0 --> 40
+    bar [2.14, 13.59, 34.135, 34.135, 13.59, 2.14]
+```
+
 The mean of N runs varies less than one run does. Its standard deviation, called the standard error of the mean, is s/√N.[^psu-503-l1] In the terms of the GUM, that's a Type A evaluation of {gloss}`uncertainty`,[^nist-tn1297-3] which you combine with the instrument's own errors as in [Measurement quality](measurement-quality.md#uncertainty).
 
 ### Outliers
@@ -218,6 +235,23 @@ Suppose the four corner test points of one block give these mean DUT input power
 | 1.25 Nm | 55.0 | 155.0 |
 
 Speed's main effect is the average at 1,500 RPM minus the average at 500 RPM: 132.5 − 47.5 = 85.0 W. Load's is 105.0 − 75.0 = 30.0 W. But load adds 15.0 W at 500 RPM and 45.0 W at 1,500 RPM. The effect of load depends on speed, which is an interaction, and a plot against load would show two lines that aren't parallel. Some of it is expected: the dyno's manual calculates absorbed power as torque times angular speed, so the same load absorbs three times the power at three times the speed.
+
+```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      plotColorPalette: "#2a78d6,#eb6834,transparent"
+---
+xychart-beta
+    title "Mean DUT input power at 1,500 RPM (upper line) and 500 RPM (lower line)"
+    x-axis "Load" ["0.25 Nm", "1.25 Nm"]
+    y-axis "Input power (W)" 0 --> 160
+    line [110.0, 155.0]
+    line [40.0, 55.0]
+    %% an invisible bar series keeps the lines' ends off the chart's edges
+    bar [0, 0]
+```
 
 Five speeds and three loads also let you fit curvature in both factors, which two levels can't.[^nist-rsm] Use the replicates to test whether each effect and interaction is significantly different from 0.[^nist-doe-what]
 

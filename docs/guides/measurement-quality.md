@@ -46,6 +46,28 @@ More bits don't mean more accuracy. The NI-9203's calibrated offset error alone 
 To capture a signal, sample faster than twice the highest frequency in it. Content above half the sample rate shows up in the data at false, lower frequencies. This is {gloss}`aliasing`, and it can't be undone afterwards, so an anti-aliasing filter goes before the ADC.[^ee-sampling]
 
 The NI-9203 samples at up to 200,000 samples per second,[^ni-9203] far faster than a pressure transducer can respond: the WIKA A-10's response time is under 4 ms.[^wika-a10] On a fluids panel, which runs compressed air through valves and pressure transducers, the pressures change over seconds, so a low sample rate is enough for them.
+```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      plotColorPalette: "gray, seagreen"
+  xyChart:
+    height: 300
+    xAxis:
+      showLabel: false
+      showTick: false
+    yAxis:
+      showLabel: false
+      showTick: false
+---
+xychart-beta
+    x-axis "Time" 0 --> 1
+    y-axis -1 --> 1
+    line [0.00, 0.45, 0.81, 0.99, 0.95, 0.71, 0.31, -0.16, -0.59, -0.89, -1.00, -0.89, -0.59, -0.16, 0.31, 0.71, 0.95, 0.99, 0.81, 0.45, 0.00, -0.45, -0.81, -0.99, -0.95, -0.71, -0.31, 0.16, 0.59, 0.89, 1.00, 0.89, 0.59, 0.16, -0.31, -0.71, -0.95, -0.99, -0.81, -0.45, 0.00, 0.45, 0.81, 0.99, 0.95, 0.71, 0.31, -0.16, -0.59, -0.89, -1.00, -0.89, -0.59, -0.16, 0.31, 0.71, 0.95, 0.99, 0.81, 0.45, 0.00, -0.45, -0.81, -0.99, -0.95, -0.71, -0.31, 0.16, 0.59, 0.89, 1.00, 0.89, 0.59, 0.16, -0.31, -0.71, -0.95, -0.99, -0.81, -0.45, 0.00, 0.45, 0.81, 0.99, 0.95, 0.71, 0.31, -0.16, -0.59, -0.89, -1.00, -0.89, -0.59, -0.16, 0.31, 0.71, 0.95, 0.99, 0.81, 0.45, 0.00, -0.45, -0.81, -0.99, -0.95, -0.71, -0.31, 0.16, 0.59, 0.89, 1.00, 0.89, 0.59, 0.16, -0.31, -0.71, -0.95, -0.99, -0.81, -0.45, 0.00]
+    line [0.00, -0.59, -0.95, -0.95, -0.59, 0.00, 0.59, 0.95, 0.95, 0.59, 0.00]
+```
+
 
 On an e-axle {gloss}`dyno <dynamometer>`, where a motor drives the e-axle under test and load motors brake it, the software reads each motor controller about 16 times a second. That's enough to follow changes slower than 8 Hz, such as speed steps and temperature, but not to measure vibration. [Frequency domain](frequency-domain.md#worked-example-what-an-e-axle-dynos-data-can-show) works out which of the dyno's frequencies that rules out, and what an accelerometer would need.
 

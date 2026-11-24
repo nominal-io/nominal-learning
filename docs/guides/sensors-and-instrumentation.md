@@ -108,6 +108,15 @@ Some channels are calculated from others. These are {gloss}`derived channels <de
 The dyno has no torque sensor, so its software calculates each motor's torque from its current, using a constant per motor:
 
 | Motor | Torque at maximum current | Constant |
+```mermaid
+flowchart TB
+    transducer[Transducer] -->|Electrical signal| daq[DAQ]
+    daq --> scale[Driver scales the raw signal]
+    instrument[Instrument] <-->|Messages| decode[Driver decodes its messages]
+    scale --> channel[Channel in engineering units]
+    decode --> channel
+```
+
 | --- | ---: | ---: |
 | DUT | 27.503 Nm at 35 A | 0.786 Nm/A |
 | Left load motor | 3.812 Nm at 20 A | 0.191 Nm/A |

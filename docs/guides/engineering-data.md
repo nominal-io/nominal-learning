@@ -47,6 +47,21 @@ A self-describing file carries its metadata with its data, so everything travels
 ### Rows and columns
 
 A CSV file stores one record per line,[^rfc4180] so to read one channel, a program reads every line. Parquet splits a table into row groups, and stores each column's values for a row group together, as a column chunk. A reader reads the file's metadata first, to find the column chunks it needs.[^parquet-format]
+```mermaid
+block-beta
+    columns 5
+    csv["CSV"]:5
+    l1["Line 1"] l1t["time"] l1a["channel 1"] l1b["channel 2"] l1c["channel 3"]
+    l2["Line 2"] l2t["time"] l2a["channel 1"] l2b["channel 2"] l2c["channel 3"]
+    l3["Line 3"] l3t["time"] l3a["channel 1"] l3b["channel 2"] l3c["channel 3"]
+    pq["Parquet"]:5
+    r1["Row group 1"] r1t["time"] r1a["channel 1"] r1b["channel 2"] r1c["channel 3"]
+    r2["Row group 2"] r2t["time"] r2a["channel 1"] r2b["channel 2"] r2c["channel 3"]
+    meta["File metadata"]:5
+    classDef read fill:#f5c26b,stroke:#9a6700,color:#000
+    class l1t,l1a,l1b,l1c,l2t,l2a,l2b,l2c,l3t,l3a,l3b,l3c,r1t,r1b,r2t,r2b,meta read
+```
+
 
 A column store reads only the columns a query uses. Data stored by column also compresses better, because the values in one column resemble each other more than the values across a row.[^abadi] Parquet's encodings include dictionary encoding, run-length encoding for repeated values, and delta encoding for 32- and 64-bit integers.[^parquet-encodings] Parquet has no field for physical units, but the file and each column chunk can carry optional key-value metadata.[^parquet-thrift]
 
@@ -63,6 +78,11 @@ Facebook built Gorilla, an in-memory {gloss}`time-series database`, for its moni
 ### Warehouses, lakes and lakehouses
 
 {gloss}`Data warehouses <data warehouse>` began as a way to collect data from a business's operational databases for decision support and business intelligence, written to a schema chosen in advance. {gloss}`Data lakes <data lake>` came next: low-cost storage with a file interface, holding raw data in open formats such as Parquet, with the schema applied when the data is read. Analysis tools, such as machine learning libraries, can read those files directly. A lakehouse keeps data in open formats on low-cost storage, and adds database features over it, such as transactions, versioning, indexing and caching.[^lakehouse]
+```mermaid
+flowchart LR
+    wh["Data warehouse<br>Schema chosen<br>in advance"] --> lake["Data lake<br>Open formats on<br>low-cost storage<br>Schema applied<br>when read"] -->|adds database<br>features| lh["Lakehouse<br>Transactions,<br>versioning, indexing<br>and caching"]
+```
+
 
 ### Downsampling for display
 

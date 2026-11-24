@@ -70,6 +70,14 @@ At the end of the warm-up, the sequence measures the ratio between the DUT's spe
 
 ## Loop rates
 
+```mermaid
+flowchart LR
+    R[Ramp] --> S[Settle]
+    S -- within 50 RPM --> H[Hold]
+    S -- not within 15 s --> A[Abort]
+    H -- next test point --> R
+```
+
 A loop can't correct faster than it measures. If a loop runs too slowly for the process it controls, it reacts late, and a late correction overshoots or oscillates.
 
 The dyno's software runs several loops at different rates:

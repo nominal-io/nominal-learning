@@ -249,6 +249,16 @@ That's an alarm. Rationalize it:
 
 The time comes from a measured soak test. At 10 A of brake current, the windings rose about 2.8 °C a minute, so the 15 °C between 85 °C and 100 °C takes about 5 minutes. Copper loss grows with the square of the current, so at the load motors' 20 A maximum, they heat about four times as fast, about 11 °C a minute. That leaves about 80 s. Both figures are on the safe side, because the temperature rises more slowly as a motor nears its {gloss}`steady state`.
 
+```mermaid
+%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#2f6fdd, #d1242f"}}}}%%
+xychart-beta horizontal
+    title "Time to the trip: about 80 s at 20 A, about 5 minutes at 10 A"
+    x-axis "Winding temperature (°C)" ["100: trip", "97", "94", "91", "88", "85: alarm"]
+    y-axis "Seconds after the alarm" 0 --> 330
+    line [321, 257, 193, 129, 64, 0]
+    line [80, 64, 48, 32, 16, 0]
+```
+
 The rest of the design follows from those numbers:
 
 - **Priority.** The consequence is bad data and a tripped run, not damage, because the trip at 100 °C protects the motors. Rank it below any alarm whose consequence is damage.

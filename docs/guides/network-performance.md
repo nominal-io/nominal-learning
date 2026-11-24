@@ -43,6 +43,25 @@ Queuing depends on how busy the link and the receiver are, so it changes from me
 
 The round-trip time is how long a message takes to go from one end of a link to the other and back.[^sa-performance] A request-and-reply protocol, such as Modbus or a SCPI query, pays it on every request, plus the time the device takes to answer. A client that waits for each reply before sending the next request can make at most one request per round trip, however much bandwidth the link has.
 
+```mermaid
+---
+config:
+  sequence:
+    mirrorActors: false
+---
+sequenceDiagram
+    participant C as Client
+    participant D as Device
+    C->>+D: Request
+    Note left of C: Waits for the reply
+    Note right of D: Answers
+    D-->>-C: Reply
+    C->>+D: Next request
+    Note left of C: Waits for the reply
+    Note right of D: Answers
+    D-->>-C: Reply
+```
+
 ### Batching
 
 The Nominal Python client doesn't send each value as you write it. It collects values into batches, and sends a batch when it reaches `batch_size` points or when it's `max_wait` old. The defaults are 250,000 points and 0.25 s.[^nominal-client] Unless a stand writes 250,000 points in less than 0.25 s, each batch waits the full 0.25 s, so a value can wait up to that long before it's sent.
@@ -69,6 +88,13 @@ The variation in latency from one message to the next is called {gloss}`jitter`.
 ## Backpressure
 
 A receiver holds incoming messages in a buffer until it can handle them. The buffer absorbs short bursts, but if data keeps arriving faster than the receiver handles it, the buffer fills. Then either the receiver makes the sender wait, which is {gloss}`backpressure`, or data is lost.
+
+```mermaid
+flowchart TB
+    S[Sender] --> B[Buffer] --> R[Receiver]
+    B -- "full, with backpressure" --> W[Sender waits]
+    B -- "full, no backpressure" --> X[Data lost]
+```
 
 TCP has backpressure built in. Each receiver advertises how much free space its buffer has, and the sender sends no more than that. When the buffer is full, the advertised space is 0, and TCP blocks the sending program until space frees up.[^sa-tcp]
 

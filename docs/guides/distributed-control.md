@@ -10,6 +10,30 @@ Control can live in two places:
 - **Central.** One controller with a lot of {gloss}`I/O points <I/O point>` runs every loop. Its I/O can sit in one rack, or be spread around a machine on a fieldbus such as [EtherCAT](communications.md#industrial-ethernet-ethercat-and-opc-ua).
 - **Distributed.** Many smaller devices, such as {gloss}`PLCs <PLC>`, motor drives and embedded controllers, each run their own loops, and exchange values over a network.
 
+```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 20
+    rankSpacing: 30
+---
+flowchart LR
+    subgraph central [Central]
+        direction TB
+        C["Controller<br>runs every loop"] --- F[Fieldbus]
+        F --- I1[I/O]
+        F --- I2[I/O]
+        F --- I3[I/O]
+    end
+    subgraph distributed [Distributed]
+        direction TB
+        N[Network] --- P["PLC<br>own loops"]
+        N --- D["Motor drive<br>own loops"]
+        N --- E["Embedded<br>controller<br>own loops"]
+    end
+    central ~~~ distributed
+```
+
 The two can be mixed. At large physics facilities, control that needs a deterministic response runs in PLCs, FPGAs or front-end computers next to its I/O, and the network coordinates the parts. That way the fastest loops don't depend on the network's timing.[^nif-2001][^ess-2023] In the European XFEL's RF control system, loops split by timescale:[^xfel-llrf]
 
 | Timescale | What the loop does | Where it runs |
@@ -58,6 +82,26 @@ Axes wired to separate controllers can still move together closely if a dedicate
 ### Share a clock
 
 When separate devices have to act at the same instant, set each one up ahead of time, and let a shared timing signal say when. A central timing system broadcasts events, and a receiver in each device turns them into hardware triggers.[^mrf] One such system is designed to trigger 1,600 channels to 30 ps accuracy.[^nif-2001] A device can also preload every waveform it might need, and play the right one when its clock event arrives.[^acnet]
+
+```mermaid
+---
+config:
+  sequence:
+    mirrorActors: false
+---
+sequenceDiagram
+    participant T as Central timing system
+    participant A as Device A
+    participant B as Device B
+    Note over A,B: Set up ahead of time
+    par Broadcast
+        T->>A: Event
+        A->>A: Hardware trigger
+    and
+        T->>B: Event
+        B->>B: Hardware trigger
+    end
+```
 
 Over Ethernet, the Precision Time Protocol (PTP, IEEE 1588) synchronizes clocks to under a microsecond, and to under a nanosecond in a properly designed network.[^ptp] With clocks that close, a message sent early enough can tell a device to act at a given absolute time, as in the White Rabbit timing system.[^white-rabbit]
 

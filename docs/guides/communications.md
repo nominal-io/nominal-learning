@@ -34,7 +34,36 @@ Classic CAN and CAN FD are both standardized in ISO 11898-1:2024.[^cia-can-fd]
 
 The dyno's three motor controllers share one CAN bus, with node IDs 0, 1 and 2. The control software sends each controller a command about 16 times a second, and each controller reports its current, speed and temperature back.
 
+```mermaid
+flowchart TB
+    S[Control software] -- "command, about 16 times a second" --> BUS[CAN bus]
+    BUS -- "current, speed, temperature" --> S
+    BUS --- N0["Motor controller<br>node 0"]
+    BUS --- N1["Motor controller<br>node 1"]
+    BUS --- N2["Motor controller<br>node 2"]
+```
+
 If two controllers start a frame at the same moment, the frame with the lower message identifier wins arbitration and goes first. The other controller waits, and sends once the bus is free. Neither frame is lost.
+
+```mermaid
+---
+config:
+  sequence:
+    mirrorActors: false
+---
+sequenceDiagram
+    participant A as Controller A
+    participant Bus as CAN bus
+    participant B as Controller B
+    par Same moment
+        A->>Bus: Frame, lower identifier
+    and
+        B->>Bus: Frame, higher identifier
+    end
+    Note over A,Bus: A wins arbitration
+    Note over B: Waits until the bus is free
+    B->>Bus: Sends its frame
+```
 
 ## Instrument control: SCPI and VISA
 
