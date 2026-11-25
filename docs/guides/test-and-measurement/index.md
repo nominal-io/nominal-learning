@@ -18,6 +18,16 @@ Acquiring, measuring and validating real-world data from physical systems.
 Connect three simulated instruments to Nominal through instro, and use their live data to find a wiring mistake.
 :::
 
+:::{grid-item-card} Production leak check
+:link: leak-test
+:link-type: doc
+:img-top: /_static/thumbnails/leak-check.svg
+:img-alt: Each vessel's pressure drop, creeping up toward the limit before any vessel fails
+:class-card: category-card
+
+Simulate leak checks on a batch of vessels, pass or fail each one, and catch a slow rise in pressure drop before vessels start to fail.
+:::
+
 :::{grid-item-card} Sensors and instrumentation
 :link: /guides/sensors-and-instrumentation
 :link-type: doc

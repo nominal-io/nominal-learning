@@ -45,6 +45,7 @@ guides/notebooks/notebook-display
 
 Overview <guides/test-and-measurement/index>
 guides/test-and-measurement/bench-bringup
+guides/test-and-measurement/leak-test
 guides/sensors-and-instrumentation
 guides/measurement-quality
 guides/test-design

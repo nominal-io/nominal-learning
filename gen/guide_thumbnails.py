@@ -214,6 +214,17 @@ def bench_bringup(ax: Axes) -> None:
     _axes(ax, "Time", "DMM voltage")
 
 
+def leak_check(ax: Axes) -> None:
+    """Each vessel's pressure drop: passing units creep up toward the limit before any fails."""
+    units = np.arange(1, 61)
+    drop = 0.3 + 0.012 * np.clip(units - 25, 0, None) + RNG.normal(0, 0.04, units.size)
+    ax.axhline(1.0, color=GREY, linestyle="--", linewidth=1)
+    ax.plot(units, drop, color=TEAL, marker="o", markersize=3, linewidth=1)
+    ax.text(1, 1.04, "limit")
+    ax.set_ylim(0, 1.2)
+    _axes(ax, "Vessel", "Pressure drop")
+
+
 THUMBNAILS: dict[str, Callable[[Axes], None]] = {
     "frequency-domain": frequency_domain,
     "statistical-analysis": statistical_analysis,
@@ -228,6 +239,7 @@ THUMBNAILS: dict[str, Callable[[Axes], None]] = {
     "network-performance": network_performance,
     "engineering-data": engineering_data,
     "bench-bringup": bench_bringup,
+    "leak-check": leak_check,
 }
 
 
