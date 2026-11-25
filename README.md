@@ -26,9 +26,10 @@ docs/                       the site: workshops, guides, notebooks and reference
 docs/guides/<category>/     a category's landing page and its notebooks
 docs/guides/notebooks/      Running the notebooks, and the notebooks that fit no category
 docs/reference/sample-data/ the learning.data docs
-docs/_ext/                  the {gloss} role and the notebook-gallery directive
+docs/_ext/                  the {gloss} role
+docs/_static/thumbnails/    the category pages' card pictures, drawn by gen/guide_thumbnails.py
 src/learning/data/          the sample datasets: `from learning.data.rf import sigmf_synthetic`
-gen/                        scripts that generate datasets, for traceability
+gen/                        scripts that generate datasets and thumbnails, for traceability
 tests/                      tests of learning.data
 .jupyter/                   makes JupyterLab open .md files as notebooks
 ```
@@ -36,9 +37,10 @@ tests/                      tests of learning.data
 ## Notebooks
 
 A notebook is a MyST Markdown file with a `kernelspec` in its front matter, edited in JupyterLab
-through Jupytext. Put it in its category's folder under `docs/guides/`, and add it to the category's
-toctree in `docs/index.md`. The category page's `notebook-gallery` lists it. Add its dependencies with
-`uv add --group notebooks <package>`.
+through Jupytext. Put it in its category's folder under `docs/guides/`, add it to the category's
+toctree in `docs/index.md`, and add a card for it to the category's `index.md`. A card's picture is a
+screenshot from the notebook, or a thumbnail that `gen/guide_thumbnails.py` draws (`just gen-thumbnails`).
+Add its dependencies with `uv add --group notebooks <package>`.
 
 The notebooks under `docs/guides/` create resources in the Nominal workspace of the `default`
 profile, so `just build` runs them only when `LEARNING_RUN_NOTEBOOKS=1` is set. Otherwise they render

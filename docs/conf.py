@@ -8,8 +8,7 @@ from nominal_sphinx_theme import intersphinx, theme_options
 
 HERE = Path(__file__).resolve().parent
 
-# _ext holds link_titles, copied from the docs hub's projects/_ext/ for its {gloss} role, and
-# gallery, for the notebook-gallery directive on the category pages
+# _ext holds link_titles, copied from the docs hub's projects/_ext/ for its {gloss} role
 sys.path.insert(0, str(HERE / "_ext"))
 
 project = "Learning"
@@ -25,14 +24,13 @@ extensions = [
     "sphinx_copybutton",
     "nominal_sphinx_theme",
     "link_titles",
-    "gallery",
 ]
 
 # {gloss} terms link to reference/glossary.md, styled by gloss.css, with the popup from gloss.js.
 # Citations are MyST footnotes ([^name]); cite.js shows each one's source in a popup, styled by cite.css.
 nominal_glossary = "reference/glossary"
 html_static_path = ["_static"]
-html_css_files = ["gloss.css", "cite.css", "notebooks.css"]
+html_css_files = ["gloss.css", "cite.css", "notebooks.css", "categories.css"]
 html_js_files = [("gloss.js", {"defer": "defer"}), ("cite.js", {"defer": "defer"}), "image-zoom.js"]
 
 exclude_patterns = ["_build", "**/.ipynb_checkpoints", "**/rf_radio_data"]

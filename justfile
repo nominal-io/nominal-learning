@@ -48,6 +48,10 @@ test *args:
 gen-flight:
     uv run --group gen python gen/aero_flight_dc.py
 
+# redraw the thumbnails on the category pages' cards, in docs/_static/thumbnails/
+gen-thumbnails:
+    uv run --group gen python gen/guide_thumbnails.py
+
 # print [[files]] manifest entries for a dataset folder, such as src/learning/data/aero/flight_dc
 hash-files folder:
     uv run python scripts/hash_files.py "{{folder}}"
