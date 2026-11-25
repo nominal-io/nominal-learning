@@ -37,15 +37,18 @@ tests/                      tests of learning.data
 ## Notebooks
 
 A notebook is a MyST Markdown file with a `kernelspec` in its front matter, edited in JupyterLab
-through Jupytext. Put it in its category's folder under `docs/guides/`, add it to the category's
+through Jupytext. Most guides in `docs/guides/` are notebooks: their prose is Markdown, and code cells
+work through what the prose explains, plotting with `learning.style.set_matplotlib_style()`. A notebook
+that isn't a guide goes in its category's folder under `docs/guides/`. Add a new page to the category's
 toctree in `docs/index.md`, and add a card for it to the category's `index.md`. A card's picture is a
 screenshot from the notebook, or a thumbnail that `gen/guide_thumbnails.py` draws (`just gen-thumbnails`).
 Add its dependencies with `uv add --group notebooks <package>`.
 
-The notebooks under `docs/guides/` create resources in the Nominal workspace of the `default`
-profile, so `just build` runs them only when `LEARNING_RUN_NOTEBOOKS=1` is set. Otherwise they render
-with their code and no outputs. The pages under `docs/reference/sample-data/` need no profile, so
-they always run.
+`just build` runs every notebook, so the published pages show their outputs. The exception is a
+notebook whose code cells connect to Nominal with a profile: it creates resources in that profile's
+workspace, so the build runs it only when `LEARNING_RUN_NOTEBOOKS=1` is set, and otherwise renders it
+with its code and no outputs. Keep a guide's code cells free of Nominal connections, so it always runs;
+show Nominal code there as a plain `python` block.
 
 ## Sample data
 
