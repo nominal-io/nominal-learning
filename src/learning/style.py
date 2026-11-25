@@ -60,7 +60,7 @@ def set_matplotlib_style() -> None:
         from matplotlib_inline.backend_inline import set_matplotlib_formats
     except ImportError:  # not in a Jupyter kernel's environment
         return
-    set_matplotlib_formats("svg")
+    set_matplotlib_formats("svg")  # type: ignore[no-untyped-call]
 
 
 def set_plotly_style() -> None:
