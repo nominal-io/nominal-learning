@@ -1,0 +1,49 @@
+# A simulated power supply for the SCPI exchange in communications.md. pyvisa-sim reads this
+# file when the notebook opens pyvisa.ResourceManager("communications-sim.yaml@sim").
+spec: "1.1"
+
+devices:
+  power supply:
+    eom:
+      TCPIP INSTR:
+        q: "\n"
+        r: "\n"
+    error:
+      # A command the instrument doesn't know adds an error to its queue, and SYST:ERR? reads
+      # the queue one error at a time. -113 is SCPI's "Undefined header" (SCPI-99, Volume 2, 21.8).
+      error_queue:
+        - q: "SYST:ERR?"
+          default: '0,"No error"'
+          command_error: '-113,"Undefined header"'
+    dialogues:
+      - q: "*IDN?"
+        r: "Simulated,PSU-1,000001,1.0.0"
+      # Always answers with the reading in communications.md
+      - q: "MEAS:VOLT?"
+        r: "47.98"
+    properties:
+      voltage:
+        default: 0.0
+        getter:
+          q: "VOLT?"
+          r: "{:.2f}"
+        setter:
+          q: "VOLT {:f}"
+        specs:
+          min: 0
+          max: 60
+          type: float
+      output:
+        default: "OFF"
+        getter:
+          q: "OUTP?"
+          r: "{:s}"
+        setter:
+          q: "OUTP {:s}"
+        specs:
+          valid: ["ON", "OFF"]
+          type: str
+
+resources:
+  TCPIP0::192.168.1.10::INSTR:
+    device: power supply
