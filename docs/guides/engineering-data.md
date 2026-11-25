@@ -1,7 +1,19 @@
+---
+jupytext:
+  text_representation:
+    format_name: myst
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
 # Engineering data and warehousing
 
 {.lead}
 Data from industrial systems is time series from many channels, and it's useful later only with its context: units, calibration, the system's configuration, and the unit and run it came from. How you store the values and their context sets how much space they take, and whether you can find and trust them later.
+
+{download}`Download this page as a notebook <engineering-data.md>` to run its code in JupyterLab. [Running the notebooks](notebooks/running.md) explains how to set it up.
 
 ## What test data is made of
 
@@ -130,12 +142,33 @@ To chart a long recording, `channel_to_dataframe_decimated()` reads a fixed numb
 
 ## Worked example: the size of one dyno run
 
+The code in this example simulates a run, and writes it to files in a temporary folder.
+
+```{code-cell} ipython3
+import json
+import tempfile
+from pathlib import Path
+
+import h5py
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+from learning.style import set_matplotlib_style
+
+set_matplotlib_style()  # plots that suit the page in its light and dark themes
+```
+
 Each of the dyno's three motor controllers broadcasts nine values on the {gloss}`CAN bus`, as scaled 16- and 32-bit integers in three frames. Speed, motor current and duty cycle come in an 8-byte frame at 50 Hz. The FET and motor temperatures, input current and PID position come in another 8-byte frame at 50 Hz. The tachometer count and input voltage come in a 6-byte frame at 5 Hz. Motor current, for example, is sent in tenths of an amp. For a run, take the manual's 12-minute soak test at 10 A:
 
-```text
-one controller:      3 × 50 + 4 × 50 + 2 × 5 = 360 values/s
-three controllers:   3 × 360                 = 1,080 values/s
-12-minute soak test: 1,080 × 720 s           = 777,600 values
+```{code-cell} ipython3
+one = 3 * 50 + 4 * 50 + 2 * 5  # values a second from one controller's three frames
+three = 3 * one
+print(f"One controller: {one} values/s")
+print(f"Three controllers: {three:,} values/s")
+print(f"12-minute soak test: {three * 12 * 60:,} values")
 ```
 
 The dyno's loaded-test script writes a CSV row 50 times a second. Suppose each row holds a timestamp and the latest of all 27 values, so the run is 36,000 rows. Suppose too that a value written to its resolution, such as `-12.3`, averages 5 characters, and that a value written with 17 significant digits, such as `-12.300000000000001`, takes 19. The run's size then depends on how each row stores its values:
@@ -149,7 +182,177 @@ The dyno's loaded-test script writes a CSV row 50 times a second. Suppose each r
 
 Written to their resolution, the dyno's values take fewer bytes as text than as 64-bit numbers. Text costs more for calculated values, such as the script's torque and efficiency, which can need all 17 digits to be read back exactly. The integers the controllers send are the smallest form. A format that stores raw values with conversion rules, as MDF4 does, keeps them, and the dyno's DBC file describes every status frame, so a CAN tool can decode them.
 
-To plot the left load motor's temperature from the CSV file, a program reads all 36,000 rows. From a Parquet file, it reads only that column's chunks.[^parquet-format] A CSV file's only metadata is its header line,[^rfc4180] so it has nowhere to record that a temperature of 0.0 means no sensor is fitted.
+To check the estimates against real files, simulate a run of the same shape: the 27 values in 36,000 rows, 50 a second, with each 5 Hz value repeated until the next one arrives. The values are made up, and so are their resolutions, apart from motor current's tenths of an amp. In this run, the right load motor has no temperature sensor fitted, so its motor temperature reads 0.0:
+
+```{code-cell} ipython3
+rng = np.random.default_rng(7)
+rows = 50 * 12 * 60  # 50 rows a second for 12 minutes
+seconds = np.arange(rows) / 50
+start = pd.Timestamp("2026-01-01T12:00:00Z")
+warming = 1 - np.exp(-seconds / 300)  # temperatures rise toward a steady state
+
+
+def noise(scale):
+    """Return random noise for one column, with a standard deviation of scale."""
+    return rng.normal(scale=scale, size=rows)
+
+
+def at_5_hz(values):
+    """Keep every tenth value, and repeat it until the next, as the CSV rows do."""
+    return np.repeat(values[::10], 10)
+
+
+run = {}
+for name, rpm, rise in [
+    ("dut", 1000, 35),
+    ("left_load", 110, 25),
+    ("right_load", 110, 25),
+]:
+    run[f"{name}.velocity"] = np.round(rpm + noise(2))  # to 1 RPM
+    run[f"{name}.motor_current"] = np.round(10 + noise(0.3), 1)  # to 0.1 A
+    run[f"{name}.duty_cycle"] = np.round(35 + noise(0.5), 1)  # to 0.1 %
+    run[f"{name}.fet_temperature"] = np.round(
+        25 + rise / 2 * warming + noise(0.1), 1
+    )
+    run[f"{name}.motor_temperature"] = np.round(25 + rise * warming + noise(0.1), 1)
+    run[f"{name}.input_current"] = np.round(4 + noise(0.5), 1)
+    run[f"{name}.pid_position"] = np.round(500 + noise(5))
+    run[f"{name}.tachometer"] = at_5_hz(np.floor(rpm / 60 * seconds))  # cumulative
+    run[f"{name}.input_voltage"] = at_5_hz(np.round(48 + noise(0.1), 1))
+run["right_load.motor_temperature"][:] = 0.0  # no sensor fitted
+
+timestamps = start + pd.to_timedelta(seconds, unit="s")
+df = pd.DataFrame(run, index=pd.DatetimeIndex(timestamps, name="timestamp"))
+df.shape
+```
+
+Plotted, the missing sensor looks like any other channel, a motor that stays at 0.0 °C:
+
+```{code-cell} ipython3
+every_second = df.iloc[::50]  # one row a second is enough to show the trend
+minutes = seconds[::50] / 60
+fig, ax = plt.subplots()
+for name in ("dut", "left_load", "right_load"):
+    column = every_second[f"{name}.motor_temperature"]
+    ax.plot(minutes, column, label=column.name)
+ax.set(xlabel="Time (min)", ylabel="Motor temperature (°C)")
+ax.legend()
+plt.show()
+```
+
+Write the run as CSV, with each value to its resolution and the timestamps as in the estimate. Write it as Parquet and HDF5 too, with 64-bit numbers, and with each column's unit in the file. The values' context, the 0.0 that means no sensor, goes in the file's metadata as well:
+
+```{code-cell} ipython3
+folder = Path(tempfile.mkdtemp())  # not in the working folder
+# The values with no decimal places; the rest have one
+whole = {"velocity", "pid_position", "tachometer"}
+text = df.copy()
+for column in df:
+    decimals = 0 if column.split(".")[1] in whole else 1
+    text[column] = df[column].map(f"{{:.{decimals}f}}".format)  # to its resolution
+text.to_csv(
+    folder / "run.csv", date_format="%Y-%m-%dT%H:%M:%S.%fZ", lineterminator="\n"
+)
+```
+
+```{code-cell} ipython3
+units = {
+    "velocity": "rpm",
+    "motor_current": "A",
+    "duty_cycle": "%",
+    "fet_temperature": "Cel",
+    "motor_temperature": "Cel",
+    "input_current": "A",
+    "input_voltage": "V",
+}
+unit_of = {c: units[c.split(".")[1]] for c in df if c.split(".")[1] in units}
+descriptions = {"right_load.motor_temperature": "0.0 means no sensor is fitted."}
+
+table = pa.Table.from_pandas(df)
+metadata = {"units": json.dumps(unit_of), "descriptions": json.dumps(descriptions)}
+# The file's key-value metadata, beside what pyarrow keeps there
+table = table.replace_schema_metadata({**table.schema.metadata, **metadata})
+pq.write_table(table, folder / "run.parquet")
+
+with h5py.File(folder / "run.h5", "w") as h5:
+    h5["timestamp"] = df.index.asi8  # nanoseconds since 1970-01-01T00:00:00Z
+    for column in df:
+        h5[column] = df[column].to_numpy()  # 64-bit numbers, uncompressed
+        h5[column].attrs["unit"] = unit_of.get(column, "")
+    for column, description in descriptions.items():
+        h5[column].attrs["description"] = description
+```
+
+Next to the estimates for the same layouts, from the assumptions above the table, the files measure:
+
+```{code-cell} ipython3
+estimate = {  # bytes per row, as in the table
+    "run.csv": 27 + 27 * 5 + 28,  # timestamp, 27 values of 5 characters, separators
+    "run.h5": 8 + 27 * 8,  # a 64-bit timestamp, and 27 64-bit numbers
+    "run.parquet": None,  # no estimate: Parquet encodes and compresses
+}
+measured = {f: (folder / f).stat().st_size / rows for f in estimate}
+sizes = pd.DataFrame(
+    {"Estimated bytes per row": estimate, "Measured bytes per row": measured}
+).rename_axis("File")
+sizes["Estimated run (MB)"] = sizes["Estimated bytes per row"] * rows / 1e6
+sizes["Measured run (MB)"] = sizes["Measured bytes per row"] * rows / 1e6
+sizes.map(lambda v: "" if pd.isna(v) else f"{v:,.1f}")
+```
+
+The CSV file's fields show where its size differs from the estimate:
+
+```{code-cell} ipython3
+lines = (folder / "run.csv").read_text().splitlines()[1:]  # after the header
+fields = [line.split(",") for line in lines]
+timestamp_chars = np.mean([len(f[0]) for f in fields])
+value_chars = np.mean([len(v) for f in fields for v in f[1:]])
+print(f"Timestamps: {timestamp_chars:.0f} characters")
+print(f"Values: {value_chars:.1f} characters on average")
+overhead = (folder / "run.h5").stat().st_size - rows * (8 + 27 * 8)
+print(f"HDF5 file: {overhead:,} bytes besides the numbers")
+```
+
+The timestamps take 27 characters, as estimated, but the simulated values average fewer than the 5 characters the estimate supposes, so the CSV file is smaller. The HDF5 file holds the 64-bit numbers as the estimate does, plus 16 kB of overhead. The Parquet file is smaller than every estimate in the table, because Parquet encodes and compresses each column. Its metadata shows the encodings and the size of each column chunk, such as these three, against the 288,000 bytes each would take as 64-bit numbers:
+
+```{code-cell} ipython3
+parquet = pq.ParquetFile(folder / "run.parquet")
+names = parquet.schema_arrow.names
+examples = ["dut.motor_current", "dut.input_voltage", "right_load.motor_temperature"]
+for column in examples:
+    chunk = parquet.metadata.row_group(0).column(names.index(column))
+    encodings = ", ".join(chunk.encodings)
+    print(f"{column}: {chunk.total_compressed_size:,} bytes, {encodings}")
+```
+
+The repeated 5 Hz values, and the 0.0 that never changes, take the least room.
+
+To plot the left load motor's temperature from the CSV file, a program reads all 36,000 rows. From a Parquet file, it reads only that column's chunks.[^parquet-format]
+
+```{code-cell} ipython3
+from_csv = pd.read_csv(folder / "run.csv")  # every row, all 28 columns
+temperature = "left_load.motor_temperature"
+from_parquet = pq.read_table(folder / "run.parquet", columns=[temperature])
+
+csv_bytes = (folder / "run.csv").stat().st_size
+chunk = parquet.metadata.row_group(0).column(names.index(temperature))
+chunk_bytes = chunk.total_compressed_size
+footer = parquet.metadata.serialized_size
+print(f"CSV: {from_csv.shape}, the whole file: {csv_bytes:,} bytes")
+print(f"Parquet: {from_parquet.shape}, one column chunk: {chunk_bytes:,} bytes")
+print(f"  and the file metadata: {footer:,} bytes")
+```
+
+A CSV file's only metadata is its header line,[^rfc4180] so it has nowhere to record that a temperature of 0.0 means no sensor is fitted. The Parquet and HDF5 files carry it, with the units, and a program reads them back with the values:
+
+```{code-cell} ipython3
+metadata = pq.read_schema(folder / "run.parquet").metadata
+print(json.loads(metadata[b"units"])[temperature])
+print(json.loads(metadata[b"descriptions"]))
+
+with h5py.File(folder / "run.h5") as h5:
+    print(dict(h5["right_load.motor_temperature"].attrs))
+```
 
 ## Further reading
 

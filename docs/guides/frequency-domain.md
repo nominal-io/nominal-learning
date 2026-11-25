@@ -1,7 +1,19 @@
+---
+jupytext:
+  text_representation:
+    format_name: myst
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
 # Frequency domain
 
 {.lead}
 A spectrum shows how much of a signal is at each frequency, which picks out repeating content such as a shaft's rotation or interference from mains power. What it can show depends on the sample rate, the record length and the window you choose.
+
+{download}`Download this page as a notebook <frequency-domain.md>` to run its code in JupyterLab. [Running the notebooks](notebooks/running.md) explains how to set it up.
 
 ## Time domain and frequency domain
 
@@ -14,6 +26,64 @@ The spectrum of a measured signal can have these features:[^smith-spectral]
 - A peak at the mains frequency, with smaller peaks at its multiples, from electrical interference.
 - A roll-off just below half the sample rate, from the anti-aliasing filter. If the spectrum doesn't drop there, suspect {gloss}`aliasing`.
 
+The code on this page runs on simulated signals. The first is 10 s of what an accelerometer might read from a machine whose shaft turns at 1,500 RPM, with a 12-tooth gear on the shaft, and with interference from 50 Hz mains power. [Rotating machinery and orders](#rotating-machinery-and-orders) explains where the shaft's and the gear's frequencies come from.
+
+```{code-cell} ipython3
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from scipy import signal
+from scipy.integrate import cumulative_trapezoid
+
+from learning.style import set_matplotlib_style
+
+set_matplotlib_style()  # plots that suit the page in its light and dark themes
+```
+
+```{code-cell} ipython3
+fs = 5000.0  # samples per second
+t = np.arange(int(10 * fs)) / fs  # 10 s
+rng = np.random.default_rng(1)
+
+shaft_hz = 1500 / 60  # the shaft's first order: 25 Hz
+mesh_hz = 12 * shaft_hz  # the gear meshes once per tooth: 300 Hz
+vibration = (  # in g
+    0.5 * np.sin(2 * np.pi * shaft_hz * t)
+    + 1.0 * np.sin(2 * np.pi * mesh_hz * t)
+    + 0.3 * np.sin(2 * np.pi * 2 * mesh_hz * t)  # the mesh's second harmonic
+    + 0.2 * np.sin(2 * np.pi * 50 * t)  # mains interference, and its multiples
+    + 0.05 * np.sin(2 * np.pi * 100 * t)
+    + 0.05 * np.sin(2 * np.pi * 150 * t)
+    + rng.normal(scale=0.1, size=t.size)  # white noise, 0.1 g RMS
+)
+
+
+def amplitude_spectrum(x, fs, window="hann"):
+    """Return each bin's frequency, and its amplitude in x's units, from one record."""
+    w = signal.get_window(window, x.size)  # see Leakage and windows, below
+    amplitude = np.abs(np.fft.rfft(x * w)) * 2 / w.sum()  # a tone reads its peak
+    return np.fft.rfftfreq(x.size, d=1 / fs), amplitude
+```
+
+The time trace, the first 0.2 s, adds every component into one waveform. In the spectrum of the first 2 s, each one is a peak at its own frequency: the shaft at 25 Hz, the mains at 50 Hz with smaller peaks at 100 Hz and 150 Hz, and the gear mesh at 300 Hz with a harmonic at 600 Hz. Below them is the flat floor of the noise. The simulation has no anti-aliasing filter, so the spectrum doesn't roll off.
+
+```{code-cell} ipython3
+record = vibration[: int(2 * fs)]  # the first 2 s
+f, amplitude = amplitude_spectrum(record, fs)
+
+fig, (ax_t, ax_f) = plt.subplots(2, 1, figsize=(8, 5.5))
+ax_t.plot(t[: int(0.2 * fs)], record[: int(0.2 * fs)], lw=0.8)
+ax_t.set(xlabel="Time (s)", ylabel="Acceleration (g)")
+ax_f.semilogy(f, amplitude, lw=0.8)
+ax_f.set(
+    xlabel="Frequency (Hz)",
+    ylabel="Amplitude (g peak)",
+    xlim=(0, 800),
+    ylim=(1e-4, 2),
+)
+fig.tight_layout()
+```
+
 ## From samples to a spectrum
 
 The discrete Fourier transform (DFT) turns a record of samples into a {gloss}`spectrum`, and the {gloss}`fast Fourier transform` (FFT) is an efficient way to compute it.[^ni-fft] A record of N samples, taken at a {gloss}`sample rate` fs, gives N/2 + 1 frequency bins, evenly spaced from 0 Hz to fs/2:[^smith-dft][^siemens-dsp]
@@ -22,6 +92,15 @@ The discrete Fourier transform (DFT) turns a record of samples into a {gloss}`sp
 record length:  T  = N / fs
 bin spacing:    Δf = fs / N = 1 / T
 highest bin:    fs / 2
+```
+
+For the 2 s record of simulated vibration plotted above:
+
+```{code-cell} ipython3
+n = record.size
+f = np.fft.rfftfreq(n, d=1 / fs)  # the bins' frequencies
+print(f"N = {n:,} samples, T = {n / fs:.1f} s")
+print(f"{f.size:,} bins, {f[1]:.1f} Hz apart, up to {f[-1]:,.0f} Hz")
 ```
 
 The sample rate sets the top of the spectrum, and the record length sets how finely it's divided. Bins 1 Hz apart need 1 s of data, and bins 0.1 Hz apart need 10 s. Two tones at 100 Hz and 101 Hz merge into one peak with 1 Hz bins, and separate with 0.5 Hz bins.[^siemens-dsp] Padding a record with zeros adds bins, but doesn't separate peaks that the record is too short to resolve.[^smith-spectral]
@@ -50,7 +129,7 @@ xychart-beta
     line [1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92, -1.00, -0.92, -0.71, -0.38, 0.00, 0.38, 0.71, 0.92, 1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92, -1.00, -0.92, -0.71, -0.38, 0.00, 0.38, 0.71, 0.92, 1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92, 1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92, -1.00, -0.92, -0.71, -0.38, 0.00, 0.38, 0.71, 0.92, 1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92, -1.00, -0.92, -0.71, -0.38, 0.00, 0.38, 0.71, 0.92, 1.00, 0.92, 0.71, 0.38, 0.00, -0.38, -0.71, -0.92]
 ```
 
-A {gloss}`window <window function>` multiplies the record by a curve that tapers to zero at both ends, so the ends meet without a jump.[^ni-fft] Every window trades resolution, the width of a peak, against leakage, the height of its tails.[^smith-spectral] With a Hann window, a tone's leakage typically stays within 1.5 bins on each side, and its amplitude is off by up to 15%. A flat top window reads amplitude to within 0.01%, but spreads each tone over 3.43 bins on each side, so two tones 4 Hz apart, with 1 Hz bins, show as one peak. With no window, which is called a rectangular or uniform window, a tone that doesn't fit the record reads up to 36% low, and leaks across the whole spectrum.[^siemens-windows] Choose the window from the signal:[^ni-fft][^siemens-windows]
+A {gloss}`window <window function>` multiplies the record by a curve that tapers to zero at both ends, so the ends meet without a jump.[^ni-fft] Every window trades resolution, the width of a peak, against leakage, the height of its tails.[^smith-spectral] With a Hann window, a tone's leakage typically stays within 1.5 bins on each side, and its amplitude is off by up to 15%. Siemens' flat top window reads amplitude to within 0.01%, but spreads each tone over 3.43 bins on each side, so two tones 4 Hz apart, with 1 Hz bins, show as one peak. With no window, which is called a rectangular or uniform window, a tone that doesn't fit the record reads up to 36% low, and leaks across the whole spectrum.[^siemens-windows] Choose the window from the signal:[^ni-fft][^siemens-windows]
 
 | Signal | Window |
 | --- | --- |
@@ -59,9 +138,45 @@ A {gloss}`window <window function>` multiplies the record by a curve that tapers
 | One tone whose amplitude must be exact, such as a calibration tone | Flat top |
 | A signal that fits the record, such as an impact that dies away inside it | Rectangular |
 
+A 1 g tone at 25.25 Hz, such as the shaft's first order at 1,515 RPM, puts 50.5 cycles in a 2 s record. It falls halfway between two 0.5 Hz bins, which is the worst case for leakage:
+
+```{code-cell} ipython3
+tone = np.sin(2 * np.pi * 25.25 * t[: int(2 * fs)])  # 1 g, 50.5 cycles in 2 s
+
+fig, ax = plt.subplots()
+for window, label in [("boxcar", "No window (rectangular)"), ("hann", "Hann")]:
+    f, amplitude = amplitude_spectrum(tone, fs, window)
+    print(f"{label}: reads {amplitude.max():.2f} g, {1 - amplitude.max():.0%} low")
+    ax.semilogy(f, amplitude, label=label)
+ax.set(
+    xlabel="Frequency (Hz)",
+    ylabel="Amplitude (g peak)",
+    xlim=(0, 100),
+    ylim=(1e-6, 2),
+)
+ax.legend()
+plt.show()
+```
+
+With no window, the tone reads 36% low, and its leakage spreads across the whole plot. With the Hann window, it reads 15% low, and its leakage falls away steeply on each side of the tone.
+
 ### Averaging
 
 A longer record gives finer bins, but the same noise. To reduce the noise, split a long measurement into records, window each one, take its FFT, and average the magnitudes. Random noise falls in proportion to the square root of the number of records.[^smith-spectral] SciPy's `welch` function does this, and by default it overlaps the records by half, which it calls a reasonable trade-off for the Hann window.[^scipy-welch]
+
+Here, 10 s of simulated white noise is split into 2 s records that don't overlap. The spectrum of one record varies from bin to bin by about its own mean, and averaging five records makes that spread about √5 times smaller:
+
+```{code-cell} ipython3
+noise = np.random.default_rng(2).normal(scale=0.5, size=int(10 * fs))  # 0.5 g RMS
+
+spread = {}
+for records in (1, 5):
+    part = noise[: records * int(2 * fs)]
+    f, psd = signal.welch(part, fs, nperseg=int(2 * fs), noverlap=0)  # no overlap
+    spread[records] = psd.std() / psd.mean()  # the spread from bin to bin
+    print(f"{records} record(s): spread {spread[records]:.2f} of the mean")
+print(f"Spread cut by {spread[1] / spread[5]:.1f}, and √5 = {np.sqrt(5):.1f}")
+```
 
 ## Amplitude spectrum or power spectral density
 
@@ -72,7 +187,7 @@ An amplitude spectrum reads in the signal's own units, such as g, and its square
 
 In SciPy, `welch` returns a PSD with `scaling="density"`, and a power spectrum with `scaling="spectrum"`. The square root of a power spectrum's peak estimates a tone's RMS amplitude.[^scipy-welch] This example measures a tone with a flat top window, and the noise around it as a PSD:
 
-```python
+```{code-cell} ipython3
 import numpy as np
 from scipy import signal
 
@@ -85,7 +200,9 @@ x = 2.0 * np.sin(2 * np.pi * 300 * t) + rng.normal(scale=0.5, size=t.size)
 # 2 s records give 0.5 Hz bins; welch averages them, overlapped by half
 nperseg = int(2 * fs)
 f, psd = signal.welch(x, fs, window="hann", nperseg=nperseg)  # g²/Hz
-f, power = signal.welch(x, fs, window="flattop", nperseg=nperseg, scaling="spectrum")  # g²
+f, power = signal.welch(
+    x, fs, window="flattop", nperseg=nperseg, scaling="spectrum"
+)  # g²
 
 k = np.argmax(power)
 print(f"Bin spacing: {f[1]:.2f} Hz, up to {f[-1]:.0f} Hz")
@@ -110,11 +227,93 @@ xychart-beta
     line [0.01, 0.02, 0.02, 0.02, 0.02, 0.01, 0.03, 0.28, 0.91, 1.37, 1.42, 1.37, 0.91, 0.28, 0.03, 0.01, 0.01, 0.02, 0.02, 0.01, 0.01]
 ```
 
+To see why the choice depends on the signal, analyze the same measurement in 1 s and 2 s records, both with a Hann window, as an amplitude spectrum, the square root of the power spectrum, and as a PSD:
+
+```{code-cell} ipython3
+fig, (ax_amp, ax_psd) = plt.subplots(1, 2, sharex=True)
+for seconds in (1, 2):
+    kw = dict(fs=fs, window="hann", nperseg=int(seconds * fs))
+    f, power = signal.welch(x, scaling="spectrum", **kw)  # g²
+    f, psd = signal.welch(x, scaling="density", **kw)  # g²/Hz
+    floor = f > 1000  # noise only
+    tone_amp, tone_psd = np.sqrt(power.max()), psd.max()
+    floor_amp, floor_psd = np.sqrt(power[floor].mean()), psd[floor].mean()
+    print(f"{f[1]:.1f} Hz bins: tone {tone_amp:.2f} g RMS, {tone_psd:.2f} g²/Hz")
+    print(f"  noise floor {floor_amp:.4f} g RMS, {floor_psd:.1e} g²/Hz")
+    ax_amp.semilogy(f, np.sqrt(power), lw=0.8, label=f"{f[1]:.1f} Hz bins")
+    ax_psd.semilogy(f, psd, lw=0.8, label=f"{f[1]:.1f} Hz bins")
+ax_amp.set(xlabel="Frequency (Hz)", ylabel="Amplitude (g RMS)", xlim=(250, 350))
+ax_psd.set(xlabel="Frequency (Hz)", ylabel="PSD (g²/Hz)")
+ax_amp.legend()
+fig.tight_layout()
+```
+
+Halving the bin spacing leaves the tone's amplitude at 1.41 g RMS, and doubles its PSD. The noise floor does the reverse: its PSD stays at 1.0 × 10⁻⁴ g²/Hz, while its power in each bin halves, so its amplitude falls by √2.
+
 ## Signals that change: the spectrogram
 
 One spectrum can't show a frequency that moves, such as a shaft's frequency during a speed {gloss}`sweep`. A {gloss}`spectrogram` splits the measurement into short, possibly overlapping records, computes a spectrum for each, and plots them against time. Each record has to be short enough that the frequency content doesn't change much within it.[^mw-pspectrum][^scipy-spectrogram]
 
 The rule Δf = 1/T applies to each record, so a spectrogram trades time resolution against frequency resolution. Records of 0.02 s give 50 Hz bins, and records of 0.2 s give 5 Hz bins.[^siemens-wavelets] In SciPy, `spectrogram` is a legacy function, and SciPy recommends its `ShortTimeFFT` class for new code.[^scipy-spectrogram]
+
+This simulated run-up speeds the shaft up from 600 RPM to 3,000 RPM over 40 s. Its vibration holds the shaft's first order, the 12-tooth gear's mesh and the mesh's second harmonic, passed through a structure with a resonance at 450 Hz, and the accelerometer picks up 50 Hz mains:
+
+```{code-cell} ipython3
+rng = np.random.default_rng(3)
+t = np.arange(int(40 * fs)) / fs  # 40 s
+rpm = 600 + 60 * t  # the shaft speeds up by 60 RPM a second
+# The shaft's angle, in revolutions
+revs = cumulative_trapezoid(rpm / 60, t, initial=0)
+
+excitation = (  # in g
+    0.2 * np.sin(2 * np.pi * revs)  # the first order
+    + 0.5 * np.sin(2 * np.pi * 12 * revs)  # the gear mesh, order 12
+    + 0.15 * np.sin(2 * np.pi * 24 * revs)  # its second harmonic, order 24
+    + rng.normal(scale=0.05, size=t.size)  # broadband vibration
+)
+# A resonance at 450 Hz, which amplifies 5 times at its peak
+b, a = signal.iirpeak(450, Q=15, fs=fs)
+runup = excitation + 4 * signal.lfilter(b, a, excitation)
+runup += 0.2 * np.sin(2 * np.pi * 50 * t)  # mains interference
+runup += rng.normal(scale=0.02, size=t.size)  # the accelerometer's noise
+```
+
+This spectrogram's records are 0.2 s long. In 0.2 s the shaft speeds up by 12 RPM, which moves the mesh 2.4 Hz, less than one bin:
+
+```{code-cell} ipython3
+stft = signal.ShortTimeFFT.from_window(
+    "hann",
+    fs,
+    nperseg=int(0.2 * fs),
+    noverlap=int(0.1 * fs),  # overlapped by half
+    fft_mode="onesided2X",
+    scale_to="magnitude",  # a tone reads its peak
+)
+S = np.abs(stft.stft(runup))
+t_s = stft.t(runup.size)  # each record's center
+print(f"{stft.delta_f:.0f} Hz bins, a spectrum every {stft.delta_t:.1f} s")
+
+shown = stft.f <= 1000
+fig, ax = plt.subplots(figsize=(8, 4))
+image = ax.pcolormesh(
+    t_s,
+    stft.f[shown],
+    20 * np.log10(S[shown] + 1e-6),  # dB re 1 g
+    vmin=-60,
+    vmax=10,
+    shading="nearest",
+    rasterized=True,
+)
+ax.set(xlabel="Time (s)", ylabel="Frequency (Hz)")
+speed_axis = ax.secondary_xaxis(
+    "top", functions=(lambda s: 600 + 60 * s, lambda r: (r - 600) / 60)
+)
+speed_axis.set_xlabel("Shaft speed (RPM)")
+fig.colorbar(image, label="Amplitude (dB re 1 g peak)")
+plt.show()
+```
+
+The three orders are lines that rise with the shaft's speed, and the mesh's harmonic rises twice as steeply as the mesh. The mains at 50 Hz and the resonance's band at 450 Hz stay where they are.
 
 ## Rotating machinery and orders
 
@@ -128,6 +327,71 @@ For a run-up, compute spectra at small speed steps and stack them along a speed 
 
 An FFT over a fixed time smears an order whose frequency moves during the record. If a shaft speeds up from 1,000 RPM to 1,060 RPM within one record, its first order moves 1 Hz and its fourth order 4 Hz. Order tracking takes each spectrum over a fixed number of revolutions instead, so orders don't smear. Spectra over a fixed time still show resonances, which order tracking can cut off.[^siemens-tracking] Order tracking needs the shaft's speed as a reference. Siemens has used engine speed read over a vehicle's CAN bus, 20 times a second and interpolated, in place of a tachometer.[^siemens-obd]
 
+Each order moves by its number times the change in speed, in revolutions per second:
+
+```{code-cell} ipython3
+for order in (1, 4, 12):
+    moves = order * (1060 - 1000) / 60  # Hz
+    print(f"Order {order}: moves {moves:.0f} Hz from 1,000 to 1,060 RPM")
+```
+
+The simulated run-up speeds up by 60 RPM a second, so a 1 s record from 1,000 RPM ends at 1,060 RPM. To take the spectrum over revolutions instead, resample the vibration at fixed steps of the shaft's angle, using the speed to find the angle. The FFT of the resampled record then has bins in orders, rather than in Hz:
+
+```{code-cell} ipython3
+# Samples a revolution: over 5,000 a second above 600 RPM, so resampling doesn't alias
+per_rev = 512
+angle = np.arange(0, revs[-1], 1 / per_rev)  # in revolutions
+by_angle = np.interp(angle, revs, runup)  # the vibration at each step of angle
+
+start = np.searchsorted(rpm, 1000)  # where the shaft reaches 1,000 RPM
+f, by_time = amplitude_spectrum(runup[start : start + int(fs)], fs)  # 1 s: 1 Hz bins
+first = np.searchsorted(angle, revs[start])
+orders, by_order = amplitude_spectrum(
+    by_angle[first : first + 17 * per_rev], per_rev
+)
+print(f"Over 1 s: the mesh peaks at {by_time[(f > 190) & (f < 230)].max():.2f} g")
+print(f"Over 17 revolutions: {by_order[orders == 12][0]:.2f} g at order 12")
+
+fig, (ax_t, ax_o) = plt.subplots(1, 2)
+ax_t.plot(f, by_time)
+ax_t.set(
+    xlabel="Frequency (Hz)",
+    ylabel="Amplitude (g peak)",
+    xlim=(190, 230),
+    ylim=(0, 0.6),
+)
+ax_o.plot(orders, by_order)
+ax_o.set(xlabel="Order", xlim=(11, 13), ylim=(0, 0.6))
+fig.tight_layout()
+```
+
+Over a fixed time, the mesh spreads across the 12 Hz it moved through, and reads low. Over 17 whole revolutions, which take about the same time, it's one sharp peak at order 12. Tracking each order through spectra over 16 revolutions, overlapped by half, shows the mesh and its harmonic rise where they cross the resonance:
+
+```{code-cell} ipython3
+by_rev = signal.ShortTimeFFT.from_window(
+    "hann",
+    per_rev,  # samples a revolution, in place of a sample rate: bins in orders
+    nperseg=16 * per_rev,  # 16 revolutions
+    noverlap=8 * per_rev,  # overlapped by half
+    fft_mode="onesided2X",
+    scale_to="magnitude",
+)
+S_rev = np.abs(by_rev.stft(by_angle))  # bins 1/16 order apart: 12 and 24 fit
+centers = by_rev.t(by_angle.size)  # each record's center, in revolutions
+speed = np.interp(centers, revs, rpm)
+# Leave out the records that are padded at the ends
+inside = (centers >= 8) & (centers <= angle[-1] - 8)
+
+fig, ax = plt.subplots()
+for order in (12, 24):
+    print(f"Order {order} crosses 450 Hz at {450 * 60 / order:,.0f} RPM")
+    track = S_rev[np.argmin(np.abs(by_rev.f - order))]
+    ax.plot(speed[inside], track[inside], label=f"Order {order}")
+ax.set(xlabel="Shaft speed (RPM)", ylabel="Amplitude (g peak)")
+ax.legend()
+plt.show()
+```
+
 ## Filters in the frequency domain
 
 A {gloss}`filter` is described by which frequencies it passes: a low-pass filter passes low frequencies, a high-pass filter high ones, and band-pass and band-reject filters pass or block a band between. The cutoff frequency divides the band a filter passes, its passband, from the transition band, where it starts to block. Analog filters put it where the amplitude falls to 0.707, or −3 dB, while digital filters use 99%, 90%, 70.7% or 50%, so check which one a filter uses.[^smith-filters]
@@ -140,6 +404,36 @@ Interference from mains power shows up as a peak at 50 Hz or 60 Hz, depending on
 
 In software, a notch filter removes a narrow band. MathWorks removes 60 Hz hum with a Butterworth band-stop filter from 59 Hz to 61 Hz, and checks in a periodogram that the peak has gone.[^mw-hum]
 
+The same approach works on the simulated vibration from the top of this page, with a band-stop filter from 49 Hz to 51 Hz, and one around each multiple of 50 Hz:
+
+```{code-cell} ipython3
+notched = vibration
+for f0 in (50, 100, 150):  # the mains and its multiples
+    # A second-order Butterworth band-stop, as in MathWorks' example
+    sos = signal.butter(1, [f0 - 1, f0 + 1], btype="bandstop", fs=fs, output="sos")
+    notched = signal.sosfiltfilt(sos, notched)  # forward and backward, like filtfilt
+
+middle = slice(int(4 * fs), int(6 * fs))  # 2 s from the middle, clear of the ends
+fig, ax = plt.subplots()
+for x, label in [(vibration, "Before"), (notched, "After the band-stop filters")]:
+    f, amplitude = amplitude_spectrum(x[middle], fs)
+    peaks = ", ".join(
+        f"{f0} Hz {amplitude[f == f0][0]:.3f} g" for f0 in (25, 50, 100, 150, 300)
+    )
+    print(f"{label}: {peaks}")
+    ax.semilogy(f, amplitude, lw=0.8, label=label)
+ax.set(
+    xlabel="Frequency (Hz)",
+    ylabel="Amplitude (g peak)",
+    xlim=(0, 400),
+    ylim=(1e-4, 2),
+)
+ax.legend()
+plt.show()
+```
+
+The mains peaks are gone, and the shaft at 25 Hz and the mesh at 300 Hz keep their amplitudes.
+
 ## Worked example: what an e-axle dyno's data can show
 
 Take a {gloss}`dyno <dynamometer>` that tests e-axles. An e-axle combines an electric motor, its power electronics and a transmission in one drive unit.[^bosch-eaxle] On the dyno, the e-axle's motor drives the axle through its gearbox, and a load motor on each side brakes it. This dyno is built to map speed, torque, current, power and temperature, and its manual says it isn't a noise and vibration stand. Its software reads each motor controller about 16 times a second, enough to show changes slower than 8 Hz, as [Sample rate and aliasing](measurement-quality.md#sample-rate-and-aliasing) describes. This example works out which of the driveline's frequencies fall below that, and what an added accelerometer would need.
@@ -148,15 +442,40 @@ Take a {gloss}`dyno <dynamometer>` that tests e-axles. An e-axle combines an ele
 
 The DUT speed channel is the DUT motor's speed. The manual gives the e-axle's gear ratio, from the motor to the axle, as 9.095. With both load motors braking equally, each half shaft and load motor turns at the axle's speed. The manual doesn't give the gearbox's tooth counts, so suppose the pinion on the motor shaft has 12 teeth.
 
-At 1,500 RPM, the top of the sweep, the motor shaft turns 1,500 / 60 = 25.00 times a second. The axle turns 25.00 / 9.095 = 2.75 times a second, and the pinion meshes at 12 × 25.00 = 300.00 Hz.
+Each frequency is an order of the motor shaft times the motor's speed in RPM, divided by 60. The axle's order is 1 divided by the gear ratio, and the mesh's order is the pinion's tooth count. At 1,500 RPM, the top of the sweep, and at 3,000 RPM, the speed ceiling:
 
-| Shaft or event | Order of the motor shaft | At 1,500 RPM (Hz) | At 3,000 RPM, the speed ceiling (Hz) |
-| --- | ---: | ---: | ---: |
-| DUT motor shaft | 1.00 | 25.00 | 50.00 |
-| Axle, half shafts and load motors | 0.11 | 2.75 | 5.50 |
-| Mesh of a 12-tooth pinion on the motor shaft | 12.00 | 300.00 | 600.00 |
+```{code-cell} ipython3
+ratio = 9.095  # motor to axle, from the manual
+teeth = 12  # supposed: the manual doesn't give the tooth counts
+order = pd.Series(
+    {
+        "DUT motor shaft": 1,
+        "Axle, half shafts and load motors": 1 / ratio,
+        "Mesh of a 12-tooth pinion on the motor shaft": teeth,
+    }
+)
+table = pd.DataFrame(
+    {
+        "Order of the motor shaft": order,
+        "At 1,500 RPM (Hz)": order * 1500 / 60,
+        "At 3,000 RPM, the speed ceiling (Hz)": order * 3000 / 60,
+    }
+).rename_axis("Shaft or event")
+table.map("{:.2f}".format)  # to 2 decimal places
+```
 
 ### 2. Compare them with the controller data
+
+Compare each frequency with the controller data's 8 Hz, at speeds from the sweep's lowest to the speed ceiling:
+
+```{code-cell} ipython3
+limit = 8  # Hz: the controller data shows changes slower than this
+for motor_rpm in (500, 1500, 3000):
+    hz = order * motor_rpm / 60
+    below = ", ".join(hz.index[hz < limit])
+    print(f"At {motor_rpm:,} RPM: motor shaft {hz.iloc[0]:.2f} Hz")
+    print(f"  Below {limit} Hz: {below}")
+```
 
 Only the axle's rotation stays below 8 Hz. The motor shaft is above it everywhere in the sweep: even at 500 RPM, the sweep's lowest speed, it turns 8.33 times a second. So the controller data can't show the motor's first order or any gear mesh, and content at those frequencies in a controller channel would alias.
 
@@ -164,15 +483,55 @@ At 3,000 RPM, the motor's first order is at 50 Hz, the mains frequency in 50 Hz 
 
 ### 3. Choose a sample rate and record length
 
-Suppose you add an accelerometer to the e-axle's housing, to see the mesh and its harmonics up to three times the mesh frequency.[^lim-singh] At 3,000 RPM that's 3 × 600 Hz = 1,800 Hz. With Siemens' factor of 2.5 for the anti-aliasing filter, sample at 4,500 samples per second or more.[^siemens-dsp]
+Suppose you add an accelerometer to the e-axle's housing, to see the mesh and its harmonics up to three times the mesh frequency.[^lim-singh] The speed ceiling sets the highest frequency, and Siemens' factor of 2.5 for the anti-aliasing filter sets the sample rate from it:[^siemens-dsp]
 
-Sidebands sit around the mesh at multiples of each shaft's frequency, so the axle, the slowest shaft, sets the closest spacing: 2.75 Hz at 1,500 RPM.[^lim-singh] A 2 s record gives 0.5 Hz bins. With a Hann window, each tone's leakage typically stays within 1.5 bins, or 0.75 Hz, on each side, so sidebands 2.75 Hz apart stay separate.[^siemens-windows] Each sweep test point holds for 10 s by default, enough for five 2 s records, or nine overlapped by half. Averaging N independent records cuts random noise by a factor of √N, so five records cut it by about 2.2.[^smith-spectral]
+```{code-cell} ipython3
+highest = 3 * teeth * 3000 / 60  # the mesh's third harmonic at 3,000 RPM
+print(f"Highest frequency: {highest:,.0f} Hz")
+print(f"Sample at {2.5 * highest:,.0f} samples per second or more")
+```
 
-The mesh is order 12 of the motor shaft, so each 1 RPM change in motor speed moves it 0.2 Hz. To keep it within one 0.5 Hz bin, the speed has to hold within 2.5 RPM during a record, and the sequence only checks that it's within 50 RPM of its setpoint. Check the speed's spread during the hold, as in the [noise check](measurement-quality.md#checks-you-can-do-in-place), or use order tracking, with the DUT speed channel as the reference.
+Sidebands sit around the mesh at multiples of each shaft's frequency, so the axle, the slowest shaft, sets the closest spacing.[^lim-singh] With a Hann window, each tone's leakage typically stays within 1.5 bins on each side.[^siemens-windows] Each sweep test point holds for 10 s by default, and averaging N independent records cuts random noise by a factor of √N.[^smith-spectral] With 2 s records at 1,500 RPM:
+
+```{code-cell} ipython3
+spacing = 1500 / 60 / ratio  # the axle's frequency: the closest sidebands
+record_s, hold_s = 2, 10
+bin_hz = 1 / record_s
+print(f"Sidebands {spacing:.2f} Hz apart, and bins {bin_hz} Hz apart")
+print(f"Hann leakage within {1.5 * bin_hz:.2f} Hz on each side of a tone")
+
+records = hold_s / record_s
+overlapped = (hold_s - record_s) / (record_s / 2) + 1  # a new record every 1 s
+print(f"In a {hold_s} s hold: {records:.0f} records")
+print(f"  or {overlapped:.0f} overlapped by half")
+print(f"Averaging 5 records cuts the noise by {np.sqrt(5):.1f}")
+```
+
+So sidebands 2.75 Hz apart stay separate, and five records cut the noise by about 2.2.
+
+The mesh is order 12 of the motor shaft, so it moves 12 times as far as the motor's first order when the speed changes. To keep it within one 0.5 Hz bin during a record, the speed has to hold within:
+
+```{code-cell} ipython3
+hz_per_rpm = teeth / 60  # how far the mesh moves for each RPM
+print(f"{hz_per_rpm:.1f} Hz per RPM: hold within {bin_hz / hz_per_rpm:.1f} RPM")
+```
+
+The sequence only checks that the speed is within 50 RPM of its setpoint. Check the speed's spread during the hold, as in the [noise check](measurement-quality.md#checks-you-can-do-in-place), or use order tracking, with the DUT speed channel as the reference.
 
 ### 4. Check the manual's working assumption
 
-The manual measures the product of the DUT motor's pole pairs and its gear ratio as 36.38, but can't separate the two from CAN data. It assumes 4 pole pairs and a ratio of 9.095. An accelerometer could settle it, because the motor's unbalance shows at its frequency of rotation.[^bk-balancing] At 6,000 electrical RPM, which the software reports as 1,500 RPM, the motor's first order is at 25.00 Hz if it has 4 pole pairs, and at 33.33 Hz if it has 3. The axle's peak is at 2.75 Hz either way.
+The manual measures the product of the DUT motor's pole pairs and its gear ratio as 36.38, but can't separate the two from CAN data. It assumes 4 pole pairs and a ratio of 9.095. An accelerometer could settle it, because the motor's unbalance shows at its frequency of rotation.[^bk-balancing] At 6,000 electrical RPM, which the software reports as 1,500 RPM:
+
+```{code-cell} ipython3
+product = 36.38  # pole pairs × gear ratio, as the manual measures it
+erpm = 6000  # electrical RPM
+for pole_pairs in (4, 3):
+    motor_hz = erpm / pole_pairs / 60  # the motor's first order
+    axle_hz = motor_hz / (product / pole_pairs)  # divided by the gear ratio
+    print(f"{pole_pairs} pole pairs: motor {motor_hz:.2f} Hz, axle {axle_hz:.2f} Hz")
+```
+
+The motor's first order is at 25.00 Hz if it has 4 pole pairs, and at 33.33 Hz if it has 3. The axle's peak is at 2.75 Hz either way.
 
 ## Further reading
 
