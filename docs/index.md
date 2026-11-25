@@ -44,10 +44,10 @@ guides/notebooks/notebook-display
 :caption: Test & Measurement
 
 Overview <guides/test-and-measurement/index>
+guides/test-and-measurement/bench-bringup
 guides/sensors-and-instrumentation
 guides/measurement-quality
 guides/test-design
-guides/test-and-measurement/bench-bringup
 ```
 
 ```{toctree}
@@ -75,11 +75,11 @@ guides/network-performance
 :caption: Signal Processing & Analysis
 
 Overview <guides/signal-processing-and-analysis/index>
-guides/frequency-domain
-guides/statistical-analysis
 guides/signal-processing-and-analysis/flight-sdr
 guides/signal-processing-and-analysis/rf-radio-field-test
 guides/signal-processing-and-analysis/sigmf-stream
+guides/frequency-domain
+guides/statistical-analysis
 ```
 
 ```{toctree}
