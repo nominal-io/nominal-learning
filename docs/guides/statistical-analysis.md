@@ -1,7 +1,32 @@
+---
+jupytext:
+  text_representation:
+    format_name: myst
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
 # Statistical analysis and DOE
 
 {.lead}
 Run the same test twice and the results differ a little. Statistics tells you whether a difference between results is bigger than that run-to-run variation, and {gloss}`design of experiments` (DOE) plans the test points so that the answer comes out clearly.
+
+{download}`Download this page as a notebook <statistical-analysis.md>` to run its code in JupyterLab. [Running the notebooks](notebooks/running.md) explains how to set it up.
+
+```{code-cell} ipython3
+import itertools
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+from learning.style import set_matplotlib_style
+
+set_matplotlib_style()  # plots that suit the page in its light and dark themes
+```
 
 ## Describing a set of results
 
@@ -43,6 +68,38 @@ On a {gloss}`dyno <dynamometer>`, where two load motors brake the motor under te
 
 To find candidates, plot the data first. For one outlier in roughly normal data, NIST recommends Grubbs' test. A z-score, the distance from the mean in standard deviations, can mislead in small samples, because it can't exceed (N − 1)/√N.[^nist-outliers] With 10 values, that's 2.85, so a rule that flags values beyond 3 standard deviations never fires.
 
+To see the limit at work, simulate ten runs of one test point: nine near 61.6 W, and a tenth at 70.0 W.
+
+```{code-cell} ipython3
+rng = np.random.default_rng(2)
+# Each run's mean input power, W: nine simulated runs, and a tenth far above them.
+runs = np.append(rng.normal(61.6, 0.67, size=9), 70.0).round(1)
+n, mean, s = len(runs), runs.mean(), runs.std(ddof=1)  # ddof=1 divides by N − 1
+z = (runs - mean) / s
+print(f"runs (W): {runs}")
+print(f"largest z-score {z.max():.2f}, bound (N − 1)/√N {(n - 1) / np.sqrt(n):.2f}")
+```
+
+In a plot, the 70.0 W run stands out from the others. It also raises s so much that it stays inside 3 standard deviations of the mean:
+
+```{code-cell} ipython3
+fig, ax = plt.subplots()
+ax.plot(np.arange(1, n + 1), runs, "o", label="run")
+ax.axhline(mean, color="C1", label="mean")
+ax.axhline(mean + 3 * s, color="C1", linestyle="--", label="mean ± 3s")
+ax.axhline(mean - 3 * s, color="C1", linestyle="--")
+ax.set(xlabel="Run", ylabel="Mean input power (W)")
+ax.legend(loc="lower left", bbox_to_anchor=(0, 1), ncols=3);  # above the plot
+```
+
+The 70.0 W run pulls the mean up by 0.84 W, while the median moves by 0.05 W:
+
+```{code-cell} ipython3
+nine = runs[:-1]  # without the tenth run
+print(f"ten runs:  mean {mean:.2f} W, median {np.median(runs):.2f} W")
+print(f"nine runs: mean {nine.mean():.2f} W, median {np.median(nine):.2f} W")
+```
+
 ## Is a difference real?
 
 ### Confidence intervals
@@ -55,7 +112,18 @@ A confidence interval gives a range for the population mean instead of a single 
 
 Here t is the 100(1 − α/2) percentile of the t distribution with N − 1 degrees of freedom, and α = 0.05 gives a 95% interval. The interval narrows as N grows and widens as s grows. A 95% interval doesn't mean a 95% chance that the true mean is inside it. It means that over many samples, about 95% of the intervals computed this way contain the true mean.[^nist-ci]
 
-Suppose you hold one dyno test point in five separate runs, and the DUT's mean input power in each run is 61.2, 62.0, 60.8, 61.5 and 62.5 W. The mean is 61.6 W and s is 0.67 W. With t = 2.776 for 4 degrees of freedom, the 95% interval is 61.6 ± 0.8 W.
+Suppose you hold one dyno test point in five separate runs, and the DUT's mean input power in each run is 61.2, 62.0, 60.8, 61.5 and 62.5 W:
+
+```{code-cell} ipython3
+a = np.array([61.2, 62.0, 60.8, 61.5, 62.5])  # each run's mean input power, W
+n = len(a)
+mean, s = a.mean(), a.std(ddof=1)
+t = stats.t.ppf(1 - 0.05 / 2, df=n - 1)  # α = 0.05, for a 95% interval
+print(f"mean {mean:.1f} W, s {s:.2f} W, t {t:.3f}")
+print(f"95% interval: {mean:.1f} ± {t * s / np.sqrt(n):.1f} W")
+```
+
+The mean is 61.6 W and s is 0.67 W. With t = 2.776 for 4 degrees of freedom, the 95% interval is 61.6 ± 0.8 W.
 
 Each of those values is one run's mean. The roughly 160 readings in a 10 s hold, at about 16 a second, are repeated measurements of one test point, not independent replicates, so average them into one value per run.[^psu-503-l5] Measurements made close together in time are often correlated.[^nist-assumptions]
 
@@ -69,7 +137,21 @@ T = (ȳ₁ − ȳ₂) / √( s₁²/N₁ + s₂²/N₂ )
 
 Reject the hypothesis if |T| is larger than t at 1 − α/2 with ν degrees of freedom. The Welch–Satterthwaite formula for ν holds up when the two samples have unequal sizes or unequal variances. If each value in one sample pairs with one in the other, such as the same unit tested in both configurations, test the differences between the pairs instead.[^nist-t-test]
 
-Suppose a second configuration gives 60.1, 59.6, 60.9, 60.3 and 59.8 W at the same test point: a mean of 60.14 W, with s of 0.50 W. The difference is 1.46 W, T = 3.91 and ν = 7.4. The critical value at α = 0.05 is 2.34, so the difference is significant at the 0.05 level. The 95% confidence interval for the difference, 0.59 to 2.33 W, also says how big it might be.[^scipy-ttest]
+Suppose a second configuration gives 60.1, 59.6, 60.9, 60.3 and 59.8 W at the same test point. SciPy's `ttest_ind` runs Welch's t-test when you pass `equal_var=False`, and its result's `confidence_interval` gives the interval for the difference:[^scipy-ttest]
+
+```{code-cell} ipython3
+b = np.array([60.1, 59.6, 60.9, 60.3, 59.8])  # the second configuration, W
+result = stats.ttest_ind(a, b, equal_var=False)  # Welch's t-test
+nu = result.df  # from the Welch–Satterthwaite formula
+critical = stats.t.ppf(1 - 0.05 / 2, df=nu)
+ci = result.confidence_interval(confidence_level=0.95)
+diff = a.mean() - b.mean()
+print(f"second configuration: mean {b.mean():.2f} W, s {b.std(ddof=1):.2f} W")
+print(f"difference {diff:.2f} W, T {result.statistic:.2f}, ν {nu:.1f}")
+print(f"critical value {critical:.2f}, 95% interval {ci.low:.2f} to {ci.high:.2f} W")
+```
+
+The second configuration's mean is 60.14 W, with s of 0.50 W. The difference is 1.46 W, T = 3.91 and ν = 7.4. The critical value at α = 0.05 is 2.34, so the difference is significant at the 0.05 level. The 95% confidence interval for the difference, 0.59 to 2.33 W, also says how big it might be.
 
 ### Statistical and practical significance
 
@@ -93,7 +175,21 @@ NIST's table for a two-sided test of one mean, at α = 0.05:[^nist-sample-size]
 | 0.10 | 43 | 11 | 5 |
 | 0.20 | 33 | 8 | 4 |
 
-N grows with (σ/δ)², so halving the difference you need to detect roughly quadruples the runs.
+The formula, rounded up to whole runs, gives the same numbers in most cells:
+
+```{code-cell} ipython3
+def runs_needed(delta_over_sigma, alpha=0.05, beta=0.10):
+    """Minimum runs for a two-sided test of one mean, with σ known."""
+    z = stats.norm.ppf(1 - alpha / 2) + stats.norm.ppf(1 - beta)
+    return int(np.ceil(z**2 / delta_over_sigma**2))
+
+
+betas, deltas = [0.05, 0.10, 0.20], [0.5, 1.0, 1.5]  # δ as a multiple of σ
+table = {f"δ = {d}σ": [runs_needed(d, beta=beta) for beta in betas] for d in deltas}
+pd.DataFrame(table, index=pd.Index(betas, name="β"))
+```
+
+At δ = 0.5σ, it gives 52 runs for β = 0.05 and 32 for β = 0.20, one fewer than NIST's table. N grows with (σ/δ)², so halving the difference you need to detect roughly quadruples the runs.
 
 ## Variation over time and across units
 
@@ -112,6 +208,46 @@ Points inside the limits must also form a random pattern.[^nist-control-charts] 
 
 Compute the first limits from past data, investigate the points outside them, and recompute. NIST calls that Phase I, and monitoring against the resulting limits Phase II.[^nist-spc] After that, change the limits only for a compelling reason, such as 30 more points with no process change, or a major change to the process.[^nist-variables-charts]
 
+Suppose a production test measures the output voltage of each 5 V power supply it tests. Simulate 80 units, with the process mean 0.015 V higher from unit 61 on. The first 50 units set the limits, in Phase I, and units 51 to 80 are monitored against them, in Phase II:
+
+```{code-cell} ipython3
+rng = np.random.default_rng(11)
+volts = rng.normal(5.008, 0.012, size=80)  # each unit's simulated output voltage, V
+volts[60:] += 0.015  # the process mean rises from unit 61 on
+phase1 = volts[:50]  # Phase I: the first 50 units set the limits
+
+center = phase1.mean()
+mr_bar = np.abs(np.diff(phase1)).mean()  # the average moving range, MR̄
+ucl, lcl = center + 3 * mr_bar / 1.128, center - 3 * mr_bar / 1.128
+print(f"center line {center:.3f} V, UCL {ucl:.3f} V, LCL {lcl:.3f} V")
+```
+
+Check every unit against two of the rules: a point beyond the limits, and eight in a row on one side of the center line.
+
+```{code-cell} ipython3
+unit = np.arange(1, len(volts) + 1)
+beyond = unit[(volts > ucl) | (volts < lcl)]
+side = np.sign(volts - center)  # +1 above the center line, −1 below
+# A window of eight units that are all on one side sums to ±8. Flag the eighth unit.
+run_of_8 = unit[7:][np.abs(np.convolve(side, np.ones(8), "valid")) == 8]
+print(f"beyond the limits: units {beyond}")
+print(f"eighth in a row on one side: units {run_of_8}")
+```
+
+```{code-cell} ipython3
+fig, ax = plt.subplots()
+ax.plot(unit, volts, ".-", label="unit")
+ax.plot(beyond, volts[beyond - 1], "o", fillstyle="none", label="beyond the limits")
+ax.axhline(center, color="C1", label="center line")
+ax.axhline(ucl, color="C1", linestyle="--", label="control limits")
+ax.axhline(lcl, color="C1", linestyle="--")
+ax.axvline(50.5, color="grey", linestyle=":")  # the end of Phase I
+ax.set(xlabel="Unit", ylabel="Output voltage (V)")
+ax.legend(loc="lower left", bbox_to_anchor=(0, 1), ncols=4);  # above the plot
+```
+
+In Phase I, left of the dotted line, no point is beyond the limits, and no eight in a row are on one side of the center line. After the mean rises at unit 61, the eight-in-a-row rule flags unit 67, eight units before unit 75 falls beyond the UCL.
+
 Control limits aren't test limits. Control limits show whether the process is consistent, and specification limits show whether the product will work.[^nist-variables-charts] In control only means predictable: the process can still be off target or too variable.[^nist-in-control]
 
 ### Process capability
@@ -124,6 +260,18 @@ Cpk = min[ (USL − μ) / 3σ, (μ − LSL) / 3σ ]
 ```
 
 Cp compares widths only. Cpk also accounts for a mean that's off center, and is never larger than Cp. With only an upper limit, use Cpu = (USL − μ) / 3σ. The indices assume normal data, and need about 50 independent values. For a centered process, a Cp of 1.00 means 0.27% rejects, and a Cp of 1.33 means 64 parts per million.[^nist-capability]
+
+Suppose the power supplies in the control chart above have test limits of 4.95 and 5.05 V. Estimate μ and σ from the 50 units of Phase I, which the chart showed in control, with their mean and their standard deviation, s:[^nist-capability]
+
+```{code-cell} ipython3
+lsl, usl = 4.95, 5.05  # test limits, V
+mu, sigma = phase1.mean(), phase1.std(ddof=1)
+cp = (usl - lsl) / (6 * sigma)
+cpk = min(usl - mu, mu - lsl) / (3 * sigma)
+print(f"mean {mu:.4f} V, s {sigma:.4f} V, Cp {cp:.2f}, Cpk {cpk:.2f}")
+```
+
+Cpk is smaller than Cp, because the mean is above 5.00 V, the center of the test limits, and so closer to the USL.
 
 ### Measurement system analysis
 
@@ -199,18 +347,24 @@ On this stand, temperature does affect the responses. The dyno calculates torque
 
 To break the link, randomize the order within each replicate, so that no test point's conditions depend on the one before.[^nist-doe-glossary] The sequence can't shuffle its points, so a randomized design needs a script that commands them in your order:
 
-```python
-import itertools
-import random
-
+```{code-cell} ipython3
 speeds = [500, 750, 1000, 1250, 1500]  # DUT speed, RPM
 loads = [0.25, 0.75, 1.25]  # torque on each load motor, Nm
+# The full factorial: every combination of speed and load, 15 test points
 points = list(itertools.product(speeds, loads))
 
+rng = np.random.default_rng(503)  # a fixed seed, so you can reproduce the order
+plan = []
 for block in range(1, 4):
-    order = random.sample(points, k=len(points))  # a new order for each block
-    for speed, load in order:
-        print(f"block {block}: {speed} RPM at {load} Nm")  # save this with the run's data
+    order = rng.permutation(len(points))  # a new order for each block
+    for position, i in enumerate(order, start=1):
+        plan.append((block, position, *points[i]))
+# Save this with the run's data.
+plan = pd.DataFrame(plan, columns=["block", "position", "speed", "load"])
+
+# Each column is one block's order.
+labels = plan["speed"].astype(str) + " RPM, " + plan["load"].astype(str) + " Nm"
+plan.assign(point=labels).pivot(index="position", columns="block", values="point")
 ```
 
 ### Blocks and replicates
@@ -234,24 +388,38 @@ Suppose the four corner test points of one block give these mean DUT input power
 | 0.25 Nm | 40.0 | 110.0 |
 | 1.25 Nm | 55.0 | 155.0 |
 
-Speed's main effect is the average at 1,500 RPM minus the average at 500 RPM: 132.5 − 47.5 = 85.0 W. Load's is 105.0 − 75.0 = 30.0 W. But load adds 15.0 W at 500 RPM and 45.0 W at 1,500 RPM. The effect of load depends on speed, which is an interaction, and a plot against load would show two lines that aren't parallel. Some of it is expected: the dyno's manual calculates absorbed power as torque times angular speed, so the same load absorbs three times the power at three times the speed.
+```{code-cell} ipython3
+# Mean DUT input power at the corner test points, W.
+# A row for each load, Nm, and a column for each speed, RPM.
+power = pd.DataFrame({500: [40.0, 55.0], 1500: [110.0, 155.0]}, index=[0.25, 1.25])
 
-```mermaid
----
-config:
-  themeVariables:
-    xyChart:
-      plotColorPalette: "#2a78d6,#eb6834,transparent"
----
-xychart-beta
-    title "Mean DUT input power at 1,500 RPM (upper line) and 500 RPM (lower line)"
-    x-axis "Load" ["0.25 Nm", "1.25 Nm"]
-    y-axis "Input power (W)" 0 --> 160
-    line [110.0, 155.0]
-    line [40.0, 55.0]
-    %% an invisible bar series keeps the lines' ends off the chart's edges
-    bar [0, 0]
+at_speed = power.mean(axis="index")  # average over load, at each speed
+at_load = power.mean(axis="columns")  # average over speed, at each load
+speed_effect = at_speed[1500] - at_speed[500]
+load_effect = at_load[1.25] - at_load[0.25]
+load_at_speed = power.loc[1.25] - power.loc[0.25]  # the effect of load at each speed
+print(f"speed: {at_speed[1500]:.1f} − {at_speed[500]:.1f} = {speed_effect:.1f} W")
+print(f"load: {at_load[1.25]:.1f} − {at_load[0.25]:.1f} = {load_effect:.1f} W")
+for speed, effect in load_at_speed.items():
+    print(f"load at {speed:,} RPM: {effect:.1f} W")
 ```
+
+Speed's main effect is the average at 1,500 RPM minus the average at 500 RPM: 132.5 − 47.5 = 85.0 W. Load's is 105.0 − 75.0 = 30.0 W. But load adds 15.0 W at 500 RPM and 45.0 W at 1,500 RPM. The effect of load depends on speed, which is an interaction, and a plot against load shows two lines that aren't parallel. Some of it is expected: the dyno's manual calculates absorbed power as torque times angular speed, so the same load absorbs three times the power at three times the speed.
+
+```{code-cell} ipython3
+fig, (ax_speed, ax_load, ax_both) = plt.subplots(1, 3, sharey=True, figsize=(9, 3.2))
+ax_speed.plot(at_speed.index, at_speed, "o-")
+ax_speed.set(title="Speed", xlabel="Speed (RPM)", ylabel="Mean input power (W)")
+ax_speed.set_ylim(0, 170)  # from 0, so the slopes compare fairly
+ax_load.plot(at_load.index, at_load, "o-")
+ax_load.set(title="Load", xlabel="Load on each load motor (Nm)")
+for speed in power.columns:
+    ax_both.plot(power.index, power[speed], "o-", label=f"{speed:,} RPM")
+ax_both.set(title="Load at each speed", xlabel="Load on each load motor (Nm)")
+ax_both.legend();
+```
+
+The two main effects, left and middle, show only that input power rises with speed and with load. The right plot shows the interaction: the line for 1,500 RPM rises three times as much as the line for 500 RPM.
 
 Five speeds and three loads also let you fit curvature in both factors, which two levels can't.[^nist-rsm] Use the replicates to test whether each effect and interaction is significantly different from 0.[^nist-doe-what]
 
