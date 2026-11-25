@@ -12,3 +12,13 @@ def test_set_plotly_style_registers_the_template():
         assert pio.templates.default == f"plotly_white+{TEMPLATE}"
     finally:
         pio.templates.default = previous
+
+
+def test_set_matplotlib_style_sets_the_colors():
+    mpl = pytest.importorskip("matplotlib")
+    from learning.style import COLORS, set_matplotlib_style
+
+    with mpl.rc_context():
+        set_matplotlib_style()
+        assert mpl.rcParams["axes.prop_cycle"].by_key()["color"][0] == COLORS[0]
+        assert mpl.rcParams["figure.facecolor"] == "none"

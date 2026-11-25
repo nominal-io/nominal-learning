@@ -46,6 +46,10 @@ notebooks = [
     "pandas>=2.2",
     "matplotlib>=3.10",
     "scikit-rf>=1.8",
+    "scipy>=1.14",
+    "pyarrow>=18",
+    "h5py>=3.12",
+    "pyvisa-sim>=0.6",
     "instro",
     "nominal-learning[all,plotly]",
 ]

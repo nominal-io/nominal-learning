@@ -1,6 +1,7 @@
 """Sphinx config for the Nominal Learning docs."""
 
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -42,11 +43,23 @@ nb_execution_cache_path = str(HERE / "_build" / ".jupyter_cache")
 nb_execution_raise_on_error = True
 nb_execution_show_tb = True  # print a failing cell's traceback, not only the log file's path
 nb_execution_timeout = 600  # per cell; uploads wait for Nominal to ingest the data
-# The notebooks under guides/ create resources in the Nominal workspace of the "default" profile, so
-# a build runs them only when asked: set LEARNING_RUN_NOTEBOOKS=1. Otherwise they render with their
-# code and no outputs. The sample data pages under reference/ need no profile, so they always run.
+
+
+def _connects_to_nominal(path: Path) -> bool:
+    """Whether a page's code cells connect to Nominal with a profile. Plain ```python blocks don't run."""
+    cells = re.findall(r"^```\{code-cell\}[^\n]*\n(.*?)^```", path.read_text(encoding="utf-8"), re.M | re.S)
+    return any("from_profile(" in cell for cell in cells)
+
+
+# Notebooks that connect to Nominal create resources in the workspace of the "default" profile, so a
+# build runs them only when asked: set LEARNING_RUN_NOTEBOOKS=1. Otherwise they render with their code
+# and no outputs. Every other notebook, such as the guides and the sample data pages, always runs.
 if not os.environ.get("LEARNING_RUN_NOTEBOOKS"):
-    nb_execution_excludepatterns = ["guides/*.md", "guides/*/*.md"]
+    nb_execution_excludepatterns = [
+        path.relative_to(HERE).as_posix()
+        for path in HERE.rglob("*.md")
+        if "_build" not in path.parts and _connects_to_nominal(path)
+    ]
 
 # Run the notebooks in this environment's kernel. A `python3` kernel in the user's own Jupyter folder
 # would otherwise win, and it can point at another project's environment.
