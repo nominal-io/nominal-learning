@@ -5,6 +5,7 @@ import re
 import sys
 from pathlib import Path
 
+from jupyter_cache.cache.db import create_db
 from nominal_sphinx_theme import intersphinx, theme_options
 
 HERE = Path(__file__).resolve().parent
@@ -43,6 +44,10 @@ nb_execution_cache_path = str(HERE / "_build" / ".jupyter_cache")
 nb_execution_raise_on_error = True
 nb_execution_show_tb = True  # print a failing cell's traceback, not only the log file's path
 nb_execution_timeout = 600  # per cell; uploads wait for Nominal to ingest the data
+# Create the cache's database here, once, before a parallel build's workers start: each worker
+# creates it if it's missing, and on a fresh checkout two of them can try at the same moment.
+Path(nb_execution_cache_path).mkdir(parents=True, exist_ok=True)
+create_db(nb_execution_cache_path)
 
 
 def _connects_to_nominal(path: Path) -> bool:
