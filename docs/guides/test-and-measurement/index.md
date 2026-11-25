@@ -8,6 +8,16 @@ Acquiring, measuring and validating real-world data from physical systems.
 :gutter: 4
 :margin: 4 0 0 0
 
+:::{grid-item-card} Bench bring-up with instro
+:link: bench-bringup
+:link-type: doc
+:img-top: /_static/thumbnails/bench-bringup.svg
+:img-alt: A DMM reading 12 V, then 5 V once its leads move to the 5 V rail
+:class-card: category-card
+
+Connect three simulated instruments to Nominal through instro, and use their live data to find a wiring mistake.
+:::
+
 :::{grid-item-card} Sensors and instrumentation
 :link: /guides/sensors-and-instrumentation
 :link-type: doc
@@ -36,15 +46,5 @@ Accuracy, resolution, noise and sampling, with an error budget for a pressure re
 :class-card: category-card
 
 Design testing versus production testing, the V-model, HiL and SiL, and where tests come from.
-:::
-
-:::{grid-item-card} Bench bring-up with instro
-:link: bench-bringup
-:link-type: doc
-:img-top: /_static/thumbnails/bench-bringup.svg
-:img-alt: A DMM reading 12 V, then 5 V once its leads move to the 5 V rail
-:class-card: category-card
-
-Connect three simulated instruments to Nominal through instro, and use their live data to find a wiring mistake.
 :::
 ::::
