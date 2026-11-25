@@ -1,7 +1,19 @@
+---
+jupytext:
+  text_representation:
+    format_name: myst
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
 # Sensors and instrumentation
 
 {.lead}
 A machine, a plant or a test stand measures with sensors and acts with actuators. Each one is either wired to a DAQ as a bare signal, or built into an instrument that exchanges messages with the computer.
+
+{download}`Download this page as a notebook <sensors-and-instrumentation.md>` to run its code in JupyterLab. [Running the notebooks](notebooks/running.md) explains how to set it up.
 
 ## Two ways in: wired to a DAQ, or through an instrument
 
@@ -49,13 +61,70 @@ Current loops suit industrial sites for two reasons:[^ni-current-loop]
 
 A two-wire transducer takes its power from the loop itself. The WIKA A-10 pressure transducer, for example, runs from an 8–30 V supply and draws no more than 25 mA, its signal current.[^wika-a10]
 
-To scale a 4–20 mA reading to a value, use the transducer's range:
+To scale a 4–20 mA reading to a value, use the transducer's range. For `p_1`, a 0–100 psig transducer, 12 mA is 50 psig, and 17.6 mA is 85 psig:
 
-```text
-value = low + (current − 4 mA) ÷ 16 mA × (high − low)
+```{code-cell} ipython3
+import matplotlib.pyplot as plt
+import numpy as np
+
+from learning.style import set_matplotlib_style
+
+set_matplotlib_style()
+
+
+def scale_4_20(current_ma, low, high):
+    """Scale a 4–20 mA reading to a value in the transducer's range, low to high."""
+    return low + (current_ma - 4) / 16 * (high - low)
+
+
+for current_ma in [12, 17.6]:
+    print(f"{current_ma} mA is {scale_4_20(current_ma, 0, 100):.0f} psig")  # p_1
 ```
 
-For `p_1`, a 0–100 psig transducer, 12 mA is 50 psig, and 17.6 mA is 85 psig.
+Simulate a minute of `p_1`, read 10 times a second. The line starts vented, it's pressurized to 85 psig at 10 s, and a wire breaks at 40 s:
+
+```{code-cell} ipython3
+rng = np.random.default_rng(42)
+t = np.arange(600) / 10  # s, 10 readings a second
+# Vented until 10 s, then the pressure rises to 85 psig.
+pressure = np.where(t < 10, 0.0, 85 * (1 - np.exp(-(t - 10) / 3)))
+current = 4 + pressure / 100 * 16  # mA, what the transducer sends
+current += rng.normal(0, 0.01, t.size)  # noise in the reading
+current[t >= 40] = 0.0  # the wire breaks, so no current flows
+```
+
+Scaled as it is, 0 mA reads −25 psig. A reading far below the 4 mA live zero is outside the transducer's range, so check for it before scaling, and treat it as a fault, not a pressure. NAMUR's recommendation NE 43 draws the line at 3.6 mA: a current at or below it is failure information, not a measurement.[^namur-ne43]
+
+```{code-cell} ipython3
+FAULT_AT_OR_BELOW_MA = 3.6  # NAMUR NE 43's failure limit
+
+scaled = scale_4_20(current, 0, 100)
+fault = current <= FAULT_AT_OR_BELOW_MA
+p_1 = np.where(fault, np.nan, scaled)  # no value while the loop is broken
+
+for seconds in [5, 30, 50]:
+    i = seconds * 10
+    print(
+        f"{seconds} s: {current[i]:.2f} mA, {scaled[i]:.1f} psig, fault {fault[i]}"
+    )
+```
+
+In the plot, compare the vented line with the broken wire. While the line is vented, the loop carries 4 mA, and `p_1` reads 0 psig. After the wire breaks, the loop carries 0 mA, and the check reports a fault instead of a value. If the range started at 0 mA, the broken wire would read 0 psig, the same as a vented line.
+
+```{code-cell} ipython3
+fig, (ax_i, ax_p) = plt.subplots(
+    2, 1, sharex=True, figsize=(8, 5), layout="constrained"
+)
+ax_i.plot(t, current)
+ax_i.axhline(4, color="gray", linestyle="--", linewidth=1)  # the live zero
+ax_i.set_ylabel("Current (mA)")
+ax_p.plot(t, scaled, color="gray", linestyle="--", label="Scaled without the check")
+ax_p.plot(t, p_1, label="p_1, with the check")
+ax_p.axvspan(40, 60, color="red", alpha=0.15, label="Fault: loop broken")
+ax_p.set_xlabel("Time (s)")
+ax_p.set_ylabel("Pressure (psig)")
+ax_p.legend(loc="upper left", bbox_to_anchor=(1, 1));
+```
 
 Outputs can use the same signal. The fluids panel commands its proportional valve, `v_2`, with a 4–20 mA output.
 
@@ -129,12 +198,47 @@ The dyno has no torque sensor, so its software calculates each motor's torque fr
 | Left load motor | 3.812 Nm at 20 A | 0.191 Nm/A |
 | Right load motor | 3.800 Nm at 20 A | 0.190 Nm/A |
 
+Each constant is the torque at maximum current divided by that current:
+
+```{code-cell} ipython3
+max_torque = {  # motor: (torque at maximum current in Nm, maximum current in A)
+    "DUT": (27.503, 35),
+    "Left load motor": (3.812, 20),
+    "Right load motor": (3.800, 20),
+}
+constant = {motor: nm / amps for motor, (nm, amps) in max_torque.items()}
+for motor, nm_per_a in constant.items():
+    print(f"{motor}: {nm_per_a:.3f} Nm/A, {10 * nm_per_a:.2f} Nm at 10 A")
+```
+
 A load motor drawing 10 A is producing about 1.9 Nm. That calculation carries two kinds of error:
 
 - Every error in the current measurement passes straight through to torque.
 - The constant is a property of the motor, and it doesn't account for friction or losses between the motor and the load. A torque sensor on the shaft would measure what reaches the load.
 
-Because torque is current times a constant, each motor's torque and current channels always move together.
+Because torque is current times a constant, each motor's torque and current channels always move together. Calculate the left load motor's torque channel from a simulated current channel, read about 16 times a second like the dyno's motor controllers:
+
+```{code-cell} ipython3
+rng = np.random.default_rng(16)
+t = np.arange(480) / 16  # s, 30 s at 16 readings a second
+current_a = 5.0 * (1 + t // 10)  # the current steps from 5 A to 10 A to 15 A
+current_a += rng.normal(0, 0.1, t.size)  # noise in the current measurement
+torque_nm = constant["Left load motor"] * current_a  # the derived torque channel
+
+fig, ax_i = plt.subplots()
+ax_i.plot(t, current_a, label="Current")
+ax_i.set_xlabel("Time (s)")
+ax_i.set_ylabel("Current (A)")
+ax_i.set_ylim(0, 20)
+ax_t = ax_i.twinx()  # torque on the right
+ax_t.plot(t, torque_nm, color="gray", linestyle="--", label="Torque")
+ax_t.set_ylim(0, 20 * constant["Left load motor"])  # 20 A lines up with its torque
+ax_t.set_ylabel("Torque (Nm)")
+ax_t.grid(False)
+fig.legend(loc="upper left", bbox_to_anchor=(0.1, 0.9));
+```
+
+The dashed torque line lies on the current line, noise included, because the torque channel is the current channel times 0.191 Nm/A.
 
 ## Choosing a sensor
 
@@ -157,6 +261,7 @@ When you choose a sensor, check:
 ## References
 
 [^ni-current-loop]: NI, ["4-20 mA Current Loop Fundamentals, System Design, and Setup"](https://www.ni.com/white-paper/6940/en/), updated 2025-02-03. Retrieved 2026-11-12.
+[^namur-ne43]: Beckhoff, ["NAMUR basic information"](https://infosys.beckhoff.com/content/1033/ioanalogmanual/3904850187.html), showing the boundaries from NAMUR recommendation NE 43, version of 03/02/2003. Retrieved 2026-11-25.
 [^wika-a10]: WIKA, ["Datasheet A-10: Pressure transmitter for general industrial applications"](https://www.transcat.com/media/pdf/Wika_A-10.pdf), 02/2008, US edition, hosted by Transcat. Retrieved 2026-11-12.
 [^ni-temperature]: NI, ["Measuring Temperature with Thermocouples, RTDs, and Thermistors"](https://www.ni.com/en/shop/data-acquisition/sensor-fundamentals/measuring-temperature-with-thermocouples-rtds-and-thermistors.html). Retrieved 2026-11-12.
 [^ni-strain]: NI, ["Measuring Strain with Strain Gages"](https://www.ni.com/en/shop/data-acquisition/sensor-fundamentals/measuring-strain-with-strain-gages.html). Retrieved 2026-11-12.
