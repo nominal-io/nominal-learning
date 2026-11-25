@@ -68,8 +68,6 @@ guides/safety
 Overview <guides/communications-and-networking/index>
 guides/communications
 guides/network-performance
-guides/communications-and-networking/rf-radio-field-test
-guides/communications-and-networking/sigmf-stream
 ```
 
 ```{toctree}
@@ -80,6 +78,8 @@ Overview <guides/signal-processing-and-analysis/index>
 guides/frequency-domain
 guides/statistical-analysis
 guides/signal-processing-and-analysis/flight-sdr
+guides/signal-processing-and-analysis/rf-radio-field-test
+guides/signal-processing-and-analysis/sigmf-stream
 ```
 
 ```{toctree}
