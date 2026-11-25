@@ -1,0 +1,114 @@
+[project]
+name = "nominal-learning"
+version = "0.1.0"
+description = "Nominal's Learning site, and the sample data its notebooks use (learning.data)."
+readme = "README.md"
+requires-python = ">=3.12"
+# learning.data has no dependencies of its own. It imports a format's library on first use; install the
+# extra for the formats you read, such as `nominal-learning[med]`. The notebooks' own dependencies are in
+# the `notebooks` group below.
+dependencies = []
+
+[project.optional-dependencies]
+pandas = ["pandas>=2.0"]
+wfdb = ["wfdb>=4.1", "pandas>=2.0"]
+numpy = ["numpy>=1.26"]
+plotly = ["plotly>=6.0"]
+med = ["nominal-learning[pandas,wfdb]"]
+rf = ["nominal-learning[numpy]"]
+aero = ["nominal-learning[pandas]"]
+all = ["nominal-learning[med,rf,aero]"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/learning"]
+# Fetched files are not in the repo; everything else under the package ships.
+exclude = ["**/__pycache__", "**/*.pyc"]
+
+[dependency-groups]
+docs = [
+    "sphinx>=9.1.0",
+    "shibuya>=2026.7.12",
+    "myst-parser>=5.1.0",
+    # renders the notebooks: MyST Markdown files with a kernelspec in their front matter
+    "myst-nb>=1.4.0",
+    "sphinx-design>=0.7.0",
+    "sphinx-copybutton>=0.5.2",
+    "nominal-sphinx-theme",
+]
+# What the notebooks import. Add a notebook's dependencies here when you add the notebook.
+notebooks = [
+    "nominal",
+    "numpy>=2.2",
+    "pandas>=2.2",
+    "matplotlib>=3.10",
+    "scikit-rf>=1.8",
+    "instro",
+    "nominal-learning[all,plotly]",
+]
+dev = [
+    "jupyterlab>=4.4",
+    "jupytext>=1.19.6",
+    "mypy>=1.18.2,<2",
+    "pandas-stubs>=2.0",
+    "pytest>=8.3.2,<9",
+    "ruff>=0.12",
+]
+# The generators in gen/
+gen = ["numpy>=1.26", "pandas>=2.0"]
+
+[tool.uv]
+default-groups = ["dev", "docs", "notebooks"]
+# The notebooks use instro's virtual instruments and Nominal publisher, which need none of
+# instro's VISA backends (pyvisa-py) or command line (typer, textual). The thermocouple tables stay:
+# `instro.drivers` imports every category, including DAQ, which imports them.
+# A marker that never matches leaves each one out.
+override-dependencies = [
+    "pyvisa-py; sys_platform == 'never'",
+    "textual; sys_platform == 'never'",
+    "typer; sys_platform == 'never'",
+]
+
+[tool.uv.sources]
+# github.com/nominal-io/nominal-sphinx-theme; uv.lock pins the commit. To update it:
+# `uv lock --upgrade-package nominal-sphinx-theme`
+nominal-sphinx-theme = { git = "https://github.com/nominal-io/nominal-sphinx-theme" }
+# The notebook cards (#1260) and their diagrams (#1272) are on main, but not yet in a release.
+# Switch to the PyPI release once it ships.
+nominal = { git = "https://github.com/nominal-io/nominal-client", branch = "main" }
+# instro's notebook cards and publisher stats (#713) and its flat imports (#724) are merged on one preview
+# branch. Switch to the PyPI release once they ship.
+instro = { git = "https://github.com/nominal-io/instro", branch = "preview/notebook-cards-flat-imports" }
+
+[tool.ruff]
+# Notebook code is formatted at 85 columns, through Jupytext, so it fits the page: see the justfile.
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "D"]
+ignore = ["D100", "D104", "D107"]
+
+[tool.ruff.lint.per-file-ignores]
+# Docstring rules apply to the learning package. The docs extensions and the tests keep their own style.
+"docs/**" = ["D"]
+"tests/**" = ["D", "B018"]  # tests touch lazy properties to trigger them
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+strict = true
+packages = ["learning"]
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["wfdb.*", "plotly.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["network: downloads real files; run with `-m network`"]
+addopts = "-m 'not network'"

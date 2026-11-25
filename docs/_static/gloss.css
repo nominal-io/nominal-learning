@@ -1,0 +1,51 @@
+/* Glossary terms ({gloss}): body-colored text followed by a small muted info mark, as tall as a lowercase
+   letter and on the baseline, and a help cursor, so they read as "hover for a definition" rather than as
+   links to more content. The mark darkens on hover. A click still opens the glossary entry. */
+.yue a.reference.gloss {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+  white-space: nowrap; /* keeps the mark on the term's line */
+  cursor: help;
+}
+
+.yue a.reference.gloss::after {
+  content: "";
+  display: inline-block;
+  width: 0.68em;
+  height: 0.68em;
+  margin-left: 0.2em;
+  vertical-align: -0.05em;
+  background-color: var(--sy-c-light);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4M12 8h.01'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.yue a.reference.gloss:hover::after,
+.yue a.reference.gloss:focus-visible::after {
+  background-color: var(--sy-c-text);
+}
+
+/* The popup with a term's summary and a link to its entry (gloss.js) */
+.gloss-tip {
+  position: absolute;
+  z-index: 9; /* under the header, as Shibuya's own dropdowns are */
+  width: max-content;
+  max-width: min(22rem, calc(100vw - 2rem));
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--sy-c-border);
+  border-radius: 6px;
+  background: var(--sy-c-background);
+  box-shadow: var(--sy-dropdown-shadow);
+  color: var(--sy-c-text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.gloss-tip a {
+  color: var(--sy-c-link);
+  text-decoration: underline;
+}
+
+.gloss-tip a:hover {
+  color: var(--sy-c-link-hover);
+}

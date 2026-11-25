@@ -1,0 +1,28 @@
+/* pandas right-aligns a DataFrame's headers, and the theme left-aligns table cells. */
+.yue table.dataframe th,
+.yue table.dataframe td {
+  text-align: right;
+}
+
+/* Click an image on a page to fill the window with it; click again (or press Esc) to go back.
+   image-zoom.js adds the overlay. */
+.yue img:not(.sp-gallery img) {
+  cursor: zoom-in;
+}
+.image-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.85);
+  cursor: zoom-out;
+}
+.image-zoom img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  cursor: zoom-out;
+}
