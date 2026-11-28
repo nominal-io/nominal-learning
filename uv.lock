@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.15' and sys_platform == 'win32'",
@@ -2518,7 +2518,7 @@ dependencies = [
     { name = "ffmpeg-python" },
     { name = "nominal-api" },
     { name = "nominal-api-protos" },
-    { name = "nominal-streaming", marker = "(platform_machine == 'arm64' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'arm64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'armv7l' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'x86_64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'AMD64' and platform_python_implementation == 'CPython' and sys_platform == 'win32')" },
+    { name = "nominal-streaming", marker = "platform_machine == 'arm64' and platform_python_implementation == 'CPython' and (sys_platform == 'darwin' or sys_platform == 'linux') or (platform_machine == 'aarch64' or platform_machine == 'armv7l' or platform_machine == 'x86_64') and platform_python_implementation == 'CPython' and sys_platform == 'linux' or platform_machine == 'AMD64' and platform_python_implementation == 'CPython' and sys_platform == 'win32'" },
     { name = "pandas" },
     { name = "polars" },
     { name = "python-dateutil" },
@@ -2561,6 +2561,7 @@ wheels = [
 name = "nominal-learning"
 version = "0.1.0"
 source = { editable = "." }
+default-groups = ["dev", "docs", "notebooks"]
 
 [package.optional-dependencies]
 aero = [
@@ -2684,7 +2685,7 @@ notebooks = [
 [[package]]
 name = "nominal-sphinx-theme"
 version = "0.1.0"
-source = { git = "https://github.com/nominal-io/nominal-sphinx-theme#0282fea5b7620d9ff88ba03446d19921c8718062" }
+source = { git = "https://github.com/nominal-io/nominal-sphinx-theme#a8d27a0d829826939612c26926257ce5a83090af" }
 dependencies = [
     { name = "myst-parser" },
     { name = "shibuya" },
